@@ -1,0 +1,17 @@
+{
+  "name": "airframe",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "ts-node --esm src/main.ts"
+  },
+  "dependencies": {
+    "ethers": "^6.6.4",
+    "typescript": "^5.1.6",
+    "ts-node": "^10.9.1"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.1.0",
+    "@typescript-eslint/parser": "^6.1.0",
+    "eslint": "^8.45.0"
+  }
+}
