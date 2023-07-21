@@ -1,5 +1,5 @@
 import {Chain} from "../config/chains";
-import {WalletI} from "./wallet";
+import {TxResult, WalletI} from "./wallet";
 import {Randomness} from "./actions";
 import {getActivitiesGenerator} from "./activity_generators";
 
@@ -13,29 +13,21 @@ export abstract class BlockchainModule {
         this.activities = activities;
     }
 
-    async doActivities(wallet: WalletI, activities: Activity[], randomOrder: Randomness): Promise<void> {
+    async doActivities(wallet: WalletI, activityNames: string[], randomOrder: Randomness): Promise<void> {
+        const activities: Activity[] = this.activities.filter(activity => activityNames.includes(activity.name))
         const txsGen = getActivitiesGenerator(activities, randomOrder)
         for (const activityTx of txsGen) {
-            const interactions = activityTx.tx(wallet)
+            const interactions: TxInteraction[] = activityTx.tx(wallet)
             for (const tx of interactions) {
-                await wallet
-                    .sendTransaction(tx)
-                    .catch(reason => {
-                            console.log(`[ERROR] Activity ${activityTx.activityName}. Tx: ${tx}. Reason: ${reason}`)
-                            console.log("Retrying tx...")
-                            wallet
-                                .sendTransaction(tx)
-                                .catch(failedRetryReason =>
-                                    console.log(`[ERROR RETRYING] Reason: ${failedRetryReason}. Shutdown.`)
-                                )
-                        }
-
-                    )
-
+                let txResult: TxResult = await wallet.sendTransaction(tx, 1)
+                if (txResult === TxResult.Fail) {
+                    console.log("Transaction failed")
+                    // i don't want to put it to the end of the queue, because it may cause side effects
+                }
             }
         }
 
-        console.log(`All done.`)
+        console.log(wallet.getAddress(), this.chain.title, "All activities done")
     }
 }
 
