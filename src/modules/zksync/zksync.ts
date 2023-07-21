@@ -5,21 +5,13 @@ import {WalletI} from "../../classes/wallet";
 import {Randomness} from "../../classes/actions";
 
 
-class ZksyncModule implements BlockchainModule {
-    chain: Chain;
-    activities: Activity[];
-
+class ZksyncModule extends BlockchainModule {
     constructor(chain: Chain, activities: Activity[]) {
-        this.chain = chain;
-        this.activities = activities;
+        super(chain, activities);
     }
 
-    doActivities(wallet: WalletI, activityNames: string[], randomOrder: Randomness): Promise<void> {
-        // randomized order of activityNames
-        // pick first Interaction from random Activity
-        // execute Interaction and drop it
-        // repeat until all Interactions are executed
-        return Promise.resolve(undefined);
+    async doActivities(wallet: WalletI, activities: Activity[], randomOrder: Randomness): Promise<void> {
+        return super.doActivities(wallet, activities, randomOrder); // TODO: change to custom zksync logic
     }
 }
 
