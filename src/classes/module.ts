@@ -1,7 +1,7 @@
 import {Chain} from "../config/chains";
 import {TxResult, WalletI} from "./wallet";
 import {Randomness} from "./actions";
-import {getActivitiesGenerator} from "./activity_generators";
+import {getActivitiesGenerator} from "../utils/activity_generators";
 
 
 export abstract class BlockchainModule {
@@ -13,7 +13,7 @@ export abstract class BlockchainModule {
         this.activities = activities;
     }
 
-    async doActivities(wallet: WalletI, activityNames: string[], randomOrder: Randomness): Promise<void> {
+    async doActivities(wallet: WalletI, activityNames: string[], randomOrder: Randomness): Promise<boolean> {
         const activities: Activity[] = this.activities.filter(activity => activityNames.includes(activity.name))
         const txsGen = getActivitiesGenerator(activities, randomOrder)
         for (const activityTx of txsGen) {
@@ -23,11 +23,14 @@ export abstract class BlockchainModule {
                 if (txResult === TxResult.Fail) {
                     console.log("Transaction failed")
                     // i don't want to put it to the end of the queue, because it may cause side effects
+                    // need to think about other options
+                    return false
                 }
             }
         }
 
         console.log(wallet.getAddress(), this.chain.title, "All activities done")
+        return true
     }
 }
 
