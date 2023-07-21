@@ -1,7 +1,8 @@
+import {TxInteraction} from "./module";
 
 
 export interface WalletI {
-    sendTransaction(): Promise<void>
+    sendTransaction(tx: TxInteraction): Promise<void>
 }
 
 export class Wallet implements WalletI{
@@ -11,7 +12,7 @@ export class Wallet implements WalletI{
     }
 
 
-    async sendTransaction() {
+    async sendTransaction(tx: TxInteraction) {
 
     }
 }
