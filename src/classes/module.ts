@@ -2,6 +2,7 @@ import {Chain} from "../config/chains";
 import {TxResult, WalletI} from "./wallet";
 import {Randomness} from "./actions";
 import {getActivitiesGenerator} from "../utils/activity_generators";
+import {ActivityTag} from "../task";
 
 
 export abstract class BlockchainModule {
@@ -13,13 +14,13 @@ export abstract class BlockchainModule {
         this.activities = activities;
     }
 
-    async doActivities(wallet: WalletI, activityNames: string[], randomOrder: Randomness): Promise<boolean> {
+    async doActivities(wallet: WalletI, activityNames: ActivityTag[], randomOrder: Randomness): Promise<boolean> {
         const activities: Activity[] = this.activities.filter(activity => activityNames.includes(activity.name))
         const txsGen = getActivitiesGenerator(activities, randomOrder)
         for (const activityTx of txsGen) {
             const interactions: TxInteraction[] = activityTx.tx(wallet)
             for (const tx of interactions) {
-                let txResult: TxResult = await wallet.sendTransaction(tx, 1)
+                let txResult: TxResult = await wallet.sendTransaction(tx, 1, this.chain)
                 if (txResult === TxResult.Fail) {
                     console.log("Transaction failed")
                     // i don't want to put it to the end of the queue, because it may cause side effects
@@ -45,7 +46,7 @@ export class ActivityTx {
 }
 
 export interface Activity {
-    name: string
+    name: ActivityTag
     txs: ((wallet: WalletI) => TxInteraction[])[]
 }
 

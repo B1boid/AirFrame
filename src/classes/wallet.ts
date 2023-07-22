@@ -2,6 +2,7 @@ import {TxInteraction} from "./module";
 import {sleep} from "../utils/utils";
 import {AbstractProvider, ethers, getDefaultProvider} from "ethers";
 import {Blockchains} from "../module_blockchains/blockchain_modules";
+import {Chain} from "../config/chains";
 
 
 export enum TxResult {
@@ -27,7 +28,7 @@ export interface WalletI {
 
     getAddress(): string
     getWithdrawAddress(): string | null
-    sendTransaction(tx: TxInteraction, maxRetries: number, chain: Blockchains): Promise<TxResult>
+    sendTransaction(tx: TxInteraction, maxRetries: number, chain: Chain): Promise<TxResult>
 }
 
 export class Wallet implements WalletI {
@@ -47,8 +48,8 @@ export class Wallet implements WalletI {
         return this.withdrawAddress
     }
 
-    async sendTransaction(txInteraction: TxInteraction, maxRetries: number = 1, chain: Blockchains): Promise<TxResult> {
-        const provider: AbstractProvider = getDefaultProvider(chain)
+    async sendTransaction(txInteraction: TxInteraction, maxRetries: number = 1, chain: Chain): Promise<TxResult> {
+        const provider: AbstractProvider = getDefaultProvider(chain.title)
         const curSigner: ethers.Wallet = this.signer.connect(provider)
 
         const gasLimit = await provider.estimateGas({
@@ -59,7 +60,7 @@ export class Wallet implements WalletI {
         });
 
         for (let retry = 0; retry < maxRetries + 1; retry++) {
-            const result: TxResult = await this._sendTransaction(curSigner, txInteraction, chain,
+            const result: TxResult = await this._sendTransaction(curSigner, txInteraction,
                 Number(gasLimit) + TX_LOGIC_BY_TRY[retry].addGasLimit)
             switch (result) {
                 case TxResult.Success:
@@ -75,8 +76,8 @@ export class Wallet implements WalletI {
     }
 
 
-    private async _sendTransaction(curSigner: ethers.Wallet, txInteraction: TxInteraction,
-                                   chain: Blockchains, gasLimit: number): Promise<TxResult> {
+    private async _sendTransaction(curSigner: ethers.Wallet, txInteraction: TxInteraction
+                                   , gasLimit: number): Promise<TxResult> {
         const tx = await curSigner.sendTransaction({
             to: txInteraction.to,
             data: txInteraction.data,
@@ -85,7 +86,7 @@ export class Wallet implements WalletI {
         })
 
         console.log("Mining transaction...");
-        console.log(`https://${chain}.etherscan.io/tx/${tx.hash}`);
+        console.log(`TxHash: ${tx.hash}`);
 
         const receipt = await tx.wait();
 

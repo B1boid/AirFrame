@@ -1,5 +1,5 @@
 import {Chain, zkSyncChain} from "../../config/chains";
-import {Activity, BlockchainModule} from "../../classes/module";
+import {Activity, ActivityTag, ActivityTx, BlockchainModule} from "../../classes/module";
 import {zksyncProject1, zksyncProject2} from "./activities";
 import {WalletI} from "../../classes/wallet";
 import {Randomness} from "../../classes/actions";
@@ -10,7 +10,7 @@ class ZkSyncModule extends BlockchainModule {
         super(chain, activities);
     }
 
-    async doActivities(wallet: WalletI, activities: string[], randomOrder: Randomness): Promise<boolean> {
+    async doActivities(wallet: WalletI, activities: ActivityTag[], randomOrder: Randomness): Promise<boolean> {
         return super.doActivities(wallet, activities, randomOrder); // TODO: change to custom zksync logic
     }
 }
