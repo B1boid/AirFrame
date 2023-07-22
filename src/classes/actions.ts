@@ -1,7 +1,16 @@
 import {Destination} from "../config/chains";
+import {Connections} from "../module_connections/connection_modules";
+import {Blockchains} from "../modules/blockchain_modules";
 
 export interface Actions {
     actions: (ModuleActions | ConnectionAction)[]
+}
+
+export enum Asset {
+    ETH = "ETH",
+    USDT = "USDT",
+    USDC = "USDC",
+    MATIC = "MATIC"
 }
 
 export enum Randomness {
@@ -11,7 +20,7 @@ export enum Randomness {
 }
 
 export interface ModuleActions {
-    chainName: Destination
+    chainName: Blockchains
     randomOrder: Randomness
     activityNames: string[]
 }
@@ -20,5 +29,7 @@ export interface ModuleActions {
 export interface ConnectionAction {
     from: Destination // chain name or exchange name
     to: Destination // chain name or exchange name
-    connectionName: string
+    asset: Asset
+    amount: number // -1 if fullBalance
+    connectionName: Connections
 }

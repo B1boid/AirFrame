@@ -10,7 +10,7 @@ class ZksyncModule extends BlockchainModule {
         super(chain, activities);
     }
 
-    async doActivities(wallet: WalletI, activities: Activity[], randomOrder: Randomness): Promise<void> {
+    async doActivities(wallet: WalletI, activities: string[], randomOrder: Randomness): Promise<boolean> {
         return super.doActivities(wallet, activities, randomOrder); // TODO: change to custom zksync logic
     }
 }

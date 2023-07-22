@@ -1,6 +1,6 @@
-import {Activity, ActivityTx, TxInteraction} from "./module";
-import {Randomness} from "./actions";
-import {WalletI} from "./wallet";
+import {Activity, ActivityTx, TxInteraction} from "../classes/module";
+import {Randomness} from "../classes/actions";
+import {WalletI} from "../classes/wallet";
 
 function shuffle<T>(array: T[]): T[] {
     let currentIndex = array.length,  randomIndex;
