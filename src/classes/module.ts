@@ -2,7 +2,7 @@ import {Chain} from "../config/chains";
 import {TxResult, WalletI} from "./wallet";
 import {Randomness} from "./actions";
 import {getActivitiesGenerator} from "../utils/activity_generators";
-import {ActivityTag} from "../task";
+import {ActivityTag} from "../module_blockchains/blockchain_modules";
 
 
 export abstract class BlockchainModule {

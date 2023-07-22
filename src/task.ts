@@ -7,12 +7,6 @@ import {Blockchains} from "./module_blockchains/blockchain_modules";
 // Later we will get it from UI, now it's hardcoded for testing
 ////////////////////////////////////////////////////////////////////////
 
-export enum ActivityTag {
-    PolygonProject1 = "polygonProject1",
-    ZkSyncProject1 = "zksyncProject1",
-    ZkSyncProject2 = "zksyncProject2"
-}
-
 const POLYGON_ACTIONS: ModuleActions = {
     chainName: Blockchains.Polygon,
     randomOrder: Randomness.OnlyActivities,
