@@ -1,6 +1,7 @@
 import {Destination} from "../config/chains";
 import {Connections} from "../module_connections/connection_modules";
-import {Blockchains} from "../modules/blockchain_modules";
+import {Blockchains} from "../module_blockchains/blockchain_modules";
+import {ActivityTag} from "../task";
 
 export interface Actions {
     actions: (ModuleActions | ConnectionAction)[]
@@ -15,14 +16,14 @@ export enum Asset {
 
 export enum Randomness {
     No,
-    onlyActivities, // possible  Activity1 -> Activity2 and Activity2 -> Activity1
+    OnlyActivities, // possible  Activity1 -> Activity2 and Activity2 -> Activity1
     Full// strict inside Activity, but possible to mix: act2_Interaction1 -> act1_Interaction1 -> act1_Interaction2 -> act2_Interaction2
 }
 
 export interface ModuleActions {
     chainName: Blockchains
     randomOrder: Randomness
-    activityNames: string[]
+    activityNames: ActivityTag[]
 }
 
 

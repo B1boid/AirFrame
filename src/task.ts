@@ -1,46 +1,46 @@
 import {Actions, Asset, ConnectionAction, ModuleActions, Randomness} from "./classes/actions";
 import {Destination} from "./config/chains";
 import {Connections} from "./module_connections/connection_modules";
-import {Blockchains} from "./modules/blockchain_modules";
+import {Blockchains} from "./module_blockchains/blockchain_modules";
 
 ////////////////////////////////////////////////////////////////////////
 // Later we will get it from UI, now it's hardcoded for testing
 ////////////////////////////////////////////////////////////////////////
 
 const POLYGON_ACTIONS: ModuleActions = {
-    chainName: Blockchains.polygon,
-    randomOrder: Randomness.onlyActivities,
-    activityNames: ["polygonProject1"]
+    chainName: Blockchains.Polygon,
+    randomOrder: Randomness.OnlyActivities,
+    activityNames: [ActivityTag.PolygonProject1]
 }
 
 const ZKSYNC_ACTIONS: ModuleActions = {
-    chainName: Blockchains.zkSync,
-    randomOrder: Randomness.onlyActivities,
-    activityNames: ["zksyncProject1", "zksyncProject2"]
+    chainName: Blockchains.ZkSync,
+    randomOrder: Randomness.OnlyActivities,
+    activityNames: [ActivityTag.ZkSyncProject1, ActivityTag.ZkSyncProject2]
 }
 
 const CONNECTION_OKX_TO_POLYGON: ConnectionAction = {
-    from: Destination.okx,
-    to: Destination.polygon,
+    from: Destination.OKX,
+    to: Destination.Polygon,
     asset: Asset.ETH,
     amount: 0.2,
-    connectionName: Connections.exchange_okx
+    connectionName: Connections.ExchangeOKX
 }
 
 const CONNECTION_ZKSYNC_TO_OKX: ConnectionAction = {
-    from: Destination.zkSync,
-    to: Destination.okx,
+    from: Destination.ZkSync,
+    to: Destination.OKX,
     asset: Asset.ETH,
     amount: -1,
-    connectionName: Connections.exchange_okx
+    connectionName: Connections.ExchangeOKX
 }
 
 const CONNECTION_POLYGON_TO_ZKSYNC: ConnectionAction = {
-    from: Destination.polygon,
-    to: Destination.zkSync,
+    from: Destination.Polygon,
+    to: Destination.ZkSync,
     asset: Asset.ETH,
     amount: -1,
-    connectionName: Connections.bridge_lz
+    connectionName: Connections.BridgeLZ
 }
 
 const ACTIONS_1: Actions = {

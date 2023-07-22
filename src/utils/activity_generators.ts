@@ -53,7 +53,7 @@ export function getActivitiesGenerator(activities: Activity[], randomness: Rando
     switch (randomness) {
         case Randomness.No:
             return noRandomness(activities)
-        case Randomness.onlyActivities:
+        case Randomness.OnlyActivities:
             return onlyActivities(activities)
         case Randomness.Full:
             return fullShuffleActivities(activities)

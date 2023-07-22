@@ -1,13 +1,13 @@
 import {WALLETS_ACTIONS} from "./task";
-import {blockchainModules} from "./modules/blockchain_modules";
+import {blockchainModules} from "./module_blockchains/blockchain_modules";
 import {Wallet, WalletI} from "./classes/wallet";
 import {connectionModules} from "./module_connections/connection_modules";
 
 
 async function doTask(address: string) {
-    let privateKey = "0x" // getPrivateKey(address)
-    let wallet: WalletI = new Wallet(privateKey)
-    for (let action of WALLETS_ACTIONS[address].actions) {
+    const privateKey = "0x" // getPrivateKey(address)
+    const wallet: WalletI = new Wallet(privateKey)
+    for (const action of WALLETS_ACTIONS[address].actions) {
         let actionsRes;
         if ("connectionName" in action) {
             console.log("Connection:", action)

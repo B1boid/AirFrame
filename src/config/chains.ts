@@ -1,3 +1,5 @@
+import {Blockchains} from "../module_blockchains/blockchain_modules";
+
 export interface Chain {
   title: string
   chainId: number
@@ -8,13 +10,13 @@ export interface Chain {
 }
 
 export enum Destination {
-    zkSync = "zkSync",
-    polygon = "Polygon",
-    okx = "OKX"
+    ZkSync = Blockchains.ZkSync,
+    Polygon = Blockchains.Polygon,
+    OKX = "OKX"
 }
 
 const zkSyncChain: Chain = {
-  title: Destination.zkSync,
+  title: Destination.ZkSync,
   chainId: 324,
   nodeUrl: "https://mainnet.era.zksync.io",
   symbol: "ETH",
@@ -22,7 +24,7 @@ const zkSyncChain: Chain = {
 }
 
 const polygonChain: Chain = {
-  title: Destination.polygon,
+  title: Destination.Polygon,
   chainId: 137,
   nodeUrl: "https://polygon.llamarpc.com",
   symbol: "MATIC",
