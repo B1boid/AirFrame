@@ -64,7 +64,7 @@ export class Wallet implements WalletI {
     }
 
     async sendTransaction(txInteraction: TxInteraction, maxRetries: number = 1, chain: Chain): Promise<TxResult> {
-        const provider: AbstractProvider = new ethers.WebSocketProvider(chain.nodeUrl, chain.chainId)
+        const provider: AbstractProvider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
         const curSigner: ethers.Wallet = this.signer.connect(provider)
 
         await this.resetGasInfo(provider, txInteraction)
