@@ -4,11 +4,11 @@ import {EnumDictionary} from "../utils/utils";
 import {lzConnectionModule} from "./lz/connection-lz";
 
 export enum Connections {
-    exchange_okx = "exchange-okx",
-    bridge_lz = "bridge-lz"
+    ExchangeOKX = "exchange-okx",
+    BridgeLZ = "bridge-lz"
 }
 
 export const connectionModules: EnumDictionary<Connections, ConnectionModule> = {
-    [Connections.exchange_okx]: okxConnectionModule,
-    [Connections.bridge_lz]: lzConnectionModule,
+    [Connections.ExchangeOKX]: okxConnectionModule,
+    [Connections.BridgeLZ]: lzConnectionModule,
 }

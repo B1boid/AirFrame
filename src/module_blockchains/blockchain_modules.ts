@@ -5,11 +5,11 @@ import {EnumDictionary} from "../utils/utils";
 
 
 export enum Blockchains {
-    zkSync = "zkSync",
-    polygon = "polygon"
+    ZkSync = "ZkSync",
+    Polygon = "Polygon"
 }
 
 export const blockchainModules: EnumDictionary<Blockchains, BlockchainModule> = {
-    [Blockchains.zkSync]: moduleZkSync,
-    [Blockchains.polygon]: modulePolygon,
+    [Blockchains.ZkSync]: moduleZkSync,
+    [Blockchains.Polygon]: modulePolygon,
 }

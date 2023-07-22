@@ -5,7 +5,7 @@ import {WalletI} from "../../classes/wallet";
 import {Randomness} from "../../classes/actions";
 
 
-class ZksyncModule extends BlockchainModule {
+class ZkSyncModule extends BlockchainModule {
     constructor(chain: Chain, activities: Activity[]) {
         super(chain, activities);
     }
@@ -16,7 +16,7 @@ class ZksyncModule extends BlockchainModule {
 }
 
 
-export const moduleZkSync: ZksyncModule = new ZksyncModule(
+export const moduleZkSync: ZkSyncModule = new ZkSyncModule(
     zkSyncChain,
     [
         zksyncProject1, zksyncProject2

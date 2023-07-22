@@ -1,5 +1,5 @@
 import {WALLETS_ACTIONS} from "./task";
-import {blockchainModules} from "./modules/blockchain_modules";
+import {blockchainModules} from "./module_blockchains/blockchain_modules";
 import {Wallet, WalletI} from "./classes/wallet";
 import {connectionModules} from "./module_connections/connection_modules";
 
