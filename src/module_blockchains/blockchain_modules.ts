@@ -4,11 +4,11 @@ import {modulePolygon} from "./polygon/polygon";
 import {EnumDictionary} from "../utils/utils";
 
 
-export enum PolygonActivity {
+export const enum PolygonActivity {
     Project1 = "polygonProject1"
 }
 
-export enum ZkSyncActivity {
+export const enum ZkSyncActivity {
     Project1 = "zksyncProject1",
     Project2 = "zksyncProject2"
 }

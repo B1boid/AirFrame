@@ -1,8 +1,9 @@
 import {Chain, zkSyncChain} from "../../config/chains";
-import {Activity, ActivityTag, ActivityTx, BlockchainModule} from "../../classes/module";
+import {Activity, BlockchainModule} from "../../classes/module";
 import {zksyncProject1, zksyncProject2} from "./activities";
 import {WalletI} from "../../classes/wallet";
 import {Randomness} from "../../classes/actions";
+import {ActivityTag} from "../blockchain_modules";
 
 
 class ZkSyncModule extends BlockchainModule {

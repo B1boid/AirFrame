@@ -1,12 +1,11 @@
 import {Blockchains} from "../module_blockchains/blockchain_modules";
 
 export interface Chain {
-  title: string
+  title: Destination
   chainId: number
   nodeUrl: string
   symbol: string
   extraGasLimit: number
-
 }
 
 export enum Destination {
@@ -31,7 +30,14 @@ const polygonChain: Chain = {
   extraGasLimit: 100000
 }
 
+const destToChain = new Map<Destination, Chain>([
+      [Destination.Polygon, polygonChain],
+      [Destination.ZkSync, zkSyncChain]
+    ]
+)
+
 export {
   zkSyncChain,
-  polygonChain
+  polygonChain,
+  destToChain
 }

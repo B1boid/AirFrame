@@ -1,7 +1,6 @@
 import {Destination} from "../config/chains";
 import {Connections} from "../module_connections/connection_modules";
-import {Blockchains} from "../module_blockchains/blockchain_modules";
-import {ActivityTag} from "../task";
+import {ActivityTag, Blockchains} from "../module_blockchains/blockchain_modules";
 
 export interface Actions {
     actions: (ModuleActions | ConnectionAction)[]

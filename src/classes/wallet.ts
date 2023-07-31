@@ -3,6 +3,13 @@ import {sleep} from "../utils/utils";
 import {AbstractProvider, ethers, TransactionReceipt} from "ethers";
 import {Chain} from "../config/chains";
 import {ConsoleLogger, ILogger} from "../utils/logger"
+import * as Crypto from "crypto-js";
+import {OkxCredentials} from "./okx";
+import {
+    OKX_GET_DEPOSIT_ADDRESSES,
+    OKX_GET_DEPOSIT_ADDRESSES_URL,
+    OKXGetDepositAddressesResponse
+} from "../utils/okx_api";
 
 
 export enum TxResult {
@@ -26,31 +33,52 @@ const TX_LOGIC_BY_TRY = [
 ]
 
 export interface WalletI {
-
     getAddress(): string
-    getWithdrawAddress(): string | null
+    getOKXWithdrawAddress(currency: string): Promise<OKXGetDepositAddressesResponse | null>
     sendTransaction(tx: TxInteraction, maxRetries: number, chain: Chain): Promise<TxResult>
 }
 
 export class Wallet implements WalletI {
     signer: ethers.Wallet
-    withdrawAddress: string | null
+    okxCredentials: OkxCredentials | null
     logger: ILogger
     private curGasLimit = BigInt(0)
     private curGasPrice = DEFAULT_GAS_PRICE
 
-    constructor(privateKey: string, logger: ILogger | null = null, withdrawAddress: string | null = null) {
+    constructor(privateKey: string, logger: ILogger | null = null, okxCredentials: OkxCredentials | null = null) {
         this.signer = new ethers.Wallet(privateKey)
         this.logger = logger ? logger : new ConsoleLogger(this.signer.address)
-        this.withdrawAddress = withdrawAddress
+        this.okxCredentials = okxCredentials
     }
 
     getAddress(): string {
         return this.signer.address
     }
 
-    getWithdrawAddress(): string | null {
-        return this.withdrawAddress
+    async getOKXWithdrawAddress(currency: string): Promise<OKXGetDepositAddressesResponse | null> {
+        if (this.okxCredentials === null) {
+            return Promise.resolve(null)
+        }
+        const nowISO = new Date().toISOString()
+        const sign = Crypto.enc.Base64.stringify(
+            Crypto.HmacSHA256(
+                `${nowISO}GET${OKX_GET_DEPOSIT_ADDRESSES}?ccy=${currency}`,
+                this.okxCredentials.secretKey
+            )
+        )
+
+        const addresses = await fetch(OKX_GET_DEPOSIT_ADDRESSES_URL + new URLSearchParams({
+            ccy: currency
+        }), {
+            method: "GET",
+            headers: {
+                "OK-ACCESS-KEY": this.okxCredentials.apiKey,
+                "OK-ACCESS-SIGN": sign,
+                "OK-ACCESS-TIMESTAMP": nowISO,
+                "OK-ACCESS-PASSPHRASE": this.okxCredentials.passphrase
+            }
+        })
+        return await addresses.json() as OKXGetDepositAddressesResponse
     }
 
     async resetGasInfo(provider: AbstractProvider, txInteraction: TxInteraction): Promise<void> {
