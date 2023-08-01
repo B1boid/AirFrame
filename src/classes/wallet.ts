@@ -3,13 +3,7 @@ import {sleep} from "../utils/utils";
 import {AbstractProvider, ethers, TransactionReceipt} from "ethers";
 import {Chain} from "../config/chains";
 import {ConsoleLogger, ILogger} from "../utils/logger"
-import * as Crypto from "crypto-js";
 import {OkxCredentials} from "./okx";
-import {
-    OKX_GET_DEPOSIT_ADDRESSES,
-    OKX_GET_DEPOSIT_ADDRESSES_URL,
-    OKXGetDepositAddressesResponse
-} from "../utils/okx_api";
 
 
 export enum TxResult {
@@ -34,51 +28,48 @@ const TX_LOGIC_BY_TRY = [
 
 export interface WalletI {
     getAddress(): string
-    getOKXWithdrawAddress(currency: string): Promise<OKXGetDepositAddressesResponse | null>
+
+    getWithdrawAddress(): string | null
+
+    getMasterCredentials(): OkxCredentials | null
+
+    getSubAccountName(): string | null
+
     sendTransaction(tx: TxInteraction, maxRetries: number, chain: Chain): Promise<TxResult>
 }
 
 export class Wallet implements WalletI {
-    signer: ethers.Wallet
-    okxCredentials: OkxCredentials | null
-    logger: ILogger
+    private signer: ethers.Wallet
+    private readonly masterCredentials: OkxCredentials | null
+    private readonly withdrawAddress: string | null
+    private readonly subAccountName: string | null
+    private readonly logger: ILogger
     private curGasLimit = BigInt(0)
     private curGasPrice = DEFAULT_GAS_PRICE
 
-    constructor(privateKey: string, logger: ILogger | null = null, okxCredentials: OkxCredentials | null = null) {
+    constructor(privateKey: string, masterCredentials: OkxCredentials | null, subAccountName: string | null,
+                logger: ILogger | null = null, withdrawAddress: string | null = null) {
         this.signer = new ethers.Wallet(privateKey)
         this.logger = logger ? logger : new ConsoleLogger(this.signer.address)
-        this.okxCredentials = okxCredentials
+        this.withdrawAddress = withdrawAddress
+        this.masterCredentials = masterCredentials
+        this.subAccountName = subAccountName
+    }
+
+    getSubAccountName(): string | null {
+        return this.subAccountName
     }
 
     getAddress(): string {
         return this.signer.address
     }
 
-    async getOKXWithdrawAddress(currency: string): Promise<OKXGetDepositAddressesResponse | null> {
-        if (this.okxCredentials === null) {
-            return Promise.resolve(null)
-        }
-        const nowISO = new Date().toISOString()
-        const sign = Crypto.enc.Base64.stringify(
-            Crypto.HmacSHA256(
-                `${nowISO}GET${OKX_GET_DEPOSIT_ADDRESSES}?ccy=${currency}`,
-                this.okxCredentials.secretKey
-            )
-        )
+    getWithdrawAddress(): string | null {
+        return this.withdrawAddress
+    }
 
-        const addresses = await fetch(OKX_GET_DEPOSIT_ADDRESSES_URL + new URLSearchParams({
-            ccy: currency
-        }), {
-            method: "GET",
-            headers: {
-                "OK-ACCESS-KEY": this.okxCredentials.apiKey,
-                "OK-ACCESS-SIGN": sign,
-                "OK-ACCESS-TIMESTAMP": nowISO,
-                "OK-ACCESS-PASSPHRASE": this.okxCredentials.passphrase
-            }
-        })
-        return await addresses.json() as OKXGetDepositAddressesResponse
+    getMasterCredentials(): OkxCredentials | null {
+        return this.masterCredentials;
     }
 
     async resetGasInfo(provider: AbstractProvider, txInteraction: TxInteraction): Promise<void> {
