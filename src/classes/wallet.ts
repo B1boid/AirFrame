@@ -3,6 +3,7 @@ import {sleep} from "../utils/utils";
 import {AbstractProvider, ethers, TransactionReceipt} from "ethers";
 import {Chain} from "../config/chains";
 import {ConsoleLogger, ILogger} from "../utils/logger"
+import {OkxCredentials} from "./okx";
 
 
 export enum TxResult {
@@ -26,23 +27,37 @@ const TX_LOGIC_BY_TRY = [
 ]
 
 export interface WalletI {
-
     getAddress(): string
+
     getWithdrawAddress(): string | null
+
+    getMasterCredentials(): OkxCredentials | null
+
+    getSubAccountName(): string | null
+
     sendTransaction(tx: TxInteraction, maxRetries: number, chain: Chain): Promise<TxResult>
 }
 
 export class Wallet implements WalletI {
-    signer: ethers.Wallet
-    withdrawAddress: string | null
-    logger: ILogger
+    private signer: ethers.Wallet
+    private readonly masterCredentials: OkxCredentials | null
+    private readonly withdrawAddress: string | null
+    private readonly subAccountName: string | null
+    private readonly logger: ILogger
     private curGasLimit = BigInt(0)
     private curGasPrice = DEFAULT_GAS_PRICE
 
-    constructor(privateKey: string, logger: ILogger | null = null, withdrawAddress: string | null = null) {
+    constructor(privateKey: string, masterCredentials: OkxCredentials | null, subAccountName: string | null,
+                logger: ILogger | null = null, withdrawAddress: string | null = null) {
         this.signer = new ethers.Wallet(privateKey)
         this.logger = logger ? logger : new ConsoleLogger(this.signer.address)
         this.withdrawAddress = withdrawAddress
+        this.masterCredentials = masterCredentials
+        this.subAccountName = subAccountName
+    }
+
+    getSubAccountName(): string | null {
+        return this.subAccountName
     }
 
     getAddress(): string {
@@ -51,6 +66,10 @@ export class Wallet implements WalletI {
 
     getWithdrawAddress(): string | null {
         return this.withdrawAddress
+    }
+
+    getMasterCredentials(): OkxCredentials | null {
+        return this.masterCredentials;
     }
 
     async resetGasInfo(provider: AbstractProvider, txInteraction: TxInteraction): Promise<void> {

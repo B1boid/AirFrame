@@ -3,7 +3,6 @@ import {blockchainModules} from "./module_blockchains/blockchain_modules";
 import {Wallet, WalletI} from "./classes/wallet";
 import {connectionModules} from "./module_connections/connection_modules";
 
-
 async function doTask(address: string) {
     const privateKey = "0x" // getPrivateKey(address)
     const wallet: WalletI = new Wallet(privateKey)
@@ -29,7 +28,6 @@ function main() {
     for (const wallet in WALLETS_ACTIONS) {
         doTask(wallet)
     }
-
 }
 
 

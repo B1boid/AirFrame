@@ -1,7 +1,7 @@
 import {Actions, Asset, ConnectionAction, ModuleActions, Randomness} from "./classes/actions";
 import {Destination} from "./config/chains";
 import {Connections} from "./module_connections/connection_modules";
-import {Blockchains} from "./module_blockchains/blockchain_modules";
+import {Blockchains, PolygonActivity, ZkSyncActivity} from "./module_blockchains/blockchain_modules";
 
 ////////////////////////////////////////////////////////////////////////
 // Later we will get it from UI, now it's hardcoded for testing
@@ -10,13 +10,13 @@ import {Blockchains} from "./module_blockchains/blockchain_modules";
 const POLYGON_ACTIONS: ModuleActions = {
     chainName: Blockchains.Polygon,
     randomOrder: Randomness.OnlyActivities,
-    activityNames: [ActivityTag.PolygonProject1]
+    activityNames: [PolygonActivity.Project1]
 }
 
 const ZKSYNC_ACTIONS: ModuleActions = {
     chainName: Blockchains.ZkSync,
     randomOrder: Randomness.OnlyActivities,
-    activityNames: [ActivityTag.ZkSyncProject1, ActivityTag.ZkSyncProject2]
+    activityNames: [ZkSyncActivity.Project1, ZkSyncActivity.Project2]
 }
 
 const CONNECTION_OKX_TO_POLYGON: ConnectionAction = {

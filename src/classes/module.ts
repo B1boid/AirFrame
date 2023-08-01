@@ -54,5 +54,4 @@ export interface TxInteraction {
     to: string
     data: string
     value: string
-
 }
