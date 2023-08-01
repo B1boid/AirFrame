@@ -2,10 +2,11 @@ import {moduleZkSync} from "./zksync/zksync";
 import {BlockchainModule} from "../classes/module";
 import {modulePolygon} from "./polygon/polygon";
 import {EnumDictionary} from "../utils/utils";
+import {Blockchains} from "../config/chains";
 
 
 export const enum PolygonActivity {
-    Project1 = "polygonProject1"
+    wrapUnwrap = "wrapUnwrap"
 }
 
 export const enum ZkSyncActivity {
@@ -14,11 +15,6 @@ export const enum ZkSyncActivity {
 }
 
 export type ActivityTag = PolygonActivity | ZkSyncActivity
-
-export enum Blockchains {
-    ZkSync = "ZkSync",
-    Polygon = "Polygon"
-}
 
 export const blockchainModules: EnumDictionary<Blockchains, BlockchainModule> = {
     [Blockchains.ZkSync]: moduleZkSync,

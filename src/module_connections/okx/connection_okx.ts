@@ -3,9 +3,8 @@ import {TxResult, WalletI} from "../../classes/wallet";
 import {Chain, Destination, destToChain} from "../../config/chains";
 import {ConsoleLogger, ILogger} from "../../utils/logger";
 import {getTxForTransfer} from "../utils";
-import {Asset} from "../../classes/actions";
 import Crypto from "crypto-js"
-import {OkxCredentials} from "../../classes/okx";
+import {OkxCredentials} from "../../classes/info";
 import {
     Method,
     OKX_BASE_URL,
@@ -15,6 +14,7 @@ import {
     OKXWithdrawalResponse
 } from "../../utils/okx_api";
 import {TxInteraction} from "../../classes/module";
+import {Asset} from "../../config/tokens";
 
 const WITHDRAWAL_FEE = "0.0005" // TODO hz skok nado
 class OkxConnectionModule implements ConnectionModule {
@@ -25,7 +25,7 @@ class OkxConnectionModule implements ConnectionModule {
     }
     async sendAsset(wallet: WalletI, from: Destination, to: Destination, asset: Asset, amount: number): Promise<boolean> {
         if (from === Destination.OKX) {
-            const chain: Chain = destToChain.get(to)!
+            const chain: Chain = destToChain(to)
             return this.withdraw(wallet, asset, amount.toString(), WITHDRAWAL_FEE, chain)
         } else if (to == Destination.OKX) {
             const withdrawAddress = wallet.getWithdrawAddress()
@@ -36,10 +36,10 @@ class OkxConnectionModule implements ConnectionModule {
             }
 
             const txTransferToWithdrawAddress: TxInteraction = getTxForTransfer(asset, withdrawAddress, amount)
-            const chain: Chain = destToChain.get(from)!
+            const chain: Chain = destToChain(from)
 
             const resWithdraw: TxResult = await wallet
-                .sendTransaction(txTransferToWithdrawAddress, 1, chain)
+                .sendTransaction(txTransferToWithdrawAddress, chain, 1)
             if (resWithdraw === TxResult.Fail) {
                 this.logger.error("Transaction failed.")
                 return Promise.resolve(false)

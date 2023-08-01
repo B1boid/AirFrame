@@ -1,12 +1,15 @@
-import {WALLETS_ACTIONS} from "./task";
 import {blockchainModules} from "./module_blockchains/blockchain_modules";
 import {Wallet, WalletI} from "./classes/wallet";
 import {connectionModules} from "./module_connections/connection_modules";
+import {getAddressInfo, getOkxCredentials} from "./utils/utils";
+import {WALLETS_ACTIONS_1} from "./tests/task1";
+import {Actions} from "./classes/actions";
 
-async function doTask(address: string) {
-    const privateKey = "0x" // getPrivateKey(address)
-    const wallet: WalletI = new Wallet(privateKey)
-    for (const action of WALLETS_ACTIONS[address].actions) {
+
+
+async function doTask(address: string, walletActions: Actions) {
+    const wallet: WalletI = new Wallet(getAddressInfo(address), getOkxCredentials())
+    for (const action of walletActions.actions) {
         let actionsRes;
         if ("connectionName" in action) {
             console.log("Connection:", action)
@@ -25,8 +28,8 @@ async function doTask(address: string) {
 }
 
 function main() {
-    for (const wallet in WALLETS_ACTIONS) {
-        doTask(wallet)
+    for (const wallet in WALLETS_ACTIONS_1) {
+        doTask(wallet, WALLETS_ACTIONS_1[wallet])
     }
 }
 

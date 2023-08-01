@@ -1,16 +1,10 @@
-import {Destination} from "../config/chains";
+import {Blockchains, Destination} from "../config/chains";
 import {Connections} from "../module_connections/connection_modules";
-import {ActivityTag, Blockchains} from "../module_blockchains/blockchain_modules";
+import {ActivityTag} from "../module_blockchains/blockchain_modules";
+import {Asset} from "../config/tokens";
 
 export interface Actions {
     actions: (ModuleActions | ConnectionAction)[]
-}
-
-export enum Asset {
-    ETH = "ETH",
-    USDT = "USDT",
-    USDC = "USDC",
-    MATIC = "MATIC"
 }
 
 export enum Randomness {
