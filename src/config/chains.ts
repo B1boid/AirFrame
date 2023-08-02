@@ -1,43 +1,41 @@
-import {Blockchains} from "../module_blockchains/blockchain_modules";
+import {blockchainModules} from "../module_blockchains/blockchain_modules";
 
 export interface Chain {
-  title: Destination
+  title: Blockchains
   chainId: number
   nodeUrl: string
   symbol: string
   extraGasLimit: number
 }
+export enum Blockchains {
+    ZkSync = "ZkSync",
+    Polygon = "Polygon"
+}
 
-export enum Destination {
-    ZkSync = Blockchains.ZkSync,
-    Polygon = Blockchains.Polygon,
+enum Exchanges {
     OKX = "OKX"
 }
 
-const zkSyncChain: Chain = {
-  title: Destination.ZkSync,
+export type Destination = Blockchains | Exchanges
+export const Destination = {...Blockchains, ...Exchanges};
+
+
+export const zkSyncChain: Chain = {
+  title: Blockchains.ZkSync,
   chainId: 324,
   nodeUrl: "https://mainnet.era.zksync.io",
   symbol: "ETH",
   extraGasLimit: 100000
 }
 
-const polygonChain: Chain = {
-  title: Destination.Polygon,
+export const polygonChain: Chain = {
+  title: Blockchains.Polygon,
   chainId: 137,
   nodeUrl: "https://polygon.llamarpc.com",
   symbol: "MATIC",
   extraGasLimit: 100000
 }
 
-const destToChain = new Map<Destination, Chain>([
-      [Destination.Polygon, polygonChain],
-      [Destination.ZkSync, zkSyncChain]
-    ]
-)
-
-export {
-  zkSyncChain,
-  polygonChain,
-  destToChain
+export const destToChain = (destination: Destination): Chain => {
+    return blockchainModules[destination as Blockchains].chain
 }

@@ -17,16 +17,24 @@ export abstract class BlockchainModule {
     async doActivities(wallet: WalletI, activityNames: ActivityTag[], randomOrder: Randomness): Promise<boolean> {
         const activities: Activity[] = this.activities.filter(activity => activityNames.includes(activity.name))
         const txsGen = getActivitiesGenerator(activities, randomOrder)
+        let skippedActivities: string[] = []
         for (const activityTx of txsGen) {
-            const interactions: TxInteraction[] = activityTx.tx(wallet)
-            for (const tx of interactions) {
-                let txResult: TxResult = await wallet.sendTransaction(tx, 1, this.chain)
-                if (txResult === TxResult.Fail) {
-                    console.log("Transaction failed")
-                    // i don't want to put it to the end of the queue, because it may cause side effects
-                    // need to think about other options
-                    return false
+            if (skippedActivities.includes(activityTx.activityName)) continue // skip interaction from activity that failed before
+            let failed = false
+            for (let i = 0; i <= 1; i++) { // extra try with rebuilding tx interaction
+                const interactions: TxInteraction[] = await activityTx.tx(wallet)
+                for (const [ind, tx] of interactions.entries()) {
+                    let txResult: TxResult = await wallet.sendTransaction(tx, this.chain, 1)
+                    if (txResult === TxResult.Fail && tx.stoppable) {
+                        console.log("Stoppable Transaction failed")
+                        failed = true
+                        if (i == 1) return false
+                    }
                 }
+                if (!failed) break
+            }
+            if (failed) {
+                skippedActivities.push(activityTx.activityName)
             }
         }
 
@@ -37,9 +45,9 @@ export abstract class BlockchainModule {
 
 export class ActivityTx {
     activityName: string
-    tx: ((wallet: WalletI) => TxInteraction[])
+    tx: ((wallet: WalletI) => Promise<TxInteraction[]>)
 
-    constructor(activityName: string, tx: ((wallet: WalletI) => TxInteraction[])) {
+    constructor(activityName: string, tx: ((wallet: WalletI) => Promise<TxInteraction[]>)) {
         this.activityName = activityName
         this.tx = tx
     }
@@ -47,11 +55,13 @@ export class ActivityTx {
 
 export interface Activity {
     name: ActivityTag
-    txs: ((wallet: WalletI) => TxInteraction[])[]
+    txs: ((wallet: WalletI) => Promise<TxInteraction[]>)[]
 }
 
 export interface TxInteraction {
     to: string
     data: string
     value: string
+    stoppable: boolean
+    name: string
 }
