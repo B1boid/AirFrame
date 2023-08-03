@@ -10,8 +10,8 @@ import {Asset} from "../config/tokens";
 
 const POLYGON_ACTIONS: ModuleActions = {
     chainName: Blockchains.Polygon,
-    randomOrder: Randomness.Full,
-    activityNames: [PolygonActivity.polygonSwapCycleNativeToUsdc, PolygonActivity.wrapUnwrap]
+    randomOrder: Randomness.OnlyActivities,
+    activityNames: [PolygonActivity.polygonSwapCycleNativeToUsdc, PolygonActivity.wrapUnwrap, PolygonActivity.wrapUnwrap]
 }
 
 const CONNECTION_OKX_TO_POLYGON: ConnectionAction = {
