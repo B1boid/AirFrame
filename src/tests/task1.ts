@@ -1,7 +1,7 @@
 import {Actions, ConnectionAction, ModuleActions, Randomness} from "../classes/actions";
 import {Blockchains, Destination} from "../config/chains";
 import {Connections} from "../module_connections/connection_modules";
-import {PolygonActivity, ZkSyncActivity} from "../module_blockchains/blockchain_modules";
+import {PolygonActivity} from "../module_blockchains/blockchain_modules";
 import {Asset} from "../config/tokens";
 
 ////////////////////////////////////////////////////////////////////////
@@ -11,7 +11,7 @@ import {Asset} from "../config/tokens";
 const POLYGON_ACTIONS: ModuleActions = {
     chainName: Blockchains.Polygon,
     randomOrder: Randomness.OnlyActivities,
-    activityNames: [PolygonActivity.wrapUnwrap]
+    activityNames: [PolygonActivity.polygonSwapCycleNativeToUsdc, PolygonActivity.wrapUnwrap, PolygonActivity.wrapUnwrap]
 }
 
 const CONNECTION_OKX_TO_POLYGON: ConnectionAction = {

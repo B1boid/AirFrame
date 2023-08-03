@@ -6,7 +6,8 @@ import {Blockchains} from "../config/chains";
 
 
 export const enum PolygonActivity {
-    wrapUnwrap = "wrapUnwrap"
+    wrapUnwrap = "wrapUnwrap",
+    polygonSwapCycleNativeToUsdc = "polygonSwapCycleNativeToUsdc",
 }
 
 export const enum ZkSyncActivity {

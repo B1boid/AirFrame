@@ -22,6 +22,19 @@ export function getRandomizedPercent(value: bigint, minPercent: number, maxPerce
     return value * BigInt(randomPercent) / BigInt(100);
 }
 
+export function shuffleArray<T>(array: T[]) {
+    for (let i = array.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        let temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+}
+
+export function getRandomElement<T> (list: T[]) {
+    return list[Math.floor((Math.random()*list.length))];
+}
+
 export function getAddressInfo(address: string): AddressInfo {
     const file = readFileSync('.accs', 'utf-8');
     let accs = file.split('\n');

@@ -8,33 +8,60 @@ import {ActivityTag} from "../module_blockchains/blockchain_modules";
 export abstract class BlockchainModule {
     chain: Chain
     activities: Activity[] // all available activities for this module
+    extraTries: number = 1
 
     constructor(chain: Chain, activities: Activity[]) {
         this.chain = chain;
         this.activities = activities;
     }
 
+    private getActivitiesTxs(activityNames: ActivityTag[], randomOrder: Randomness): ActivityTx[] {
+        let activities: Activity[] = []
+        for (const activityName of activityNames) {
+            const activity: Activity | undefined = this.activities.find(activity => activity.name === activityName)
+            if (activity === undefined) {
+                console.log("Unexpected error: Activity not found")
+                return []
+            }
+            activities.push(activity)
+        }
+        return getActivitiesGenerator(activities, randomOrder)
+    }
+
     async doActivities(wallet: WalletI, activityNames: ActivityTag[], randomOrder: Randomness): Promise<boolean> {
-        const activities: Activity[] = this.activities.filter(activity => activityNames.includes(activity.name))
-        const txsGen = getActivitiesGenerator(activities, randomOrder)
-        let skippedActivities: string[] = []
-        for (const activityTx of txsGen) {
+        let genActivities: ActivityTx[] = this.getActivitiesTxs(activityNames, randomOrder)
+        let skippedActivities: string[] = [] // activities with interactions which failed before
+        let startedActivities: string[] = [] // activities with at least one successful interaction
+        for (const activityTx of genActivities) {
             if (skippedActivities.includes(activityTx.activityName)) continue // skip interaction from activity that failed before
-            let failed = false
-            for (let i = 0; i <= 1; i++) { // extra try with rebuilding tx interaction
+            let failed: boolean = false;
+            for (let i = 0; i <= this.extraTries; i++) { // extra try with rebuilding tx interaction
+                failed = false
                 const interactions: TxInteraction[] = await activityTx.tx(wallet)
-                for (const [ind, tx] of interactions.entries()) {
-                    let txResult: TxResult = await wallet.sendTransaction(tx, this.chain, 1)
-                    if (txResult === TxResult.Fail && tx.stoppable) {
-                        console.log("Stoppable Transaction failed")
-                        failed = true
-                        if (i == 1) return false
+                if (interactions.length === 0) {
+                    failed = true // empty array means failure while building tx interactions
+                    if (i == this.extraTries && startedActivities.includes(activityTx.activityName)){ // prefer to stop - as we don't know if tx is stoppable or not
+                        console.log("Tx failed from activity that was already started")
+                        return false
+                    }
+                } else {
+                    for (const tx of interactions) {
+                        let txResult: TxResult = await wallet.sendTransaction(tx, this.chain, 1)
+                        if (txResult === TxResult.Fail) {
+                            if (i == this.extraTries && tx.stoppable) {
+                                console.log("Stoppable Transaction failed")
+                                return false
+                            }
+                            failed = true
+                        }
                     }
                 }
                 if (!failed) break
             }
             if (failed) {
                 skippedActivities.push(activityTx.activityName)
+            } else {
+                startedActivities.push(activityTx.activityName)
             }
         }
 
@@ -51,6 +78,11 @@ export class ActivityTx {
         this.activityName = activityName
         this.tx = tx
     }
+}
+
+export interface WrappedActivity {
+    activity: Activity
+    id: number
 }
 
 export interface Activity {

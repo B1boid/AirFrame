@@ -1,6 +1,5 @@
-import {Activity, ActivityTx, TxInteraction} from "../classes/module";
+import {Activity, ActivityTx, WrappedActivity} from "../classes/module";
 import {Randomness} from "../classes/actions";
-import {WalletI} from "../classes/wallet";
 
 function shuffle<T>(array: T[]): T[] {
     let currentIndex = array.length,  randomIndex;
@@ -20,36 +19,59 @@ function shuffle<T>(array: T[]): T[] {
     return array;
 }
 
-function* noRandomness(activities: Activity[]) {
+function noRandomness(activities: WrappedActivity[]): ActivityTx[] {
+    let res: ActivityTx[] = []
     for (const activity of activities) {
-        for (const tx of activity.txs) {
-            yield new ActivityTx(activity.name, tx)
+        for (const tx of activity.activity.txs) {
+            res.push(new ActivityTx(activity.activity.name + activity.id.toString(), tx))
         }
     }
+    return res
 }
 
-function* onlyActivities(activities: Activity[]) {
+function onlyActivities(activities: WrappedActivity[]): ActivityTx[] {
+    let res: ActivityTx[] = []
     const shuffledActivities = shuffle(activities)
     for (const activity of shuffledActivities) {
-        for (const tx of activity.txs) {
-            yield new ActivityTx(activity.name, tx)
+        for (const tx of activity.activity.txs) {
+            res.push(new ActivityTx(activity.activity.name + activity.id.toString(), tx))
         }
     }
+    return res
 }
 
-function* fullShuffleActivities(activities: Activity[]) {
-    while (activities.length > 0) {
-        const idx = Math.floor(Math.random() * activities.length)
-        const activity = activities[idx];
-        const tx = activity.txs.shift()!
-        if (activity.txs.length == 0) {
-            activities = activities.splice(idx, 1)
+function fullShuffleActivities(activities: WrappedActivity[]): ActivityTx[]{
+    let res: ActivityTx[] = []
+    while (true){
+        let added = false
+        const shuffledActivities = shuffle(activities)
+        for (const activity of shuffledActivities) {
+            if (activity.activity.txs.length > 0){
+                res.push(new ActivityTx(activity.activity.name + activity.id.toString(), activity.activity.txs.shift()!))
+                added = true
+                break
+            }
         }
-        yield new ActivityTx(activity.name, tx)
+        if (!added) break
     }
+    return res
 }
 
-export function getActivitiesGenerator(activities: Activity[], randomness: Randomness) {
+function addIdToActivities(activities: Activity[]): WrappedActivity[]{
+    let ids: {[id: string]: number} = {}
+    let newActivities: WrappedActivity[] = []
+    for (let activity of activities){
+        if (ids[activity.name] === undefined){
+            ids[activity.name] = 0
+        }
+        newActivities.push({activity: activity, id: ++ids[activity.name]})
+
+    }
+    return newActivities
+}
+
+export function getActivitiesGenerator(_activities: Activity[], randomness: Randomness): ActivityTx[] {
+    let activities: WrappedActivity[] = addIdToActivities(_activities)
     switch (randomness) {
         case Randomness.No:
             return noRandomness(activities)

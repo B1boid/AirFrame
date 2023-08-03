@@ -1,6 +1,6 @@
 import {Chain, polygonChain} from "../../config/chains";
 import {Activity, BlockchainModule} from "../../classes/module";
-import {polygonWrapUnwrap} from "./activities";
+import {polygonSwapCycleNativeToUsdc, polygonWrapUnwrap} from "./activities";
 
 
 class PolygonModule extends BlockchainModule {
@@ -15,6 +15,6 @@ class PolygonModule extends BlockchainModule {
 export const modulePolygon: PolygonModule = new PolygonModule(
     polygonChain,
     [
-        polygonWrapUnwrap
+        polygonWrapUnwrap, polygonSwapCycleNativeToUsdc
     ]
 )
