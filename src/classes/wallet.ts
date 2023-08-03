@@ -80,24 +80,30 @@ export class Wallet implements WalletI {
         return this.masterCredentials;
     }
 
-    private async resetGasInfo(provider: AbstractProvider, txInteraction: TxInteraction, chain: Chain): Promise<void> {
-        this.curGasLimit = toNumber(await provider.estimateGas({
-            from: this.getAddress(),
-            to: txInteraction.to,
-            data: txInteraction.data,
-            value: txInteraction.value
-        }))
-        this.curGasPriceInfo = await provider.getFeeData()
-        if (chain.title === Blockchains.Polygon) {
-            this.curGasPriceInfo = new FeeData(
-                this.curGasPriceInfo.gasPrice,
-                this.curGasPriceInfo.maxFeePerGas,
-                toBigInt(getRandomInt(16, 30) * (10 ** 9)) // polygon min value is 30 (we multiply by 2 later, so 32 > 30)
-            )
-        }
-        while (this.curGasPriceInfo.gasPrice !== null && this.curGasPriceInfo.gasPrice > GAS_PRICE_LIMITS(chain.title)){
-            await sleep(60 * 1000)
-            this.logger.warn(`Gas price is too high | Gas price: ${this.curGasPriceInfo.gasPrice}`)
+    private async resetGasInfo(provider: AbstractProvider, txInteraction: TxInteraction, chain: Chain): Promise<TxResult> {
+        try {
+            this.curGasLimit = toNumber(await provider.estimateGas({
+                from: this.getAddress(),
+                to: txInteraction.to,
+                data: txInteraction.data,
+                value: txInteraction.value
+            }))
+            this.curGasPriceInfo = await provider.getFeeData()
+            if (chain.title === Blockchains.Polygon) {
+                this.curGasPriceInfo = new FeeData(
+                    this.curGasPriceInfo.gasPrice,
+                    this.curGasPriceInfo.maxFeePerGas,
+                    toBigInt(getRandomInt(16, 30) * (10 ** 9)) // polygon min value is 30 (we multiply by 2 later, so 32 > 30)
+                )
+            }
+            while (this.curGasPriceInfo.gasPrice !== null && this.curGasPriceInfo.gasPrice > GAS_PRICE_LIMITS(chain.title)) {
+                await sleep(60)
+                this.logger.warn(`Gas price is too high | Gas price: ${this.curGasPriceInfo.gasPrice}`)
+            }
+            return TxResult.Success
+        } catch (e) {
+            this.logger.warn(`Error while simulating tx ${txInteraction.name}, ${e}`)
+            return TxResult.Fail
         }
     }
 
@@ -106,9 +112,11 @@ export class Wallet implements WalletI {
         const curSigner: ethers.Wallet = this.signer.connect(provider)
 
         for (let retry = 0; retry < maxRetries + 1; retry++) {
-            await this.resetGasInfo(provider, txInteraction, chain)
-            this.curGasLimit += TX_LOGIC_BY_TRY[retry].addGasLimit + chain.extraGasLimit
-            const result: TxResult = await this._sendTransaction(curSigner, txInteraction)
+            let result: TxResult = await this.resetGasInfo(provider, txInteraction, chain)
+            if(result === TxResult.Success) {
+                this.curGasLimit += TX_LOGIC_BY_TRY[retry].addGasLimit + chain.extraGasLimit
+                result = await this._sendTransaction(curSigner, txInteraction)
+            }
             switch (result) {
                 case TxResult.Success:
                     this.logger.success(`Tx:${txInteraction.name} Gas used: ${this.curGasLimit}. Gas price: ${this.lastTxGasPrice / BigInt(10 ** 9)}`)

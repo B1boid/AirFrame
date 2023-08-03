@@ -1,6 +1,5 @@
-import {Activity, ActivityTx, TxInteraction} from "../classes/module";
+import {Activity, ActivityTx} from "../classes/module";
 import {Randomness} from "../classes/actions";
-import {WalletI} from "../classes/wallet";
 
 function shuffle<T>(array: T[]): T[] {
     let currentIndex = array.length,  randomIndex;
@@ -20,36 +19,45 @@ function shuffle<T>(array: T[]): T[] {
     return array;
 }
 
-function* noRandomness(activities: Activity[]) {
+function noRandomness(activities: Activity[]): ActivityTx[] {
+    let res: ActivityTx[] = []
     for (const activity of activities) {
         for (const tx of activity.txs) {
-            yield new ActivityTx(activity.name, tx)
+            res.push(new ActivityTx(activity.name, tx))
         }
     }
+    return res
 }
 
-function* onlyActivities(activities: Activity[]) {
+function onlyActivities(activities: Activity[]): ActivityTx[] {
+    let res: ActivityTx[] = []
     const shuffledActivities = shuffle(activities)
     for (const activity of shuffledActivities) {
         for (const tx of activity.txs) {
-            yield new ActivityTx(activity.name, tx)
+            res.push(new ActivityTx(activity.name, tx))
         }
     }
+    return res
 }
 
-function* fullShuffleActivities(activities: Activity[]) {
-    while (activities.length > 0) {
-        const idx = Math.floor(Math.random() * activities.length)
-        const activity = activities[idx];
-        const tx = activity.txs.shift()!
-        if (activity.txs.length == 0) {
-            activities = activities.splice(idx, 1)
+function fullShuffleActivities(activities: Activity[]): ActivityTx[]{
+    let res: ActivityTx[] = []
+    while (true){
+        let added = false
+        const shuffledActivities = shuffle(activities)
+        for (const activity of shuffledActivities) {
+            if (activity.txs.length > 0){
+                res.push(new ActivityTx(activity.name, activity.txs.shift()!))
+                added = true
+                break
+            }
         }
-        yield new ActivityTx(activity.name, tx)
+        if (!added) break
     }
+    return res
 }
 
-export function getActivitiesGenerator(activities: Activity[], randomness: Randomness) {
+export function getActivitiesGenerator(activities: Activity[], randomness: Randomness): ActivityTx[] {
     switch (randomness) {
         case Randomness.No:
             return noRandomness(activities)
