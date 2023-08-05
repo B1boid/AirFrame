@@ -19,8 +19,6 @@ import {TxInteraction} from "../../classes/module";
 import {Asset} from "../../config/tokens";
 import {sleep} from "../../utils/utils";
 import axios from "axios";
-
-const WITHDRAWAL_FEE = "0.1" // TODO hz skok nado
 const MAX_TRIES = 30
 
 class OkxConnectionModule implements ConnectionModule {
@@ -54,6 +52,7 @@ class OkxConnectionModule implements ConnectionModule {
             }
 
             const chain: Chain = destToChain(from)
+            const withdrawalConfig = config[`${asset}-${chain.title}`]
             const txTransferToWithdrawAddress: TxInteraction = getTxForTransfer(asset, withdrawAddress, amount)
             txTransferToWithdrawAddress.confirmations = withdrawalConfig.confirmations
 
