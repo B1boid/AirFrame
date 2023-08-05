@@ -159,7 +159,7 @@ export class Wallet implements WalletI {
 
             this.logger.info(`Tx:${txInteraction.name} sending transaction with tx_hash: ${tx.hash}`)
 
-            const receipt: TransactionReceipt | null = await tx.wait(txInteraction.confirmations, MAX_TX_WAITING())
+            const receipt: TransactionReceipt | null = await tx.wait(txInteraction.confirmations, MAX_TX_WAITING(txInteraction.confirmations))
 
             if (!receipt) {
                 this.logger.warn("Receipt is null.")
