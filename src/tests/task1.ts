@@ -15,11 +15,25 @@ const POLYGON_ACTIONS: ModuleActions = {
     activityNames: [PolygonActivity.polygonSwapCycleNativeToUsdc, PolygonActivity.wrapUnwrap, PolygonActivity.wrapUnwrap]
 }
 
+const ZKSYNC_ACTIONS: ModuleActions = {
+    chainName: Blockchains.ZkSync,
+    randomOrder: Randomness.OnlyActivities,
+    activityNames: []
+}
+
 const CONNECTION_OKX_TO_POLYGON: ConnectionAction = {
     from: Destination.OKX,
     to: Destination.Polygon,
     asset: Asset.MATIC,
     amount: 2,
+    connectionName: Connections.ExchangeOKX
+}
+
+const CONNECTION_OKX_TO_ZKSYNC: ConnectionAction = {
+    from: Destination.OKX,
+    to: Destination.ZkSync,
+    asset: Asset.ETH,
+    amount: 0.01,
     connectionName: Connections.ExchangeOKX
 }
 
@@ -34,14 +48,15 @@ const CONNECTION_POLYGON_TO_OKX: ConnectionAction = {
 
 const ACTIONS_1: Actions = {
     actions: [
+        CONNECTION_OKX_TO_ZKSYNC
         // CONNECTION_OKX_TO_POLYGON,
         // POLYGON_ACTIONS,
-        CONNECTION_POLYGON_TO_OKX
+        // CONNECTION_POLYGON_TO_OKX
     ]
 }
 
 export const WALLETS_ACTIONS_1: {[id: string]: Actions} = {
-    "0x2Fd49f2da0d07102b223D89f290F61b265291952": ACTIONS_1,
+    "0x90eAC2Dda44F0a96C81a34b69C6aF653Db33cf53": ACTIONS_1,
     // "0x..2": ACTIONS_1
 }
 
