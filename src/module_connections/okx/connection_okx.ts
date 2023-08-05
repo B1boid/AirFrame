@@ -34,40 +34,40 @@ class OkxConnectionModule implements ConnectionModule {
             const chain: Chain = destToChain(to)
             return this.withdraw(wallet, asset, amount.toString(), WITHDRAWAL_FEE, chain)
         } else if (to == Destination.OKX) {
-            // const withdrawAddress = wallet.getWithdrawAddress()
-            //
-            // if (withdrawAddress === null) {
-            //     this.logger.error("No withdraw address.")
-            //     return Promise.resolve(false)
-            // }
+            const withdrawAddress = wallet.getWithdrawAddress()
+
+            if (withdrawAddress === null) {
+                this.logger.error("No withdraw address.")
+                return Promise.resolve(false)
+            }
             const subAccount = wallet.getSubAccountName()
-            // const initialBalance = await this.getBalance(wallet, asset, subAccount)
-            //
-            // if (!initialBalance) {
-            //     this
-            //         .logger
-            //         .warn(`Could not fetch initial balance from main or subAccount. SubAccount: ${wallet.getSubAccountName()}`)
-            // } else {
-            //     this.logger.info(`Fetched initial balance: ${initialBalance}. Ready for withdrawal to OKX.`)
-            // }
-            //
-            // const txTransferToWithdrawAddress: TxInteraction = getTxForTransfer(asset, withdrawAddress, amount)
-            // const chain: Chain = destToChain(from)
-            //
-            // const resWithdraw: TxResult = await wallet
-            //     .sendTransaction(txTransferToWithdrawAddress, chain, 1)
-            // if (resWithdraw === TxResult.Fail) {
-            //     this.logger.error("Transaction failed.")
-            //     return Promise.resolve(false)
-            // }
-            //
-            // let retry = 0
-            // while (initialBalance && retry < MAX_TRIES && !await this.hasBalanceChanged(wallet, asset, subAccount, initialBalance)) {
-            //     await sleep(30)
-            //     this.logger.info(`Checking changes in balance... Try ${retry}/${MAX_TRIES}`)
-            //     retry++
-            // }
-            //
+            const initialBalance = await this.getBalance(wallet, asset, subAccount)
+
+            if (!initialBalance) {
+                this
+                    .logger
+                    .warn(`Could not fetch initial balance from main or subAccount. SubAccount: ${wallet.getSubAccountName()}`)
+            } else {
+                this.logger.info(`Fetched initial balance: ${initialBalance}. Ready for withdrawal to OKX.`)
+            }
+
+            const txTransferToWithdrawAddress: TxInteraction = getTxForTransfer(asset, withdrawAddress, amount)
+            const chain: Chain = destToChain(from)
+
+            const resWithdraw: TxResult = await wallet
+                .sendTransaction(txTransferToWithdrawAddress, chain, 1)
+            if (resWithdraw === TxResult.Fail) {
+                this.logger.error("Transaction failed.")
+                return Promise.resolve(false)
+            }
+
+            let retry = 0
+            while (initialBalance && retry < MAX_TRIES && !await this.hasBalanceChanged(wallet, asset, subAccount, initialBalance)) {
+                await sleep(30)
+                this.logger.info(`Checking changes in balance... Try ${retry}/${MAX_TRIES}`)
+                retry++
+            }
+
             if (subAccount === null) {
                 return Promise.resolve(true)
             }
