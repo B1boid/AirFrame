@@ -56,6 +56,7 @@ export async function oneInchSwapNativeTo(
             data: data,
             value: tokenBalance.toString(),
             stoppable: stoppable,
+            confirmations: 1,
             name: name
         })
         return txs
@@ -101,6 +102,7 @@ export async function oneInchSwap(
             data: data,
             value: "0",
             stoppable: stoppable,
+            confirmations: 1,
             name: name
         })
         return txs

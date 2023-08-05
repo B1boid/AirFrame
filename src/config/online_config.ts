@@ -18,5 +18,5 @@ export function GAS_PRICE_LIMITS(chain: Blockchains, randomized_percent: number 
 }
 
 export function MAX_TX_WAITING(): number {
-    return 10 * 60 * 1000 // timeout after 10 minutes
+    return 15 * 60 * 1000 // timeout after 15 minutes
 }

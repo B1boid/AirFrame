@@ -13,11 +13,11 @@ async function doTask(address: string, walletActions: Actions) {
         let actionsRes;
         if ("connectionName" in action) {
             console.log("Connection:", action)
-            let connectionModule = connectionModules[action.connectionName]
+            const connectionModule = connectionModules[action.connectionName]
             actionsRes = await connectionModule.sendAsset(wallet, action.from, action.to, action.asset, action.amount)
         } else {
             console.log("Module:", action)
-            let blockchainModule = blockchainModules[action.chainName]
+            const blockchainModule = blockchainModules[action.chainName]
             actionsRes = await blockchainModule.doActivities(wallet, action.activityNames, action.randomOrder)
         }
         if (!actionsRes) {

@@ -49,7 +49,7 @@ export function getAddressInfo(address: string): AddressInfo {
 
 export function getOkxCredentials(): OkxCredentials {
     if (process.env.OKX_API_KEY && process.env.OKX_API_SECRET && process.env.OKX_PASSPHRASE) {
-        return new OkxCredentials(process.env.OKX_API_KEY, process.env.OKX_API_SECRET, process.env.OKX_PASSPHRASE)
+        return new OkxCredentials(process.env.OKX_API_KEY, process.env.OKX_PASSPHRASE, process.env.OKX_API_SECRET)
     }
     throw new Error("Missing OKX credentials")
 }

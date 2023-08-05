@@ -21,6 +21,7 @@ export async function checkAndGetApprovalsInteraction(
                 data: data,
                 value: "0",
                 stoppable: false,
+                confirmations: 1,
                 name: "approve"
             }]
         } else {

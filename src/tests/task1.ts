@@ -3,6 +3,7 @@ import {Blockchains, Destination} from "../config/chains";
 import {Connections} from "../module_connections/connection_modules";
 import {PolygonActivity} from "../module_blockchains/blockchain_modules";
 import {Asset} from "../config/tokens";
+import {ethers} from "ethers";
 
 ////////////////////////////////////////////////////////////////////////
 // Later we will get it from UI, now it's hardcoded for testing
@@ -26,7 +27,7 @@ const CONNECTION_POLYGON_TO_OKX: ConnectionAction = {
     from: Destination.Polygon,
     to: Destination.OKX,
     asset: Asset.MATIC,
-    amount: -1,
+    amount: Number(ethers.parseEther("0.9")),
     connectionName: Connections.ExchangeOKX
 }
 
@@ -34,13 +35,13 @@ const CONNECTION_POLYGON_TO_OKX: ConnectionAction = {
 const ACTIONS_1: Actions = {
     actions: [
         // CONNECTION_OKX_TO_POLYGON,
-        POLYGON_ACTIONS,
-        // CONNECTION_POLYGON_TO_OKX
+        // POLYGON_ACTIONS,
+        CONNECTION_POLYGON_TO_OKX
     ]
 }
 
 export const WALLETS_ACTIONS_1: {[id: string]: Actions} = {
-    "0x90eAC2Dda44F0a96C81a34b69C6aF653Db33cf53": ACTIONS_1,
+    "0x2Fd49f2da0d07102b223D89f290F61b265291952": ACTIONS_1,
     // "0x..2": ACTIONS_1
 }
 
