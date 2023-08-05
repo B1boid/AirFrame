@@ -1,7 +1,7 @@
 // TODO: These parameters should be changeable online(without rerunning the app) through bot/dashboard
 
 import {Blockchains} from "./chains";
-import {toBigInt} from "ethers";
+import {toBigInt} from "ethers-new";
 import {getRandomInt} from "../utils/utils";
 
 export function GAS_PRICE_LIMITS(chain: Blockchains, randomized_percent: number = 10): bigint {
