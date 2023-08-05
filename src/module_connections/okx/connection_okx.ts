@@ -5,6 +5,7 @@ import {ConsoleLogger, ILogger} from "../../utils/logger";
 import {getTxForTransfer} from "../utils";
 import Crypto from "crypto-js"
 import {OkxCredentials} from "../../classes/info";
+import {config} from "./config"
 import {
     Method,
     OKX_BASE_URL,
@@ -32,7 +33,8 @@ class OkxConnectionModule implements ConnectionModule {
     async sendAsset(wallet: WalletI, from: Destination, to: Destination, asset: Asset, amount: number): Promise<boolean> {
         if (from === Destination.OKX) {
             const chain: Chain = destToChain(to)
-            return this.withdraw(wallet, asset, amount.toString(), WITHDRAWAL_FEE, chain)
+            const withdrawalConfig = config[`${asset}-${chain.title}`]
+            return this.withdraw(wallet, asset, amount.toString(), withdrawalConfig.fee, chain)
         } else if (to == Destination.OKX) {
             const withdrawAddress = wallet.getWithdrawAddress()
 
@@ -51,8 +53,9 @@ class OkxConnectionModule implements ConnectionModule {
                 this.logger.info(`Fetched initial balance: ${initialBalance}. Ready for withdrawal to OKX.`)
             }
 
-            const txTransferToWithdrawAddress: TxInteraction = getTxForTransfer(asset, withdrawAddress, amount)
             const chain: Chain = destToChain(from)
+            const txTransferToWithdrawAddress: TxInteraction = getTxForTransfer(asset, withdrawAddress, amount)
+            txTransferToWithdrawAddress.confirmations = withdrawalConfig.confirmations
 
             const resWithdraw: TxResult = await wallet
                 .sendTransaction(txTransferToWithdrawAddress, chain, 1)
