@@ -1,19 +1,25 @@
 import {Activity} from "../../classes/module";
-import {zksyncProject1_swap, zksyncProject2_stake, zksyncProject2_unstake} from "./interations";
 import {ZkSyncActivity} from "../blockchain_modules";
+import {
+    zkSyncSwapCycleNativeToUsdc_swapback,
+    zkSyncSwapCycleNativeToUsdc_swapto,
+    zkSyncWrapUnwrap_unwrap,
+    zkSyncWrapUnwrap_wrap
+} from "./interations";
 
 
-export const zksyncProject1: Activity = {
-    name: ZkSyncActivity.Project1,
+
+export const zkSyncWrapUnwrap: Activity = {
+    name: ZkSyncActivity.wrapUnwrap,
     txs: [
-        zksyncProject1_swap
+        zkSyncWrapUnwrap_wrap,
+        zkSyncWrapUnwrap_unwrap
     ]
 }
 
-export const zksyncProject2: Activity = {
-    name: ZkSyncActivity.Project2,
+export const zkSyncSwapCycleNativeToUsdc: Activity = {
+    name: ZkSyncActivity.zkSyncSwapCycleNativeToUsdc,
     txs: [
-        zksyncProject2_stake,
-        zksyncProject2_unstake
+        zkSyncSwapCycleNativeToUsdc_swapto, zkSyncSwapCycleNativeToUsdc_swapback
     ]
 }

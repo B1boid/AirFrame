@@ -1,18 +1,18 @@
 import {TxInteraction} from "./module";
 import {getRandomInt, sleep} from "../utils/utils";
 import {
-    AbstractProvider,
     ethers,
     FeeData,
     toBigInt,
-    toNumber,
     TransactionReceipt,
-    TransactionResponse
-} from "ethers";
+    TransactionResponse,
+} from "ethers-new";
 import {Blockchains, Chain} from "../config/chains";
 import {ConsoleLogger, ILogger} from "../utils/logger"
 import {AddressInfo, OkxCredentials} from "./info";
 import {GAS_PRICE_LIMITS, MAX_TX_WAITING} from "../config/online_config";
+import * as zk from "zksync-web3";
+import * as oldethers from "ethers";
 
 
 export enum TxResult {
@@ -45,7 +45,10 @@ export interface WalletI {
     sendTransaction(tx: TxInteraction, chain: Chain, maxRetries: number): Promise<TxResult>
 }
 
-export class Wallet implements WalletI {
+type UnionProvider = ethers.JsonRpcProvider | zk.Provider
+type UnionWallet = ethers.Wallet | zk.Wallet
+
+export class MyWallet implements WalletI {
     private signer: ethers.Wallet
     private readonly masterCredentials: OkxCredentials | null
     private readonly withdrawAddress: string | null
@@ -80,20 +83,30 @@ export class Wallet implements WalletI {
         return this.masterCredentials;
     }
 
-    private async resetGasInfo(provider: AbstractProvider, txInteraction: TxInteraction, chain: Chain): Promise<TxResult> {
+    private async resetGasInfo(provider: UnionProvider, txInteraction: TxInteraction, chain: Chain): Promise<TxResult> {
         try {
-            this.curGasLimit = toNumber(await provider.estimateGas({
+            this.curGasLimit = Number((await provider.estimateGas({
                 from: this.getAddress(),
                 to: txInteraction.to,
                 data: txInteraction.data,
                 value: txInteraction.value
-            }))
-            this.curGasPriceInfo = await provider.getFeeData()
+            })).toString())
+
+            if (chain.title === Blockchains.ZkSync) {
+                let tmpGasInfo: oldethers.providers.FeeData = await (provider as zk.Provider).getFeeData()
+                this.curGasPriceInfo = new FeeData(
+                    tmpGasInfo.gasPrice?.toBigInt() ?? null,
+                    tmpGasInfo.maxFeePerGas?.toBigInt() ?? null,
+                    tmpGasInfo.maxPriorityFeePerGas?.toBigInt() ?? null
+                )
+            } else {
+                this.curGasPriceInfo = await (provider as ethers.JsonRpcProvider).getFeeData()
+            }
             if (chain.title === Blockchains.Polygon) {
                 this.curGasPriceInfo = new FeeData(
                     this.curGasPriceInfo.gasPrice,
                     this.curGasPriceInfo.maxFeePerGas,
-                    toBigInt(getRandomInt(16, 30) * (10 ** 9)) // polygon min value is 30 (we multiply by 2 later, so 32 > 30)
+                    toBigInt(getRandomInt(32, 70) * (10 ** 9)) // polygon min value is 30 (we multiply by 2 later, so 32 > 30)
                 )
             }
             while (this.curGasPriceInfo.gasPrice !== null && this.curGasPriceInfo.gasPrice > GAS_PRICE_LIMITS(chain.title)) {
@@ -108,8 +121,15 @@ export class Wallet implements WalletI {
     }
 
     async sendTransaction(txInteraction: TxInteraction, chain: Chain, maxRetries: number = 1): Promise<TxResult> {
-        const provider: AbstractProvider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
-        const curSigner: ethers.Wallet = this.signer.connect(provider)
+        let provider: ethers.JsonRpcProvider | zk.Provider
+        let curSigner: ethers.Wallet | zk.Wallet
+        if (chain.title === Blockchains.ZkSync) {
+            provider = new zk.Provider(chain.nodeUrl)
+            curSigner = new zk.Wallet(this.signer.privateKey, provider, oldethers.getDefaultProvider())
+        } else {
+            provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+            curSigner = this.signer.connect(provider)
+        }
 
         for (let retry = 0; retry < maxRetries + 1; retry++) {
             let result: TxResult = await this.resetGasInfo(provider, txInteraction, chain)
@@ -134,10 +154,14 @@ export class Wallet implements WalletI {
     }
 
 
-    private async _sendTransaction(curSigner: ethers.Wallet, txInteraction: TxInteraction): Promise<TxResult> {
+    private async _sendTransaction(curSigner: UnionWallet, txInteraction: TxInteraction): Promise<TxResult> {
         try {
             let gasPrice;
             if (this.curGasPriceInfo.maxFeePerGas === null || this.curGasPriceInfo.maxPriorityFeePerGas === null) {
+                if (this.curGasPriceInfo.gasPrice === null){
+                    this.logger.warn(`Gas price is null ${this.curGasPriceInfo}`)
+                    return TxResult.Fail
+                }
                 gasPrice = {
                     gasPrice: this.curGasPriceInfo.gasPrice
                 }
@@ -145,10 +169,12 @@ export class Wallet implements WalletI {
                 gasPrice = {
                     type: 2,
                     maxFeePerGas: this.curGasPriceInfo.maxFeePerGas,
-                    maxPriorityFeePerGas: this.curGasPriceInfo.maxPriorityFeePerGas * BigInt(2)
+                    maxPriorityFeePerGas: this.curGasPriceInfo.maxPriorityFeePerGas
                 }
             }
-            const tx: TransactionResponse = await curSigner.sendTransaction({
+
+
+            const tx: TransactionResponse | oldethers.providers.TransactionResponse = await curSigner.sendTransaction({
                 to: txInteraction.to,
                 data: txInteraction.data,
                 value: txInteraction.value,
@@ -159,8 +185,8 @@ export class Wallet implements WalletI {
 
             this.logger.info(`Tx:${txInteraction.name} sending transaction with tx_hash: ${tx.hash}`)
 
-            const receipt: TransactionReceipt | null = await tx.wait(txInteraction.confirmations, MAX_TX_WAITING(txInteraction.confirmations))
-
+            const receipt: TransactionReceipt | oldethers.providers.TransactionReceipt | null = await tx.wait(
+                txInteraction.confirmations, MAX_TX_WAITING(txInteraction.confirmations))
             if (!receipt) {
                 this.logger.warn("Receipt is null.")
                 return TxResult.Fail
@@ -168,8 +194,9 @@ export class Wallet implements WalletI {
 
             this.logger.info(`Tx:${txInteraction.name} mined successfully: ${tx.hash}`)
 
-            this.curGasLimit = toNumber(receipt.gasUsed)
-            this.lastTxGasPrice = receipt.gasPrice
+            this.curGasLimit = Number(receipt.gasUsed.toString())
+            // @ts-ignore
+            this.lastTxGasPrice = receipt.gasPrice ?? toBigInt(receipt.effectiveGasPrice.toString())
 
             if (receipt.status == 1) {
                 return TxResult.Success
@@ -180,6 +207,5 @@ export class Wallet implements WalletI {
             this.logger.warn(`Tx:${txInteraction.name} failed. Error: ${e}`)
             return TxResult.Fail
         }
-
     }
 }

@@ -1,5 +1,5 @@
 import {TxInteraction} from "../classes/module";
-import {ethers, MaxUint256} from "ethers";
+import {ethers, MaxUint256} from "ethers-new";
 import {ConsoleLogger} from "../utils/logger";
 
 

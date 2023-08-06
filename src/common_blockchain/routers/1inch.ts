@@ -1,7 +1,7 @@
 import axios from "axios";
 import {WalletI} from "../../classes/wallet";
 import {TxInteraction} from "../../classes/module";
-import {ethers, formatEther, formatUnits} from "ethers";
+import {ethers, formatEther, formatUnits} from "ethers-new";
 import {Chain} from "../../config/chains";
 import erc20 from "./../../abi/erc20.json";
 import {NATIVE_ADDRESS} from "./common";
