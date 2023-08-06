@@ -1,6 +1,7 @@
 import {AddressInfo, OkxCredentials} from "../classes/info";
 import dotenv from 'dotenv';
 import { readFileSync } from 'fs';
+import CryptoJS from "crypto-js/core";
 dotenv.config();
 
 export type EnumDictionary<T extends string | symbol | number, U> = {
@@ -35,21 +36,24 @@ export function getRandomElement<T> (list: T[]) {
     return list[Math.floor((Math.random()*list.length))];
 }
 
-export function getAddressInfo(address: string): AddressInfo {
+export function getAddressInfo(password: string, address: string): AddressInfo {
     const file = readFileSync('.accs', 'utf-8');
     let accs = file.split('\n');
     for (let accLine of accs) {
-        let [addr, pk, withdrawAddr, subacc] = accLine.trim().split(',');
+        let [label, addr, withdrawAddr, subacc, pkCipher] = accLine.trim().split(',');
         if (addr.toLowerCase() === address.toLowerCase()) {
+            console.log(`Found account ${label} for address ${addr}`)
+            let pk: string = CryptoJS.AES.decrypt(pkCipher, password).toString(CryptoJS.enc.Utf8)
             return new AddressInfo(addr, pk, withdrawAddr === "" ? null : withdrawAddr, subacc === "" ? null : subacc);
         }
     }
     throw new Error("Missing account info")
 }
 
-export function getOkxCredentials(): OkxCredentials {
+export function getOkxCredentials(password: string): OkxCredentials {
     if (process.env.OKX_API_KEY && process.env.OKX_API_SECRET && process.env.OKX_PASSPHRASE) {
-        return new OkxCredentials(process.env.OKX_API_KEY, process.env.OKX_PASSPHRASE, process.env.OKX_API_SECRET)
+        let passphrase: string = CryptoJS.AES.decrypt(process.env.OKX_PASSPHRASE, password).toString(CryptoJS.enc.Utf8)
+        return new OkxCredentials(process.env.OKX_API_KEY, passphrase, process.env.OKX_API_SECRET)
     }
     throw new Error("Missing OKX credentials")
 }

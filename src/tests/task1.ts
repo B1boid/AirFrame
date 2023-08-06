@@ -53,12 +53,12 @@ const ACTIONS_1: Actions = {
         // POLYGON_ACTIONS,
         // CONNECTION_POLYGON_TO_OKX
         // POLYGON_ACTIONS
-        ZKSYNC_ACTIONS
+        // ZKSYNC_ACTIONS
     ]
 }
 
 export const WALLETS_ACTIONS_1: {[id: string]: Actions} = {
-    "0x90eAC2Dda44F0a96C81a34b69C6aF653Db33cf53": ACTIONS_1,
+    "0x365c597620d13eA24DdC36A7Ff1Fb3224941Be19": ACTIONS_1,
     // "0x..2": ACTIONS_1
 }
 

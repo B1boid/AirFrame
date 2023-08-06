@@ -4,11 +4,12 @@ import {connectionModules} from "./module_connections/connection_modules";
 import {getAddressInfo, getOkxCredentials} from "./utils/utils";
 import {WALLETS_ACTIONS_1} from "./tests/task1";
 import {Actions} from "./classes/actions";
+let prompt = require('password-prompt')
 
 
 
-async function doTask(address: string, walletActions: Actions) {
-    const wallet: WalletI = new MyWallet(getAddressInfo(address), getOkxCredentials())
+async function doTask(password: string, passwordOkx: string, address: string, walletActions: Actions) {
+    const wallet: WalletI = new MyWallet(getAddressInfo(password, address), getOkxCredentials(passwordOkx))
     for (const action of walletActions.actions) {
         let actionsRes;
         if ("connectionName" in action) {
@@ -27,9 +28,11 @@ async function doTask(address: string, walletActions: Actions) {
     }
 }
 
-function main() {
+async function main() {
+    let password: string = await prompt('Accs password: ')
+    let passwordOkx: string = await prompt('Okx password: ')
     for (const wallet in WALLETS_ACTIONS_1) {
-        doTask(wallet, WALLETS_ACTIONS_1[wallet])
+        doTask(password, passwordOkx, wallet, WALLETS_ACTIONS_1[wallet])
     }
 }
 
