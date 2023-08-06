@@ -1,7 +1,7 @@
 import axios from "axios";
 import {WalletI} from "../../classes/wallet";
 import {TxInteraction} from "../../classes/module";
-import {ethers, formatEther, formatUnits} from "ethers";
+import {ethers, formatEther, formatUnits} from "ethers-new";
 import {Chain} from "../../config/chains";
 import erc20 from "./../../abi/erc20.json";
 import {NATIVE_ADDRESS} from "./common";
@@ -56,6 +56,7 @@ export async function oneInchSwapNativeTo(
             data: data,
             value: tokenBalance.toString(),
             stoppable: stoppable,
+            confirmations: 1,
             name: name
         })
         return txs
@@ -101,6 +102,7 @@ export async function oneInchSwap(
             data: data,
             value: "0",
             stoppable: stoppable,
+            confirmations: 1,
             name: name
         })
         return txs

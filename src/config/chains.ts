@@ -9,7 +9,8 @@ export interface Chain {
 }
 export enum Blockchains {
     ZkSync = "ZkSync",
-    Polygon = "Polygon"
+    Polygon = "Polygon",
+    Ethereum = "Ethereum"
 }
 
 enum Exchanges {
@@ -34,6 +35,14 @@ export const polygonChain: Chain = {
   nodeUrl: "https://polygon.llamarpc.com",
   symbol: "MATIC",
   extraGasLimit: 100000
+}
+
+export const ethereumChain: Chain = {
+    title: Blockchains.Ethereum,
+    chainId: 1,
+    nodeUrl: "https://eth.llamarpc.com",
+    symbol: "ETH",
+    extraGasLimit: 100000
 }
 
 export const destToChain = (destination: Destination): Chain => {

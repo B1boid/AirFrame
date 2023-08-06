@@ -95,5 +95,6 @@ export interface TxInteraction {
     data: string
     value: string
     stoppable: boolean
+    confirmations: number
     name: string
 }

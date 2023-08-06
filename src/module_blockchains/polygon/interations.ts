@@ -1,7 +1,7 @@
 import {TxInteraction} from "../../classes/module";
 import {WalletI} from "../../classes/wallet";
 import {polygonContracts, polygonTokens} from "./constants";
-import {ethers} from "ethers";
+import {ethers} from "ethers-new";
 import wrapped from "./../../abi/wrapped.json";
 import {polygonChain} from "../../config/chains";
 import {getRandomizedPercent} from "../../utils/utils";
@@ -24,6 +24,7 @@ export async function polygonWrapUnwrap_wrap(wallet: WalletI): Promise<TxInterac
             data: "0xd0e30db0",
             value: tokenBalance.toString(),
             stoppable: false, // if wrap failed - it's fine, we can continue another activities
+            confirmations: 1,
             name: "polygonWrapUnwrap_wrap"
         }]
     } catch (e) {
@@ -44,6 +45,7 @@ export async function polygonWrapUnwrap_unwrap(wallet: WalletI): Promise<TxInter
             data: data,
             value: "0",
             stoppable: true, // if unwrap failed - we have remaining wrapped tokens, so we need to stop
+            confirmations: 1,
             name: "polygonWrapUnwrap_unwrap"
         }]
     } catch (e) {

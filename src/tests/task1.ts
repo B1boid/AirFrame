@@ -1,8 +1,9 @@
 import {Actions, ConnectionAction, ModuleActions, Randomness} from "../classes/actions";
 import {Blockchains, Destination} from "../config/chains";
 import {Connections} from "../module_connections/connection_modules";
-import {PolygonActivity} from "../module_blockchains/blockchain_modules";
+import {PolygonActivity, ZkSyncActivity} from "../module_blockchains/blockchain_modules";
 import {Asset} from "../config/tokens";
+import {ethers} from "ethers-new";
 
 ////////////////////////////////////////////////////////////////////////
 // Later we will get it from UI, now it's hardcoded for testing
@@ -11,7 +12,13 @@ import {Asset} from "../config/tokens";
 const POLYGON_ACTIONS: ModuleActions = {
     chainName: Blockchains.Polygon,
     randomOrder: Randomness.OnlyActivities,
-    activityNames: [PolygonActivity.polygonSwapCycleNativeToUsdc, PolygonActivity.wrapUnwrap, PolygonActivity.wrapUnwrap]
+    activityNames: [PolygonActivity.wrapUnwrap]
+}
+
+const ZKSYNC_ACTIONS: ModuleActions = {
+    chainName: Blockchains.ZkSync,
+    randomOrder: Randomness.OnlyActivities,
+    activityNames: [ZkSyncActivity.wrapUnwrap]
 }
 
 const CONNECTION_OKX_TO_POLYGON: ConnectionAction = {
@@ -22,20 +29,31 @@ const CONNECTION_OKX_TO_POLYGON: ConnectionAction = {
     connectionName: Connections.ExchangeOKX
 }
 
+const CONNECTION_OKX_TO_ZKSYNC: ConnectionAction = {
+    from: Destination.OKX,
+    to: Destination.ZkSync,
+    asset: Asset.ETH,
+    amount: 0.01,
+    connectionName: Connections.ExchangeOKX
+}
+
 const CONNECTION_POLYGON_TO_OKX: ConnectionAction = {
     from: Destination.Polygon,
     to: Destination.OKX,
     asset: Asset.MATIC,
-    amount: -1,
+    amount: Number(ethers.parseEther("0.9")),
     connectionName: Connections.ExchangeOKX
 }
 
 
 const ACTIONS_1: Actions = {
     actions: [
+        // CONNECTION_OKX_TO_ZKSYNC
         // CONNECTION_OKX_TO_POLYGON,
-        POLYGON_ACTIONS,
+        // POLYGON_ACTIONS,
         // CONNECTION_POLYGON_TO_OKX
+        // POLYGON_ACTIONS
+        ZKSYNC_ACTIONS
     ]
 }
 

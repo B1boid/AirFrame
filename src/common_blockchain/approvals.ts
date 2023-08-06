@@ -1,5 +1,5 @@
 import {TxInteraction} from "../classes/module";
-import {ethers, MaxUint256} from "ethers";
+import {ethers, MaxUint256} from "ethers-new";
 import {ConsoleLogger} from "../utils/logger";
 
 
@@ -21,6 +21,7 @@ export async function checkAndGetApprovalsInteraction(
                 data: data,
                 value: "0",
                 stoppable: false,
+                confirmations: 1,
                 name: "approve"
             }]
         } else {
