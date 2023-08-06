@@ -19,6 +19,7 @@ import {TxInteraction} from "../../classes/module";
 import {Asset} from "../../config/tokens";
 import {sleep} from "../../utils/utils";
 import axios from "axios";
+
 const MAX_TRIES = 30
 
 class OkxConnectionModule implements ConnectionModule {
@@ -46,7 +47,8 @@ class OkxConnectionModule implements ConnectionModule {
             if (!initialBalance) {
                 this
                     .logger
-                    .warn(`Could not fetch initial balance from main or subAccount. SubAccount: ${wallet.getSubAccountName()}`)
+                    .error(`Could not fetch initial balance from main or subAccount. SubAccount: ${wallet.getSubAccountName()}.`)
+                return Promise.resolve(false)
             } else {
                 this.logger.info(`Fetched initial balance: ${initialBalance}. Ready for withdrawal to OKX.`)
             }
@@ -64,10 +66,19 @@ class OkxConnectionModule implements ConnectionModule {
             }
 
             let retry = 0
-            while (initialBalance && retry < MAX_TRIES && !await this.hasBalanceChanged(wallet, asset, subAccount, initialBalance)) {
-                await sleep(30)
-                this.logger.info(`Checking changes in balance... Try ${retry}/${MAX_TRIES}`)
+            let changed = await this.hasBalanceChanged(wallet, asset, subAccount, initialBalance)
+            do {
+                this.logger.info(`Checking changes in balance... Try ${retry + 1}/${MAX_TRIES}`)
+                if (retry !== 0) {
+                    await sleep(30)
+                    changed = await this.hasBalanceChanged(wallet, asset, subAccount, initialBalance)
+                }
                 retry++
+            } while (retry < MAX_TRIES && !changed)
+
+            if (!changed) {
+                this.logger.error(`Could not fetch changed balance after ${MAX_TRIES}.`)
+                return Promise.resolve(false)
             }
 
             if (subAccount === null) {

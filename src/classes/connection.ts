@@ -1,6 +1,6 @@
 import {Destination} from "../config/chains";
 import {WalletI} from "./wallet";
-import {Asset} from "./actions";
+import {Asset} from "../config/tokens";
 
 
 export interface ConnectionModule {
