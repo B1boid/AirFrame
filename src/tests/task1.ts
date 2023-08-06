@@ -4,6 +4,7 @@ import {Connections} from "../module_connections/connection_modules";
 import {PolygonActivity, ZkSyncActivity} from "../module_blockchains/blockchain_modules";
 import {Asset} from "../config/tokens";
 import {ethers} from "ethers-new";
+import {zkSyncMintZnsId} from "../module_blockchains/zksync/activities";
 
 ////////////////////////////////////////////////////////////////////////
 // Later we will get it from UI, now it's hardcoded for testing
@@ -18,7 +19,7 @@ const POLYGON_ACTIONS: ModuleActions = {
 const ZKSYNC_ACTIONS: ModuleActions = {
     chainName: Blockchains.ZkSync,
     randomOrder: Randomness.OnlyActivities,
-    activityNames: [ZkSyncActivity.wrapUnwrap]
+    activityNames: [ZkSyncActivity.zkSyncMintZnsId]
 }
 
 const CONNECTION_OKX_TO_POLYGON: ConnectionAction = {
@@ -53,7 +54,7 @@ const ACTIONS_1: Actions = {
         // POLYGON_ACTIONS,
         CONNECTION_POLYGON_TO_OKX
         // POLYGON_ACTIONS
-        // ZKSYNC_ACTIONS
+        ZKSYNC_ACTIONS
     ]
 }
 

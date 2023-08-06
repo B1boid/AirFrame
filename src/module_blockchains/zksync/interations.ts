@@ -1,12 +1,15 @@
 import {TxInteraction} from "../../classes/module";
 import {WalletI} from "../../classes/wallet";
-import {getRandomizedPercent} from "../../utils/utils";
+import {getRandomInt, getRandomizedPercent} from "../../utils/utils";
 import {ConsoleLogger} from "../../utils/logger";
 import wrapped from "../../abi/wrapped.json";
+import zns_1 from "../../abi/zns_1.json";
+import zns_2 from "../../abi/zns_2.json";
 import {commonSwap, Dexes} from "../../common_blockchain/routers/common";
 import {zkSyncChain} from "../../config/chains";
 import {zkSyncContracts, zkSyncTokens} from "./constants";
 import {ethers} from "ethers-new";
+import { generateUsername } from "unique-username-generator";
 
 
 let tokens = zkSyncTokens
@@ -64,4 +67,61 @@ export async function zkSyncSwapCycleNativeToUsdc_swapto(wallet: WalletI): Promi
 export async function zkSyncSwapCycleNativeToUsdc_swapback(wallet: WalletI): Promise<TxInteraction[]> {
     return await commonSwap(tokens.USDC, tokens.ETH, [], [Dexes.OneInch],
         wallet, chain, contracts, "zkSyncSwapCycleNativeToUsdc_swapback")
+}
+
+export async function zkSyncMintTevaera_buyid(wallet: WalletI): Promise<TxInteraction[]> {
+    return [{
+        to: contracts.tevaeraId,
+        data: "0xfefe409d",
+        value: ethers.parseEther("0.0003").toString(),
+        stoppable: false,
+        confirmations: 1,
+        name: "zkSyncMintTevaera_buyid"
+    }]
+}
+
+export async function zkSyncMintTevaera_mint(wallet: WalletI): Promise<TxInteraction[]> {
+    return [{
+        to: contracts.tevaeraNft,
+        data: "0x1249c58b",
+        value: "0",
+        stoppable: false,
+        confirmations: 1,
+        name: "zkSyncMintTevaera_mint"
+    }]
+}
+
+export async function zkSyncMintZnsId_mint(wallet: WalletI): Promise<TxInteraction[]> {
+    let name: string = generateUsername("", 0, getRandomInt(10, 15))
+    const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+    let znsContract1 = new ethers.Contract(contracts.znsIdReg, zns_1, provider)
+    let data: string = znsContract1.interface.encodeFunctionData(
+        "RegisterWithConfig", [name, "2592000", [
+            wallet.getAddress(), "0x91b93e6d46ba99bd8170034441e8ca52b4608bcf", wallet.getAddress()
+        ]]
+    )
+    let txs = []
+    txs.push({
+        to: contracts.znsIdReg,
+        data: data,
+        value: "0",
+        stoppable: false,
+        confirmations: 1,
+        name: "zkSyncMintZnsId_mintId"
+    })
+
+    let znsContract2 = new ethers.Contract(contracts.znsIdName, zns_2, provider)
+    let data2: string = znsContract2.interface.encodeFunctionData(
+        "setName", [name + '.zk']
+    )
+    txs.push({
+        to: contracts.znsIdName,
+        data: data2,
+        value: "0",
+        stoppable: false,
+        confirmations: 1,
+        name: "zkSyncMintZnsId_setName"
+    })
+
+    return txs
 }

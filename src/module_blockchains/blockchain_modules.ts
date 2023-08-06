@@ -14,6 +14,8 @@ export const enum PolygonActivity {
 export const enum ZkSyncActivity {
     wrapUnwrap = "wrapUnwrap",
     zkSyncSwapCycleNativeToUsdc = "zkSyncSwapCycleNativeToUsdc",
+    zkSyncMintTevaera = "zkSyncMintTevaera",
+    zkSyncMintZnsId = "zkSyncMintZnsId"
 }
 
 export const enum EthereumActivity {
