@@ -37,10 +37,10 @@ export const polygonChain: Chain = {
   extraGasLimit: 100000
 }
 
-export const ethereumChain: Chain = { // TODO fix fields
+export const ethereumChain: Chain = {
     title: Blockchains.Ethereum,
-    chainId: 137,
-    nodeUrl: "https://polygon.llamarpc.com",
+    chainId: 1,
+    nodeUrl: "https://eth.llamarpc.com",
     symbol: "ETH",
     extraGasLimit: 100000
 }

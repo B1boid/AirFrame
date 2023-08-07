@@ -1,7 +1,7 @@
 import {TxInteraction} from "../../classes/module";
 import {WalletI} from "../../classes/wallet";
 import {polygonContracts, polygonTokens} from "./constants";
-import {ethers} from "ethers";
+import {ethers} from "ethers-new";
 import wrapped from "./../../abi/wrapped.json";
 import {polygonChain} from "../../config/chains";
 import {getRandomizedPercent} from "../../utils/utils";

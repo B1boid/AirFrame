@@ -5,7 +5,7 @@ import {ConsoleLogger, ILogger} from "../../utils/logger";
 import {getTxForTransfer} from "../utils";
 import Crypto from "crypto-js"
 import {OkxCredentials} from "../../classes/info";
-import {config} from "./config"
+import {destToOkxChain, OKXWithdrawalConfig, okxWithdrawalConfig} from "./config"
 import {
     Method,
     OKX_BASE_URL,
@@ -32,7 +32,7 @@ class OkxConnectionModule implements ConnectionModule {
     async sendAsset(wallet: WalletI, from: Destination, to: Destination, asset: Asset, amount: number): Promise<boolean> {
         if (from === Destination.OKX) {
             const chain: Chain = destToChain(to)
-            const withdrawalConfig = config[`${asset}-${chain.title}`]
+            const withdrawalConfig: OKXWithdrawalConfig = okxWithdrawalConfig(asset, chain.title)
             return this.withdraw(wallet, asset, amount.toString(), withdrawalConfig.fee, chain)
         } else if (to == Destination.OKX) {
             const withdrawAddress = wallet.getWithdrawAddress()
@@ -54,7 +54,11 @@ class OkxConnectionModule implements ConnectionModule {
             }
 
             const chain: Chain = destToChain(from)
-            const withdrawalConfig = config[`${asset}-${chain.title}`]
+            const withdrawalConfig: OKXWithdrawalConfig = okxWithdrawalConfig(asset, chain.title)
+            if (withdrawalConfig.confirmations === -1){
+                this.logger.error("Chain is not supported for depositing to OKX ")
+                return Promise.resolve(false)
+            }
             const txTransferToWithdrawAddress: TxInteraction = getTxForTransfer(asset, withdrawAddress, amount)
             txTransferToWithdrawAddress.confirmations = withdrawalConfig.confirmations
 
@@ -139,7 +143,7 @@ class OkxConnectionModule implements ConnectionModule {
                 amt: amt,
                 fee: fee,
                 dest: "4", // on chain
-                chain: `${ccy}-${chain.title}`,
+                chain: `${ccy}-${destToOkxChain(chain.title)}`,
                 toAddr: wallet.getAddress()
             }
         )
