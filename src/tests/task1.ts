@@ -25,7 +25,7 @@ const CONNECTION_OKX_TO_POLYGON: ConnectionAction = {
     from: Destination.OKX,
     to: Destination.Polygon,
     asset: Asset.MATIC,
-    amount: 2,
+    amount: 1,
     connectionName: Connections.ExchangeOKX
 }
 
@@ -41,7 +41,7 @@ const CONNECTION_POLYGON_TO_OKX: ConnectionAction = {
     from: Destination.Polygon,
     to: Destination.OKX,
     asset: Asset.MATIC,
-    amount: Number(ethers.parseEther("0.9")),
+    amount: Number(ethers.parseEther("1")),
     connectionName: Connections.ExchangeOKX
 }
 
@@ -49,9 +49,9 @@ const CONNECTION_POLYGON_TO_OKX: ConnectionAction = {
 const ACTIONS_1: Actions = {
     actions: [
         // CONNECTION_OKX_TO_ZKSYNC
-        // CONNECTION_OKX_TO_POLYGON,
+        CONNECTION_OKX_TO_POLYGON,
         // POLYGON_ACTIONS,
-        // CONNECTION_POLYGON_TO_OKX
+        CONNECTION_POLYGON_TO_OKX
         // POLYGON_ACTIONS
         // ZKSYNC_ACTIONS
     ]
