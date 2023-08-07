@@ -3,9 +3,11 @@ import {TxInteraction} from "../../classes/module";
 import {oneInchSwap, oneInchSwapNativeTo} from "./1inch";
 import {Chain} from "../../config/chains";
 import {shuffleArray} from "../../utils/utils";
+import {muteSwap, muteSwapNativeTo} from "./mute";
 
 export enum Dexes {
-    OneInch = "1inch"
+    OneInch = "1inch",
+    Mute = "mute"
 }
 
 export const NATIVE_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
@@ -30,6 +32,16 @@ export async function commonSwap(
                 )
             } else {
                 res = await oneInchSwap(
+                    tokenFrom, tokenTo, wallet, chain, contracts, name, balancePercent
+                )
+            }
+        } else if (dex === Dexes.Mute){
+            if (tokenFrom === NATIVE_ADDRESS){
+                res = await muteSwapNativeTo(
+                    tokenTo, wallet, chain, contracts, name, balancePercent
+                )
+            } else {
+                res = await muteSwap(
                     tokenFrom, tokenTo, wallet, chain, contracts, name, balancePercent
                 )
             }
