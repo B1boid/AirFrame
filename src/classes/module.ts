@@ -16,7 +16,7 @@ export abstract class BlockchainModule {
     }
 
     private getActivitiesTxs(activityNames: ActivityTag[], randomOrder: Randomness): ActivityTx[] {
-        let activities: Activity[] = []
+        const activities: Activity[] = []
         for (const activityName of activityNames) {
             const activity: Activity | undefined = this.activities.find(activity => activity.name === activityName)
             if (activity === undefined) {
@@ -46,7 +46,7 @@ export abstract class BlockchainModule {
                     }
                 } else {
                     for (const tx of interactions) {
-                        let txResult: TxResult = await wallet.sendTransaction(tx, this.chain, 1)
+                        const [txResult,]: [TxResult, string] = await wallet.sendTransaction(tx, this.chain, 1)
                         if (txResult === TxResult.Fail) {
                             if (i == this.extraTries && tx.stoppable) {
                                 console.log("Stoppable Transaction failed")

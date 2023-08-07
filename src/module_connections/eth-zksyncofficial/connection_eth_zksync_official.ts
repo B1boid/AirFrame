@@ -28,7 +28,7 @@ class ZkSyncEthOfficialConectionModule implements ConnectionModule {
         }
 
         const tx = this.buildTx(wallet, from, amount)
-        const homeResponse = await wallet.sendTransaction(tx, destToChain(from), 1)
+        const [homeResponse,] = await wallet.sendTransaction(tx, destToChain(from), 1)
 
         if (homeResponse === TxResult.Fail) {
             this.logger.error(`Failed tx for bridging ${from} -> ${to} using ${tag}.`)

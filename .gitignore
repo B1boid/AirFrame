@@ -6,3 +6,5 @@ yarn-error.log
 package-lock.json
 .env
 .accs
+.subs
+src/gen.js

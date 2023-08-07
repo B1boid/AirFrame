@@ -40,9 +40,11 @@ export interface WalletI {
 
     getMasterCredentials(): OkxCredentials | null
 
+    getSubAccountCredentials(): OkxCredentials | null
+
     getSubAccountName(): string | null
 
-    sendTransaction(tx: TxInteraction, chain: Chain, maxRetries: number): Promise<TxResult>
+    sendTransaction(tx: TxInteraction, chain: Chain, maxRetries: number): Promise<[TxResult, string]>
 }
 
 type UnionProvider = ethers.JsonRpcProvider | zk.Provider
@@ -51,6 +53,7 @@ type UnionWallet = ethers.Wallet | zk.Wallet
 export class MyWallet implements WalletI {
     private signer: ethers.Wallet
     private readonly masterCredentials: OkxCredentials | null
+    private readonly subAccountCredentials: OkxCredentials | null
     private readonly withdrawAddress: string | null
     private readonly subAccountName: string | null
     private readonly logger: ILogger
@@ -58,12 +61,14 @@ export class MyWallet implements WalletI {
     private lastTxGasPrice: bigint = BigInt(0)
     private curGasPriceInfo: FeeData = new FeeData(BigInt(0), BigInt(0), BigInt(0));
 
-    constructor(addressInfo: AddressInfo, masterCredentials: OkxCredentials | null, logger: ILogger | null = null) {
+    constructor(addressInfo: AddressInfo, masterCredentials: OkxCredentials | null,
+                subAccountCredentials: OkxCredentials | null, logger: ILogger | null = null) {
         this.signer = new ethers.Wallet(addressInfo.privateKey)
         if (this.signer.address.toLowerCase() !== addressInfo.address.toLowerCase()) throw new Error("Address mismatch")
         this.logger = logger ? logger : new ConsoleLogger(this.signer.address)
         this.withdrawAddress = addressInfo.withdrawAddress
         this.masterCredentials = masterCredentials
+        this.subAccountCredentials = subAccountCredentials
         this.subAccountName = addressInfo.subAccName
     }
 
@@ -93,7 +98,7 @@ export class MyWallet implements WalletI {
             })).toString())
 
             if (chain.title === Blockchains.ZkSync) {
-                let tmpGasInfo: oldethers.providers.FeeData = await (provider as zk.Provider).getFeeData()
+                const tmpGasInfo: oldethers.providers.FeeData = await (provider as zk.Provider).getFeeData()
                 this.curGasPriceInfo = new FeeData(
                     tmpGasInfo.gasPrice?.toBigInt() ?? null,
                     tmpGasInfo.maxFeePerGas?.toBigInt() ?? null,
@@ -120,7 +125,7 @@ export class MyWallet implements WalletI {
         }
     }
 
-    async sendTransaction(txInteraction: TxInteraction, chain: Chain, maxRetries: number = 1): Promise<TxResult> {
+    async sendTransaction(txInteraction: TxInteraction, chain: Chain, maxRetries: number = 1): Promise<[TxResult, string]> {
         let provider: ethers.JsonRpcProvider | zk.Provider
         let curSigner: ethers.Wallet | zk.Wallet
         if (chain.title === Blockchains.ZkSync) {
@@ -133,14 +138,17 @@ export class MyWallet implements WalletI {
 
         for (let retry = 0; retry < maxRetries + 1; retry++) {
             let result: TxResult = await this.resetGasInfo(provider, txInteraction, chain)
+            let txHash: string = ""
             if(result === TxResult.Success) {
                 this.curGasLimit += TX_LOGIC_BY_TRY[retry].addGasLimit + chain.extraGasLimit
-                result = await this._sendTransaction(curSigner, txInteraction)
+                const [sendResponse, txInfo] = await this._sendTransaction(curSigner, txInteraction)
+                result = sendResponse
+                txHash = txInfo
             }
             switch (result) {
                 case TxResult.Success:
                     this.logger.success(`Tx:${txInteraction.name} Gas used: ${this.curGasLimit}. Gas price: ${this.lastTxGasPrice / BigInt(10 ** 9)}`)
-                    return TxResult.Success
+                    return [TxResult.Success, txHash]
                 case TxResult.Fail:
                     this.logger.warn(`Tx:${txInteraction.name} Tx failed. Try №${retry} | Gas used: ${this.curGasLimit}`)
                     if (retry !== maxRetries) {
@@ -150,17 +158,17 @@ export class MyWallet implements WalletI {
 
         }
         this.logger.error(`Tx:${txInteraction.name} failed after ${maxRetries} tries`)
-        return TxResult.Fail
+        return [TxResult.Fail, ""]
     }
 
 
-    private async _sendTransaction(curSigner: UnionWallet, txInteraction: TxInteraction): Promise<TxResult> {
+    private async _sendTransaction(curSigner: UnionWallet, txInteraction: TxInteraction): Promise<[TxResult, string]> {
         try {
             let gasPrice;
             if (this.curGasPriceInfo.maxFeePerGas === null || this.curGasPriceInfo.maxPriorityFeePerGas === null) {
                 if (this.curGasPriceInfo.gasPrice === null){
                     this.logger.warn(`Gas price is null ${this.curGasPriceInfo}`)
-                    return TxResult.Fail
+                    return [TxResult.Fail, ""]
                 }
                 gasPrice = {
                     gasPrice: this.curGasPriceInfo.gasPrice
@@ -189,7 +197,7 @@ export class MyWallet implements WalletI {
                 txInteraction.confirmations, MAX_TX_WAITING(txInteraction.confirmations))
             if (!receipt) {
                 this.logger.warn("Receipt is null.")
-                return TxResult.Fail
+                return [TxResult.Fail, ""]
             }
 
             this.logger.info(`Tx:${txInteraction.name} mined successfully: ${tx.hash}`)
@@ -199,13 +207,17 @@ export class MyWallet implements WalletI {
             this.lastTxGasPrice = receipt.gasPrice ?? toBigInt(receipt.effectiveGasPrice.toString())
 
             if (receipt.status == 1) {
-                return TxResult.Success
+                return [TxResult.Success, tx.hash]
             } else {
-                return TxResult.Fail
+                return [TxResult.Fail, ""]
             }
         } catch (e) {
             this.logger.warn(`Tx:${txInteraction.name} failed. Error: ${e}`)
-            return TxResult.Fail
+            return [TxResult.Fail, ""]
         }
+    }
+
+    getSubAccountCredentials(): OkxCredentials | null {
+        return this.subAccountCredentials
     }
 }

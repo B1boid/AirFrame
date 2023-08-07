@@ -1,7 +1,7 @@
 import {blockchainModules} from "./module_blockchains/blockchain_modules";
 import {MyWallet, WalletI} from "./classes/wallet";
 import {connectionModules} from "./module_connections/connection_modules";
-import {getAddressInfo, getOkxCredentials} from "./utils/utils";
+import {getAddressInfo, getOkxCredentials, getOkxCredentialsForSub} from "./utils/utils";
 import {WALLETS_ACTIONS_1} from "./tests/task1";
 import {Actions} from "./classes/actions";
 let prompt = require('password-prompt')
@@ -9,7 +9,11 @@ let prompt = require('password-prompt')
 
 
 async function doTask(password: string, passwordOkx: string, address: string, walletActions: Actions) {
-    const wallet: WalletI = new MyWallet(getAddressInfo(password, address), getOkxCredentials(passwordOkx))
+    const addressInfo = getAddressInfo(password, address)
+    const wallet: WalletI = new MyWallet(addressInfo,
+        getOkxCredentials(passwordOkx),
+        getOkxCredentialsForSub(addressInfo, passwordOkx)
+    )
     for (const action of walletActions.actions) {
         let actionsRes;
         if ("connectionName" in action) {
@@ -29,8 +33,8 @@ async function doTask(password: string, passwordOkx: string, address: string, wa
 }
 
 async function main() {
-    let password: string = await prompt('Accs password: ')
-    let passwordOkx: string = await prompt('Okx password: ')
+    const password: string = await prompt('Accs password: ')
+    const passwordOkx: string = await prompt('Okx password: ')
     for (const wallet in WALLETS_ACTIONS_1) {
         doTask(password, passwordOkx, wallet, WALLETS_ACTIONS_1[wallet])
     }

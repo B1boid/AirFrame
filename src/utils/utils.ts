@@ -19,14 +19,14 @@ export function getRandomInt(min: number, max: number): number {
 }
 
 export function getRandomizedPercent(value: bigint, minPercent: number, maxPercent: number): bigint {
-    let randomPercent = getRandomInt(minPercent, maxPercent);
+    const randomPercent = getRandomInt(minPercent, maxPercent);
     return value * BigInt(randomPercent) / BigInt(100);
 }
 
 export function shuffleArray<T>(array: T[]) {
     for (let i = array.length - 1; i > 0; i--) {
-        let j = Math.floor(Math.random() * (i + 1));
-        let temp = array[i];
+        const j = Math.floor(Math.random() * (i + 1));
+        const temp = array[i];
         array[i] = array[j];
         array[j] = temp;
     }
@@ -38,12 +38,12 @@ export function getRandomElement<T> (list: T[]) {
 
 export function getAddressInfo(password: string, address: string): AddressInfo {
     const file = readFileSync('.accs', 'utf-8');
-    let accs = file.split('\n');
-    for (let accLine of accs) {
-        let [label, addr, withdrawAddr, subacc, pkCipher] = accLine.trim().split(',');
+    const accs = file.split('\n');
+    for (const accLine of accs) {
+        const [label, addr, withdrawAddr, subacc, pkCipher] = accLine.trim().split(',');
         if (addr.toLowerCase() === address.toLowerCase()) {
             console.log(`Found account ${label} for address ${addr}`)
-            let pk: string = CryptoJS.AES.decrypt(pkCipher, password).toString(CryptoJS.enc.Utf8)
+            const pk: string = CryptoJS.AES.decrypt(pkCipher, password).toString(CryptoJS.enc.Utf8)
             return new AddressInfo(addr, pk, withdrawAddr === "" ? null : withdrawAddr, subacc === "" ? null : subacc);
         }
     }
@@ -52,8 +52,28 @@ export function getAddressInfo(password: string, address: string): AddressInfo {
 
 export function getOkxCredentials(password: string): OkxCredentials {
     if (process.env.OKX_API_KEY && process.env.OKX_API_SECRET && process.env.OKX_PASSPHRASE) {
-        let passphrase: string = CryptoJS.AES.decrypt(process.env.OKX_PASSPHRASE, password).toString(CryptoJS.enc.Utf8)
-        return new OkxCredentials(process.env.OKX_API_KEY, passphrase, process.env.OKX_API_SECRET)
+        const passphrase: string = CryptoJS.AES.decrypt(process.env.OKX_PASSPHRASE, password).toString(CryptoJS.enc.Utf8)
+        const secret: string = CryptoJS.AES.decrypt(process.env.OKX_API_SECRET, password).toString(CryptoJS.enc.Utf8)
+        return new OkxCredentials(process.env.OKX_API_KEY, passphrase, secret)
     }
     throw new Error("Missing OKX credentials")
+}
+
+export function getOkxCredentialsForSub(addressInfo : AddressInfo, password: string): OkxCredentials | null {
+    if (!addressInfo.subAccName) {
+        console.log(`No subacc for ${addressInfo.address}. Is it ok?`)
+        return null
+    }
+    const file = readFileSync('.subs', 'utf-8');
+    const credentials = file.split('\n');
+    for (const subAccCredentials of credentials) {
+        const [subName, apikey, secretCipher, passphraseCipher] = subAccCredentials.trim().split(',');
+        if (subName === addressInfo.subAccName) {
+            console.log(`Found account ${subName} for address ${addressInfo.address}`)
+            const passphrase: string = CryptoJS.AES.decrypt(passphraseCipher, password).toString(CryptoJS.enc.Utf8)
+            const secret: string = CryptoJS.AES.decrypt(secretCipher, password).toString(CryptoJS.enc.Utf8)
+            return new OkxCredentials(apikey, passphrase, secret)
+        }
+    }
+    throw new Error(`Missing OKX credentials for ${addressInfo.subAccName}.`)
 }
