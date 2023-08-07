@@ -15,7 +15,8 @@ export const enum ZkSyncActivity {
     wrapUnwrap = "wrapUnwrap",
     zkSyncSwapCycleNativeToUsdc = "zkSyncSwapCycleNativeToUsdc",
     zkSyncMintTevaera = "zkSyncMintTevaera",
-    zkSyncMintZnsId = "zkSyncMintZnsId"
+    zkSyncMintZnsId = "zkSyncMintZnsId",
+    zkSyncRandomApprove = "zkSyncRandomApprove"
 }
 
 export const enum EthereumActivity {

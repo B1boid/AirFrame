@@ -19,7 +19,7 @@ const POLYGON_ACTIONS: ModuleActions = {
 const ZKSYNC_ACTIONS: ModuleActions = {
     chainName: Blockchains.ZkSync,
     randomOrder: Randomness.OnlyActivities,
-    activityNames: [ZkSyncActivity.zkSyncMintZnsId]
+    activityNames: [ZkSyncActivity.zkSyncRandomApprove]
 }
 
 const CONNECTION_OKX_TO_POLYGON: ConnectionAction = {

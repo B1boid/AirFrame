@@ -10,6 +10,7 @@ import {zkSyncChain} from "../../config/chains";
 import {zkSyncContracts, zkSyncTokens} from "./constants";
 import {ethers} from "ethers-new";
 import { generateUsername } from "unique-username-generator";
+import {getRandomApprove} from "../../common_blockchain/approvals";
 
 
 let tokens = zkSyncTokens
@@ -124,4 +125,17 @@ export async function zkSyncMintZnsId_mint(wallet: WalletI): Promise<TxInteracti
     })
 
     return txs
+}
+
+
+export async function zkSyncRandomApprove_approve(wallet: WalletI): Promise<TxInteraction[]> {
+    let rndTokens: string[] = [
+        tokens.BUSD, tokens.WMATIC, tokens.SIS, tokens.IZI, tokens.ZAT, tokens.DVF, tokens.LUSD, tokens.MAV, tokens.MUTE,
+        tokens.RETH, tokens.SPACE, tokens.VC, tokens.ZKDOGE, tokens.WBTC
+    ]
+    let rndSpenders: string[] = [
+        contracts.OneInchRouter, contracts.velocoreRouter, contracts.spaceRouter, contracts.syncSwapRouter,
+        contracts.iziRouter, contracts.muteRouter,
+    ]
+    return await getRandomApprove(rndTokens, rndSpenders, wallet.getAddress(), chain)
 }

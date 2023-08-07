@@ -1,7 +1,7 @@
 import {Activity} from "../../classes/module";
 import {ZkSyncActivity} from "../blockchain_modules";
 import {
-    zkSyncMintTevaera_buyid, zkSyncMintTevaera_mint, zkSyncMintZnsId_mint,
+    zkSyncMintTevaera_buyid, zkSyncMintTevaera_mint, zkSyncMintZnsId_mint, zkSyncRandomApprove_approve,
     zkSyncSwapCycleNativeToUsdc_swapback,
     zkSyncSwapCycleNativeToUsdc_swapto,
     zkSyncWrapUnwrap_unwrap,
@@ -36,5 +36,12 @@ export const zkSyncMintZnsId: Activity = {
     name: ZkSyncActivity.zkSyncMintZnsId,
     txs: [
         zkSyncMintZnsId_mint
+    ]
+}
+
+export const zkSyncRandomApprove: Activity = {
+    name: ZkSyncActivity.zkSyncRandomApprove,
+    txs: [
+        zkSyncRandomApprove_approve
     ]
 }

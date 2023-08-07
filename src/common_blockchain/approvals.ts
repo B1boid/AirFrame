@@ -1,6 +1,9 @@
 import {TxInteraction} from "../classes/module";
 import {ethers, MaxUint256} from "ethers-new";
 import {ConsoleLogger} from "../utils/logger";
+import {Chain} from "../config/chains";
+import {shuffleArray} from "../utils/utils";
+import erc20 from "../abi/erc20.json";
 
 
 export async function checkAndGetApprovalsInteraction(
@@ -32,4 +35,28 @@ export async function checkAndGetApprovalsInteraction(
         logger.warn(`Getting approvals failed: ${e}`)
         return []
     }
+}
+
+
+export async function getRandomApprove(
+    tokens: string[],
+    spenders: string[],
+    fromAddress: string,
+    chain: Chain
+): Promise<TxInteraction[]> {
+    shuffleArray(tokens)
+    shuffleArray(spenders)
+    for (let token of tokens){
+        const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+        let tokenContract = new ethers.Contract(token, erc20, provider)
+        for (let spender of spenders){
+            let res: TxInteraction[] = await checkAndGetApprovalsInteraction(
+                fromAddress, spender, BigInt(1), tokenContract
+            )
+            if (res.length > 0){
+                return res
+            }
+        }
+    }
+    return []
 }
