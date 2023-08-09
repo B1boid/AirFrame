@@ -8,11 +8,12 @@ import mute from "./../../abi/mute.json";
 import {NATIVE_ADDRESS} from "./common";
 import {checkAndGetApprovalsInteraction} from "../approvals";
 import {ConsoleLogger} from "../../utils/logger";
-import {getRandomizedPercent, sleep} from "../../utils/utils";
+import {getCurTimestamp, getRandomizedPercent, sleep} from "../../utils/utils";
 
 
 
 export async function muteSwapNativeTo(
+    wrappedToken: string,
     token: string,
     wallet: WalletI,
     chain: Chain,
@@ -29,9 +30,10 @@ export async function muteSwapNativeTo(
         if (balancePercent.length > 0) {
             tokenBalance = getRandomizedPercent(tokenBalance, balancePercent[0], balancePercent[1])
         }
-        let amountOutMin = ""
+        let amountsOutMin: bigint[] = await routerContract.getAmountsOut(tokenBalance.toString(), [wrappedToken, token], [ true, false ])
+        let minOut: bigint = amountsOutMin[1] * BigInt(999) / BigInt(1000)
         let data = routerContract.interface.encodeFunctionData("swapExactETHForTokensSupportingFeeOnTransferTokens",
-            [amountOutMin, []])
+            [minOut, [wrappedToken, token], wallet.getAddress(), getCurTimestamp() + 1200,  [ true, false ]])
         txs.push({
             to: contracts.muteRouter,
             data: data,
@@ -60,6 +62,7 @@ export async function muteSwap(
 ): Promise<TxInteraction[]> {
     try {
         const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+        let routerContract = new ethers.Contract(contracts.muteRouter, mute, provider)
         let tokenContract = new ethers.Contract(tokenFrom, erc20, provider)
         let tokenBalance: bigint = await tokenContract.balanceOf(wallet.getAddress())
         if (tokenBalance === BigInt(0)){
@@ -71,13 +74,10 @@ export async function muteSwap(
             tokenBalance = getRandomizedPercent(tokenBalance, balancePercent[0], balancePercent[1])
         }
         let txs = await checkAndGetApprovalsInteraction(wallet.getAddress(), contracts.muteRouter, tokenBalance, tokenContract)
-        let data = ""
-        if (data === null) {
-            let logger = new ConsoleLogger(wallet.getAddress())
-            let decimals = await tokenContract.decimals()
-            logger.warn(`mute quote for ${name} failed, amount: ${formatUnits(tokenBalance.toString(), decimals)}`)
-            return []
-        }
+        let amountsOutMin: bigint[] = await routerContract.getAmountsOut(tokenBalance.toString(), [tokenFrom, tokenTo], [ true, false ])
+        let minOut: bigint = amountsOutMin[1] * BigInt(999) / BigInt(1000)
+        let data = routerContract.interface.encodeFunctionData("swapExactTokensForETHSupportingFeeOnTransferTokens",
+            [tokenBalance.toString(), minOut, [tokenFrom, tokenTo], wallet.getAddress(), getCurTimestamp() + 1200,  [ true, false ]])
         txs.push({
             to: contracts.muteRouter,
             data: data,

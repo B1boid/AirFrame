@@ -21,7 +21,8 @@ export const zkSyncWrapUnwrap: Activity = {
 export const zkSyncSwapCycleNativeToUsdc: Activity = {
     name: ZkSyncActivity.zkSyncSwapCycleNativeToUsdc,
     txs: [
-        zkSyncSwapCycleNativeToUsdc_swapto, zkSyncSwapCycleNativeToUsdc_swapback
+        zkSyncSwapCycleNativeToUsdc_swapto,
+        zkSyncSwapCycleNativeToUsdc_swapback
     ]
 }
 

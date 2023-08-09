@@ -101,8 +101,8 @@ export class MyWallet implements WalletI {
                 const tmpGasInfo: oldethers.providers.FeeData = await (provider as zk.Provider).getFeeData()
                 this.curGasPriceInfo = new FeeData(
                     tmpGasInfo.gasPrice?.toBigInt() ?? null,
-                    tmpGasInfo.maxFeePerGas?.toBigInt() ?? null,
-                    tmpGasInfo.maxPriorityFeePerGas?.toBigInt() ?? null
+                    null,
+                    null
                 )
             } else {
                 this.curGasPriceInfo = await (provider as ethers.JsonRpcProvider).getFeeData()
@@ -164,20 +164,24 @@ export class MyWallet implements WalletI {
 
     private async _sendTransaction(curSigner: UnionWallet, txInteraction: TxInteraction): Promise<[TxResult, string]> {
         try {
-            let gasPrice;
+            let txTyped;
             if (this.curGasPriceInfo.maxFeePerGas === null || this.curGasPriceInfo.maxPriorityFeePerGas === null) {
                 if (this.curGasPriceInfo.gasPrice === null){
                     this.logger.warn(`Gas price is null ${this.curGasPriceInfo}`)
                     return [TxResult.Fail, ""]
                 }
-                gasPrice = {
-                    gasPrice: this.curGasPriceInfo.gasPrice
+                txTyped = {
+                    gasPrice: this.curGasPriceInfo.gasPrice,
+                    gasLimit: oldethers.utils.hexlify(this.curGasLimit),
+                    value: oldethers.utils.hexlify(BigInt(txInteraction.value)),
                 }
             } else {
-                gasPrice = {
+                txTyped = {
                     type: 2,
                     maxFeePerGas: this.curGasPriceInfo.maxFeePerGas,
-                    maxPriorityFeePerGas: this.curGasPriceInfo.maxPriorityFeePerGas
+                    maxPriorityFeePerGas: this.curGasPriceInfo.maxPriorityFeePerGas,
+                    gasLimit: this.curGasLimit.toString(),
+                    value: txInteraction.value,
                 }
             }
 
@@ -185,10 +189,8 @@ export class MyWallet implements WalletI {
             const tx: TransactionResponse | oldethers.providers.TransactionResponse = await curSigner.sendTransaction({
                 to: txInteraction.to,
                 data: txInteraction.data,
-                value: txInteraction.value,
-                gasLimit: this.curGasLimit.toString(),
                 nonce: await curSigner.getNonce(),
-                ...gasPrice
+                ...txTyped
             })
 
             this.logger.info(`Tx:${txInteraction.name} sending transaction with tx_hash: ${tx.hash}`)

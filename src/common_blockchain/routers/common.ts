@@ -2,8 +2,9 @@ import {WalletI} from "../../classes/wallet";
 import {TxInteraction} from "../../classes/module";
 import {oneInchSwap, oneInchSwapNativeTo} from "./1inch";
 import {Chain} from "../../config/chains";
-import {shuffleArray} from "../../utils/utils";
+import {EnumDictionary, shuffleArray} from "../../utils/utils";
 import {muteSwap, muteSwapNativeTo} from "./mute";
+import {Asset} from "../../config/tokens";
 
 export enum Dexes {
     OneInch = "1inch",
@@ -20,6 +21,7 @@ export async function commonSwap(
     wallet: WalletI,
     chain: Chain,
     contracts: { [id: string]: string },
+    tokens: EnumDictionary<Asset, string>,
     name: string
 ): Promise<TxInteraction[]> {
     shuffleArray(dexes)
@@ -38,11 +40,11 @@ export async function commonSwap(
         } else if (dex === Dexes.Mute){
             if (tokenFrom === NATIVE_ADDRESS){
                 res = await muteSwapNativeTo(
-                    tokenTo, wallet, chain, contracts, name, balancePercent
+                    tokens.WETH, tokenTo, wallet, chain, contracts, name, balancePercent
                 )
-            } else {
+            } else if (tokenTo === NATIVE_ADDRESS){
                 res = await muteSwap(
-                    tokenFrom, tokenTo, wallet, chain, contracts, name, balancePercent
+                    tokenFrom, tokens.WETH, wallet, chain, contracts, name, balancePercent
                 )
             }
         }
