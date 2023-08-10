@@ -5,10 +5,12 @@ import {Chain} from "../../config/chains";
 import {EnumDictionary, shuffleArray} from "../../utils/utils";
 import {muteSwap, muteSwapNativeTo} from "./mute";
 import {Asset} from "../../config/tokens";
+import {syncSwap, syncSwapNativeTo} from "./syncswap";
 
 export enum Dexes {
     OneInch = "1inch",
-    Mute = "mute"
+    Mute = "mute",
+    SyncSwap = "syncswap"
 }
 
 export const NATIVE_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
@@ -44,6 +46,16 @@ export async function commonSwap(
                 )
             } else if (tokenTo === NATIVE_ADDRESS){
                 res = await muteSwap(
+                    tokenFrom, tokens.WETH, wallet, chain, contracts, name, balancePercent
+                )
+            }
+        } else if (dex === Dexes.SyncSwap){
+            if (tokenFrom === NATIVE_ADDRESS){
+                res = await syncSwapNativeTo(
+                    tokens.WETH, tokenTo, wallet, chain, contracts, name, balancePercent
+                )
+            } else if (tokenTo === NATIVE_ADDRESS){
+                res = await syncSwap(
                     tokenFrom, tokens.WETH, wallet, chain, contracts, name, balancePercent
                 )
             }

@@ -1,14 +1,12 @@
-import axios from "axios";
 import {WalletI} from "../../classes/wallet";
 import {TxInteraction} from "../../classes/module";
-import {ethers, formatEther, formatUnits} from "ethers-new";
+import {ethers} from "ethers-new";
 import {Chain} from "../../config/chains";
 import erc20 from "./../../abi/erc20.json";
 import mute from "./../../abi/mute.json";
-import {NATIVE_ADDRESS} from "./common";
 import {checkAndGetApprovalsInteraction} from "../approvals";
 import {ConsoleLogger} from "../../utils/logger";
-import {getCurTimestamp, getRandomizedPercent, sleep} from "../../utils/utils";
+import {getCurTimestamp, getRandomizedPercent} from "../../utils/utils";
 
 
 

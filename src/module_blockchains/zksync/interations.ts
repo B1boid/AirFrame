@@ -61,12 +61,12 @@ export async function zkSyncWrapUnwrap_unwrap(wallet: WalletI): Promise<TxIntera
 }
 
 export async function zkSyncSwapCycleNativeToUsdc_swapto(wallet: WalletI): Promise<TxInteraction[]> {
-    return await commonSwap(tokens.ETH, tokens.USDC, [20, 40], [Dexes.Mute],
+    return await commonSwap(tokens.ETH, tokens.USDC, [20, 40], [Dexes.SyncSwap],
         wallet, chain, contracts, tokens, "zkSyncSwapCycleNativeToUsdc_swapto")
 }
 
 export async function zkSyncSwapCycleNativeToUsdc_swapback(wallet: WalletI): Promise<TxInteraction[]> {
-    return await commonSwap(tokens.USDC, tokens.ETH, [], [Dexes.Mute],
+    return await commonSwap(tokens.USDC, tokens.ETH, [], [Dexes.SyncSwap],
         wallet, chain, contracts, tokens,"zkSyncSwapCycleNativeToUsdc_swapback")
 }
 

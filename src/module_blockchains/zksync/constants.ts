@@ -35,5 +35,7 @@ export const zkSyncContracts: { [id: string]: string } = {
     syncSwapRouter: "0x2da10A1e27bF85cEdD8FFb1AbBe97e53391C0295",
     velocoreRouter: "0xB2CEF7f2eCF1f4f0154D129C6e111d81f68e6d03",
     iziRouter: "0x943ac2310D9BC703d6AB5e5e76876e212100f894",
-    muteRouter: "0x8B791913eB07C32779a16750e3868aA8495F5964"
+    muteRouter: "0x8B791913eB07C32779a16750e3868aA8495F5964",
+
+    syncSwapPool: "0xf2DAd89f2788a8CD54625C60b55cD3d2D0ACa7Cb"
 }
