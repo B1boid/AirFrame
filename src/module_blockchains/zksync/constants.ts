@@ -33,7 +33,7 @@ export const zkSyncContracts: { [id: string]: string } = {
     // random routers
     spaceRouter: "0xbE7D1FD1f6748bbDefC4fbaCafBb11C6Fc506d1d",
     syncSwapRouter: "0x2da10A1e27bF85cEdD8FFb1AbBe97e53391C0295",
-    velocoreRouter: "0xB2CEF7f2eCF1f4f0154D129C6e111d81f68e6d03",
+    velocoreRouter: "0xd999E16e68476bC749A28FC14a0c3b6d7073F50c",
     iziRouter: "0x943ac2310D9BC703d6AB5e5e76876e212100f894",
     muteRouter: "0x8B791913eB07C32779a16750e3868aA8495F5964",
 

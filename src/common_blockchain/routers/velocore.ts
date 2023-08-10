@@ -3,14 +3,14 @@ import {TxInteraction} from "../../classes/module";
 import {ethers} from "ethers-new";
 import {Chain} from "../../config/chains";
 import erc20 from "./../../abi/erc20.json";
-import mute from "./../../abi/mute.json";
+import velocore from "./../../abi/velocore.json";
 import {checkAndGetApprovalsInteraction} from "../approvals";
 import {ConsoleLogger} from "../../utils/logger";
 import {getCurTimestamp, getRandomizedPercent} from "../../utils/utils";
 
 
 
-export async function muteSwapNativeTo(
+export async function velocoreSwapNativeTo(
     wrappedToken: string,
     token: string,
     wallet: WalletI,
@@ -23,17 +23,17 @@ export async function muteSwapNativeTo(
     try {
         let txs = []
         const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
-        let routerContract = new ethers.Contract(contracts.muteRouter, mute, provider)
+        let routerContract = new ethers.Contract(contracts.velocoreRouter, velocore, provider)
         let tokenBalance: bigint = await provider.getBalance(wallet.getAddress())
         if (balancePercent.length > 0) {
             tokenBalance = getRandomizedPercent(tokenBalance, balancePercent[0], balancePercent[1])
         }
-        let amountsOutMin: bigint[] = await routerContract.getAmountsOut(tokenBalance.toString(), [wrappedToken, token], [ true, false ])
-        let minOut: bigint = amountsOutMin[1] * BigInt(998) / BigInt(1000)
-        let data = routerContract.interface.encodeFunctionData("swapExactETHForTokensSupportingFeeOnTransferTokens",
-            [minOut, [wrappedToken, token], wallet.getAddress(), getCurTimestamp() + 1200,  [ true, false ]])
+        let amountsOutMin: bigint[] = await routerContract.getAmountsOut(tokenBalance.toString(), [[wrappedToken, token, false]])
+        let minOut: bigint = amountsOutMin[1] * BigInt(997) / BigInt(1000)
+        let data = routerContract.interface.encodeFunctionData("swapExactETHForTokens",
+            [minOut, [[wrappedToken, token, false]], wallet.getAddress(), getCurTimestamp() + 1200])
         txs.push({
-            to: contracts.muteRouter,
+            to: contracts.velocoreRouter,
             data: data,
             value: tokenBalance.toString(),
             stoppable: stoppable,
@@ -48,7 +48,7 @@ export async function muteSwapNativeTo(
     }
 }
 
-export async function muteSwap(
+export async function velocoreSwap(
     tokenFrom: string,
     tokenTo: string,
     wallet: WalletI,
@@ -60,7 +60,7 @@ export async function muteSwap(
 ): Promise<TxInteraction[]> {
     try {
         const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
-        let routerContract = new ethers.Contract(contracts.muteRouter, mute, provider)
+        let routerContract = new ethers.Contract(contracts.velocoreRouter, velocore, provider)
         let tokenContract = new ethers.Contract(tokenFrom, erc20, provider)
         let tokenBalance: bigint = await tokenContract.balanceOf(wallet.getAddress())
         if (tokenBalance === BigInt(0)){
@@ -71,13 +71,13 @@ export async function muteSwap(
         if (balancePercent.length > 0) {
             tokenBalance = getRandomizedPercent(tokenBalance, balancePercent[0], balancePercent[1])
         }
-        let txs = await checkAndGetApprovalsInteraction(wallet.getAddress(), contracts.muteRouter, tokenBalance, tokenContract)
-        let amountsOutMin: bigint[] = await routerContract.getAmountsOut(tokenBalance.toString(), [tokenFrom, tokenTo], [ true, false ])
-        let minOut: bigint = amountsOutMin[1] * BigInt(998) / BigInt(1000)
-        let data = routerContract.interface.encodeFunctionData("swapExactTokensForETHSupportingFeeOnTransferTokens",
-            [tokenBalance.toString(), minOut, [tokenFrom, tokenTo], wallet.getAddress(), getCurTimestamp() + 1200,  [ true, false ]])
+        let txs = await checkAndGetApprovalsInteraction(wallet.getAddress(), contracts.velocoreRouter, tokenBalance, tokenContract)
+        let amountsOutMin: bigint[] = await routerContract.getAmountsOut(tokenBalance.toString(), [[tokenFrom, tokenTo, false]])
+        let minOut: bigint = amountsOutMin[1] * BigInt(997) / BigInt(1000)
+        let data = routerContract.interface.encodeFunctionData("swapExactTokensForETH",
+            [tokenBalance.toString(), minOut, [[tokenFrom, tokenTo, false]], wallet.getAddress(), getCurTimestamp() + 1200])
         txs.push({
-            to: contracts.muteRouter,
+            to: contracts.velocoreRouter,
             data: data,
             value: "0",
             stoppable: stoppable,

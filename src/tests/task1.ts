@@ -33,7 +33,7 @@ const CONNECTION_OKX_TO_ZKSYNC: ConnectionAction = {
     from: Destination.OKX,
     to: Destination.ZkSync,
     asset: Asset.ETH,
-    amount: 0.01,
+    amount: 0.03,
     connectionName: Connections.ExchangeOKX
 }
 
@@ -48,7 +48,7 @@ const CONNECTION_POLYGON_TO_OKX: ConnectionAction = {
 
 const ACTIONS_1: Actions = {
     actions: [
-        // CONNECTION_OKX_TO_ZKSYNC
+         // CONNECTION_OKX_TO_ZKSYNC,
         // CONNECTION_OKX_TO_POLYGON,
         // POLYGON_ACTIONS,
         // CONNECTION_POLYGON_TO_OKX
@@ -58,13 +58,8 @@ const ACTIONS_1: Actions = {
 }
 
 export const WALLETS_ACTIONS_1: {[id: string]: Actions} = {
-    "0x365c597620d13eA24DdC36A7Ff1Fb3224941Be19": ACTIONS_1,
+    "0x06AC426394b23a93C227aB885ffeE74053Dde8D9": ACTIONS_1,
     // "0x..2": ACTIONS_1
 }
 
 ////////////////////////////////////////////////////////////////////////
-//
-// curl https://mainnet.era.zksync.io/ \
-//     -X POST \
-//   -H "Content-Type: application/json" \
-//   --data '{"method":"eth_getTransactionReceipt","params":["0xa18619d71598a66bcb3c069512a11fc2c5d7e652605520facd9c00f9ab8ea92d"],"id":1,"jsonrpc":"2.0"}'

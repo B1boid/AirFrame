@@ -6,11 +6,13 @@ import {EnumDictionary, shuffleArray} from "../../utils/utils";
 import {muteSwap, muteSwapNativeTo} from "./mute";
 import {Asset} from "../../config/tokens";
 import {syncSwap, syncSwapNativeTo} from "./syncswap";
+import {velocoreSwap, velocoreSwapNativeTo} from "./velocore";
 
 export enum Dexes {
     OneInch = "1inch",
     Mute = "mute",
-    SyncSwap = "syncswap"
+    SyncSwap = "syncswap",
+    Velocore = "velocore"
 }
 
 export const NATIVE_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
@@ -24,7 +26,8 @@ export async function commonSwap(
     chain: Chain,
     contracts: { [id: string]: string },
     tokens: EnumDictionary<Asset, string>,
-    name: string
+    name: string,
+    stoppable: boolean = false
 ): Promise<TxInteraction[]> {
     shuffleArray(dexes)
     let res: TxInteraction[] = []
@@ -32,31 +35,41 @@ export async function commonSwap(
         if (dex === Dexes.OneInch){
             if (tokenFrom === NATIVE_ADDRESS){
                 res = await oneInchSwapNativeTo(
-                    tokenTo, wallet, chain, contracts, name, balancePercent
+                    tokenTo, wallet, chain, contracts, name, balancePercent, stoppable
                 )
             } else {
                 res = await oneInchSwap(
-                    tokenFrom, tokenTo, wallet, chain, contracts, name, balancePercent
+                    tokenFrom, tokenTo, wallet, chain, contracts, name, balancePercent, stoppable
                 )
             }
         } else if (dex === Dexes.Mute){
             if (tokenFrom === NATIVE_ADDRESS){
                 res = await muteSwapNativeTo(
-                    tokens.WETH, tokenTo, wallet, chain, contracts, name, balancePercent
+                    tokens.WETH, tokenTo, wallet, chain, contracts, name, balancePercent, stoppable
                 )
             } else if (tokenTo === NATIVE_ADDRESS){
                 res = await muteSwap(
-                    tokenFrom, tokens.WETH, wallet, chain, contracts, name, balancePercent
+                    tokenFrom, tokens.WETH, wallet, chain, contracts, name, balancePercent, stoppable
                 )
             }
         } else if (dex === Dexes.SyncSwap){
             if (tokenFrom === NATIVE_ADDRESS){
                 res = await syncSwapNativeTo(
-                    tokens.WETH, tokenTo, wallet, chain, contracts, name, balancePercent
+                    tokens.WETH, tokenTo, wallet, chain, contracts, name, balancePercent, stoppable
                 )
             } else if (tokenTo === NATIVE_ADDRESS){
                 res = await syncSwap(
-                    tokenFrom, tokens.WETH, wallet, chain, contracts, name, balancePercent
+                    tokenFrom, tokens.WETH, wallet, chain, contracts, name, balancePercent, stoppable
+                )
+            }
+        } else if (dex === Dexes.Velocore){
+            if (tokenFrom === NATIVE_ADDRESS){
+                res = await velocoreSwapNativeTo(
+                    tokens.WETH, tokenTo, wallet, chain, contracts, name, balancePercent, stoppable
+                )
+            } else if (tokenTo === NATIVE_ADDRESS){
+                res = await velocoreSwap(
+                    tokenFrom, tokens.WETH, wallet, chain, contracts, name, balancePercent, stoppable
                 )
             }
         }
