@@ -21,7 +21,8 @@ export const enum ZkSyncActivity {
     zkSyncEraLendInit = "zkSyncEraLendInit",
     zkSyncEraLendCycle = "zkSyncEraLendCycle",
     zkSyncReactFusionInit = "zkSyncReactFusionInit",
-    zkSyncReactFusionCycle = "zkSyncReactFusionCycle"
+    zkSyncReactFusionCycle = "zkSyncReactFusionCycle",
+    zkSyncSynFuturesTest = "zkSyncSynFuturesTest"
 }
 
 export const enum EthereumActivity {

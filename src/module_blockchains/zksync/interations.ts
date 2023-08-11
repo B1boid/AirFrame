@@ -1,9 +1,8 @@
 import {TxInteraction} from "../../classes/module";
 import {WalletI} from "../../classes/wallet";
-import {getRandomInt, getRandomizedPercent} from "../../utils/utils";
+import {getRandomElement, getRandomInt, getRandomizedPercent} from "../../utils/utils";
 import {ConsoleLogger} from "../../utils/logger";
 import wrapped from "../../abi/wrapped.json";
-import erc20 from "../../abi/erc20.json";
 import zns_1 from "../../abi/zns_1.json";
 import zns_2 from "../../abi/zns_2.json";
 import eralend from "../../abi/eralend.json";
@@ -235,5 +234,17 @@ export async function zkSyncReactFusionCycle_withdraw(wallet: WalletI): Promise<
         stoppable: true,
         confirmations: 1,
         name: "zkSyncReactFusionCycle_withdraw"
+    }]
+}
+
+export async function zkSyncSynFuturesTest_mint(wallet: WalletI): Promise<TxInteraction[]> {
+    let testTokens = [contracts.synFuturesMint1, contracts.synFuturesMint2]
+    return [{
+        to: getRandomElement(testTokens),
+        data: "0x1249c58b",
+        value: "0",
+        stoppable: false,
+        confirmations: 1,
+        name: "zkSyncSynFuturesTest_mint"
     }]
 }
