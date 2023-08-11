@@ -3,7 +3,15 @@ import {Activity, BlockchainModule} from "../../classes/module";
 import {WalletI} from "../../classes/wallet";
 import {Randomness} from "../../classes/actions";
 import {ActivityTag} from "../blockchain_modules";
-import {zkSyncSwapCycleNativeToUsdc, zkSyncWrapUnwrap} from "./activities";
+import {
+    zkSyncEraLendCycle,
+    zkSyncEraLendInit,
+    zkSyncMintTevaera,
+    zkSyncMintZnsId,
+    zkSyncRandomApprove, zkSyncReactFusionCycle, zkSyncReactFusionInit,
+    zkSyncSwapCycleNativeToUsdc,
+    zkSyncWrapUnwrap
+} from "./activities";
 
 
 class ZkSyncModule extends BlockchainModule {
@@ -20,6 +28,7 @@ class ZkSyncModule extends BlockchainModule {
 export const moduleZkSync: ZkSyncModule = new ZkSyncModule(
     zkSyncChain,
     [
-        zkSyncWrapUnwrap, zkSyncSwapCycleNativeToUsdc
+        zkSyncWrapUnwrap, zkSyncSwapCycleNativeToUsdc, zkSyncMintTevaera, zkSyncMintZnsId, zkSyncRandomApprove,
+        zkSyncEraLendInit, zkSyncEraLendCycle, zkSyncReactFusionCycle, zkSyncReactFusionInit
     ]
 )

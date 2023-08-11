@@ -57,10 +57,10 @@ export async function polygonWrapUnwrap_unwrap(wallet: WalletI): Promise<TxInter
 
 export async function polygonSwapCycleNativeToUsdc_swapto(wallet: WalletI): Promise<TxInteraction[]> {
     return await commonSwap(tokens.MATIC, tokens.USDC, [20, 40], [Dexes.OneInch],
-        wallet, chain, contracts, "polygonSwapCycleNativeToUsdc_swapto")
+        wallet, chain, contracts, tokens, "polygonSwapCycleNativeToUsdc_swapto")
 }
 
 export async function polygonSwapCycleNativeToUsdc_swapback(wallet: WalletI): Promise<TxInteraction[]> {
     return await commonSwap(tokens.USDC, tokens.MATIC, [], [Dexes.OneInch],
-        wallet, chain, contracts, "polygonSwapCycleNativeToUsdc_swapback")
+        wallet, chain, contracts, tokens, "polygonSwapCycleNativeToUsdc_swapback")
 }
