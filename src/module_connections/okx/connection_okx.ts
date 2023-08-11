@@ -40,6 +40,18 @@ class OkxConnectionModule implements ConnectionModule {
         if (from === Destination.OKX) {
             const chain: Chain = destToChain(to)
             const withdrawalConfig: OKXWithdrawalConfig = okxWithdrawalConfig(asset, chain.title)
+
+            if (amount === -1) {
+                const okxAssetBalance = await this.getBalance(wallet, asset, null) // get master balance for withdrawal
+
+                if (okxAssetBalance === null) {
+                    this.logger.error("Failed fetching OKX balance for full withdrawal.")
+                    return Promise.resolve(false)
+                }
+                amount = Number(okxAssetBalance) - Number(withdrawalConfig.fee)
+            }
+
+
             const [withdrawSubmitStatus, wdId] = await this.withdraw(wallet, asset, amount.toString(), withdrawalConfig.fee, chain)
 
             if (!withdrawSubmitStatus) {
@@ -63,6 +75,10 @@ class OkxConnectionModule implements ConnectionModule {
 
             return Promise.resolve(submitStatus)
         } else if (to == Destination.OKX) {
+            if (amount < 0) {
+                throw Error("Negative currently not supported for deposit.")
+            }
+            amount = Number(ethers.parseEther(`${amount}`))
             const withdrawAddress = wallet.getWithdrawAddress()
 
             if (withdrawAddress === null) {

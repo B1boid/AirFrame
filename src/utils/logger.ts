@@ -40,3 +40,5 @@ export class ConsoleLogger implements ILogger {
         console.log(`${type} - ${this.address} - ${msg}`)
     }
 }
+
+export const globalLogger: ILogger = new ConsoleLogger("GLOBAL")

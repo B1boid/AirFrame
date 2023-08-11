@@ -41,24 +41,44 @@ const CONNECTION_POLYGON_TO_OKX: ConnectionAction = {
     from: Destination.Polygon,
     to: Destination.OKX,
     asset: Asset.MATIC,
-    amount: Number(ethers.parseEther("1")),
+    amount: 1,
     connectionName: Connections.ExchangeOKX
+}
+
+const CONNECTION_OKX_TO_ETHEREUM: ConnectionAction = {
+    from: Destination.OKX,
+    to: Destination.Ethereum,
+    asset: Asset.ETH,
+    amount: -1,
+    connectionName: Connections.ExchangeOKX
+}
+
+const BRIDGE_ETHEREUM_TO_ZKSYNC: ConnectionAction = {
+    from: Destination.Ethereum,
+    to: Destination.ZkSync,
+    asset: Asset.ETH,
+    amount: -1,
+    connectionName: Connections.OfficialZkSyncBridge
 }
 
 
 const ACTIONS_1: Actions = {
     actions: [
         // CONNECTION_OKX_TO_ZKSYNC
-        CONNECTION_OKX_TO_POLYGON,
+        // CONNECTION_OKX_TO_POLYGON,
         // POLYGON_ACTIONS,
-        CONNECTION_POLYGON_TO_OKX
+        // CONNECTION_POLYGON_TO_OKX
         // POLYGON_ACTIONS
         // ZKSYNC_ACTIONS
+
+
+        CONNECTION_OKX_TO_ETHEREUM,
+        BRIDGE_ETHEREUM_TO_ZKSYNC
     ]
 }
 
 export const WALLETS_ACTIONS_1: {[id: string]: Actions} = {
-    "0x365c597620d13eA24DdC36A7Ff1Fb3224941Be19": ACTIONS_1,
+    "0x2Fd49f2da0d07102b223D89f290F61b265291952": ACTIONS_1,
     // "0x..2": ACTIONS_1
 }
 

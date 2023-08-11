@@ -1,18 +1,17 @@
 import {TxInteraction} from "./module";
-import {getRandomInt, sleep} from "../utils/utils";
-import {
-    ethers,
-    FeeData,
-    toBigInt,
-    TransactionReceipt,
-    TransactionResponse,
-} from "ethers-new";
-import {Blockchains, Chain} from "../config/chains";
+import {sleep} from "../utils/utils";
+import {ethers, FeeData, JsonRpcProvider, toBigInt, TransactionReceipt, TransactionResponse, Wallet,} from "ethers-new";
+import {Blockchains, Chain, ethereumChain, zkSyncChain} from "../config/chains";
 import {ConsoleLogger, ILogger} from "../utils/logger"
 import {AddressInfo, OkxCredentials} from "./info";
-import {GAS_PRICE_LIMITS, MAX_TX_WAITING} from "../config/online_config";
+import {MAX_TX_WAITING} from "../config/online_config";
 import * as zk from "zksync-web3";
 import * as oldethers from "ethers";
+import {getFeeData, getGasLimit} from "../utils/gas";
+import {
+    DEFAULT_GAS_PRICE_ZKSYNC_OFFICIAL_BRIDGE,
+    ZKSYNC_BRIDGE_NAME
+} from "../module_connections/eth-zksyncofficial/connection_eth_zksync_official";
 
 
 export enum TxResult {
@@ -44,10 +43,12 @@ export interface WalletI {
 
     getSubAccountName(): string | null
 
+    getWallet(chain: Chain): Wallet | zk.Wallet
+
     sendTransaction(tx: TxInteraction, chain: Chain, maxRetries: number): Promise<[TxResult, string]>
 }
 
-type UnionProvider = ethers.JsonRpcProvider | zk.Provider
+export type UnionProvider = ethers.JsonRpcProvider | zk.Provider
 type UnionWallet = ethers.Wallet | zk.Wallet
 
 export class MyWallet implements WalletI {
@@ -90,34 +91,9 @@ export class MyWallet implements WalletI {
 
     private async resetGasInfo(provider: UnionProvider, txInteraction: TxInteraction, chain: Chain): Promise<TxResult> {
         try {
-            this.curGasLimit = Number((await provider.estimateGas({
-                from: this.getAddress(),
-                to: txInteraction.to,
-                data: txInteraction.data,
-                value: txInteraction.value
-            })).toString())
+            this.curGasLimit = await getGasLimit(provider, this.getAddress(), txInteraction)
+            this.curGasPriceInfo = await getFeeData(provider, chain)
 
-            if (chain.title === Blockchains.ZkSync) {
-                const tmpGasInfo: oldethers.providers.FeeData = await (provider as zk.Provider).getFeeData()
-                this.curGasPriceInfo = new FeeData(
-                    tmpGasInfo.gasPrice?.toBigInt() ?? null,
-                    tmpGasInfo.maxFeePerGas?.toBigInt() ?? null,
-                    tmpGasInfo.maxPriorityFeePerGas?.toBigInt() ?? null
-                )
-            } else {
-                this.curGasPriceInfo = await (provider as ethers.JsonRpcProvider).getFeeData()
-            }
-            if (chain.title === Blockchains.Polygon) {
-                this.curGasPriceInfo = new FeeData(
-                    this.curGasPriceInfo.gasPrice,
-                    this.curGasPriceInfo.maxFeePerGas,
-                    toBigInt(getRandomInt(32, 70) * (10 ** 9)) // polygon min value is 30 (we multiply by 2 later, so 32 > 30)
-                )
-            }
-            while (this.curGasPriceInfo.gasPrice !== null && this.curGasPriceInfo.gasPrice > GAS_PRICE_LIMITS(chain.title)) {
-                await sleep(60)
-                this.logger.warn(`Gas price is too high | Gas price: ${this.curGasPriceInfo.gasPrice}`)
-            }
             return TxResult.Success
         } catch (e) {
             this.logger.warn(`Error while simulating tx ${txInteraction.name}, ${e}`)
@@ -165,22 +141,27 @@ export class MyWallet implements WalletI {
     private async _sendTransaction(curSigner: UnionWallet, txInteraction: TxInteraction): Promise<[TxResult, string]> {
         try {
             let gasPrice;
-            if (this.curGasPriceInfo.maxFeePerGas === null || this.curGasPriceInfo.maxPriorityFeePerGas === null) {
-                if (this.curGasPriceInfo.gasPrice === null){
-                    this.logger.warn(`Gas price is null ${this.curGasPriceInfo}`)
-                    return [TxResult.Fail, ""]
-                }
+            if (txInteraction.name === ZKSYNC_BRIDGE_NAME) {
                 gasPrice = {
-                    gasPrice: this.curGasPriceInfo.gasPrice
+                    gasPrice: this.curGasPriceInfo.gasPrice ?? DEFAULT_GAS_PRICE_ZKSYNC_OFFICIAL_BRIDGE
                 }
             } else {
-                gasPrice = {
-                    type: 2,
-                    maxFeePerGas: this.curGasPriceInfo.maxFeePerGas,
-                    maxPriorityFeePerGas: this.curGasPriceInfo.maxPriorityFeePerGas
+                if (this.curGasPriceInfo.maxFeePerGas === null || this.curGasPriceInfo.maxPriorityFeePerGas === null) {
+                    if (this.curGasPriceInfo.gasPrice === null){
+                        this.logger.warn(`Gas price is null ${this.curGasPriceInfo}`)
+                        return [TxResult.Fail, ""]
+                    }
+                    gasPrice = {
+                        gasPrice: this.curGasPriceInfo.gasPrice
+                    }
+                } else {
+                    gasPrice = {
+                        type: 2,
+                        maxFeePerGas: this.curGasPriceInfo.maxFeePerGas,
+                        maxPriorityFeePerGas: this.curGasPriceInfo.maxPriorityFeePerGas
+                    }
                 }
             }
-
 
             const tx: TransactionResponse | oldethers.providers.TransactionResponse = await curSigner.sendTransaction({
                 to: txInteraction.to,
@@ -219,5 +200,15 @@ export class MyWallet implements WalletI {
 
     getSubAccountCredentials(): OkxCredentials | null {
         return this.subAccountCredentials
+    }
+
+    getWallet(chain: Chain): Wallet | zk.Wallet {
+        if (chain.title === Blockchains.ZkSync) {
+            const provider: zk.Provider = new zk.Provider(zkSyncChain.nodeUrl)
+            const ethProvider = new oldethers.providers.JsonRpcProvider(ethereumChain.nodeUrl, ethereumChain.chainId)
+            return new zk.Wallet(this.signer.privateKey, provider, ethProvider)
+        }
+        const provider: JsonRpcProvider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+        return this.signer.connect(provider);
     }
 }
