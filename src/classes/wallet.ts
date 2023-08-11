@@ -1,7 +1,7 @@
 import {TxInteraction} from "./module";
 import {sleep} from "../utils/utils";
-import {ethers, FeeData, JsonRpcProvider, toBigInt, TransactionReceipt, TransactionResponse, Wallet,} from "ethers-new";
-import {Blockchains, Chain, ethereumChain, zkSyncChain} from "../config/chains";
+import {ethers, FeeData, toBigInt, TransactionReceipt, TransactionResponse} from "ethers-new";
+import {Blockchains, Chain} from "../config/chains";
 import {ConsoleLogger, ILogger} from "../utils/logger"
 import {AddressInfo, OkxCredentials} from "./info";
 import {MAX_TX_WAITING} from "../config/online_config";
@@ -42,8 +42,6 @@ export interface WalletI {
     getSubAccountCredentials(): OkxCredentials | null
 
     getSubAccountName(): string | null
-
-    getWallet(chain: Chain): Wallet | zk.Wallet
 
     sendTransaction(tx: TxInteraction, chain: Chain, maxRetries: number): Promise<[TxResult, string]>
 }
@@ -143,7 +141,9 @@ export class MyWallet implements WalletI {
             let txTyped;
             if (txInteraction.name === ZKSYNC_BRIDGE_NAME) {
                 txTyped = {
-                    gasPrice: this.curGasPriceInfo.gasPrice ?? DEFAULT_GAS_PRICE_ZKSYNC_OFFICIAL_BRIDGE
+                    gasPrice: this.curGasPriceInfo.gasPrice ?? DEFAULT_GAS_PRICE_ZKSYNC_OFFICIAL_BRIDGE,
+                    gasLimit: oldethers.utils.hexlify(this.curGasLimit),
+                    value: oldethers.utils.hexlify(BigInt(txInteraction.value))
                 }
             } else {
                 if (this.curGasPriceInfo.maxFeePerGas === null || this.curGasPriceInfo.maxPriorityFeePerGas === null) {
@@ -203,15 +203,5 @@ export class MyWallet implements WalletI {
 
     getSubAccountCredentials(): OkxCredentials | null {
         return this.subAccountCredentials
-    }
-
-    getWallet(chain: Chain): Wallet | zk.Wallet {
-        if (chain.title === Blockchains.ZkSync) {
-            const provider: zk.Provider = new zk.Provider(zkSyncChain.nodeUrl)
-            const ethProvider = new oldethers.providers.JsonRpcProvider(ethereumChain.nodeUrl, ethereumChain.chainId)
-            return new zk.Wallet(this.signer.privateKey, provider, ethProvider)
-        }
-        const provider: JsonRpcProvider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
-        return this.signer.connect(provider);
     }
 }

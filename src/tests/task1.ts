@@ -71,7 +71,6 @@ const ACTIONS_1: Actions = {
         // POLYGON_ACTIONS
         // ZKSYNC_ACTIONS
 
-
         CONNECTION_OKX_TO_ETHEREUM,
         BRIDGE_ETHEREUM_TO_ZKSYNC
     ]
