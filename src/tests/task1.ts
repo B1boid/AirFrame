@@ -18,7 +18,7 @@ const POLYGON_ACTIONS: ModuleActions = {
 const ZKSYNC_ACTIONS: ModuleActions = {
     chainName: Blockchains.ZkSync,
     randomOrder: Randomness.OnlyActivities,
-    activityNames: [ZkSyncActivity.wrapUnwrap]
+    activityNames: [ZkSyncActivity.zkSyncReactFusionInit]
 }
 
 const CONNECTION_OKX_TO_POLYGON: ConnectionAction = {
@@ -33,7 +33,7 @@ const CONNECTION_OKX_TO_ZKSYNC: ConnectionAction = {
     from: Destination.OKX,
     to: Destination.ZkSync,
     asset: Asset.ETH,
-    amount: 0.01,
+    amount: 0.03,
     connectionName: Connections.ExchangeOKX
 }
 
@@ -49,7 +49,7 @@ const CONNECTION_OKX_TO_ETHEREUM: ConnectionAction = {
     from: Destination.OKX,
     to: Destination.Ethereum,
     asset: Asset.ETH,
-    amount: -1,
+    amount: 0.05,
     connectionName: Connections.ExchangeOKX
 }
 
@@ -78,7 +78,7 @@ const ACTIONS_1: Actions = {
 }
 
 export const WALLETS_ACTIONS_1: {[id: string]: Actions} = {
-    "0x2Fd49f2da0d07102b223D89f290F61b265291952": ACTIONS_1,
+    "0x06AC426394b23a93C227aB885ffeE74053Dde8D9": ACTIONS_1,
     // "0x..2": ACTIONS_1
 }
 

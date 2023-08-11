@@ -140,9 +140,9 @@ export class MyWallet implements WalletI {
 
     private async _sendTransaction(curSigner: UnionWallet, txInteraction: TxInteraction): Promise<[TxResult, string]> {
         try {
-            let gasPrice;
+            let txTyped;
             if (txInteraction.name === ZKSYNC_BRIDGE_NAME) {
-                gasPrice = {
+                txTyped = {
                     gasPrice: this.curGasPriceInfo.gasPrice ?? DEFAULT_GAS_PRICE_ZKSYNC_OFFICIAL_BRIDGE
                 }
             } else {
@@ -151,25 +151,28 @@ export class MyWallet implements WalletI {
                         this.logger.warn(`Gas price is null ${this.curGasPriceInfo}`)
                         return [TxResult.Fail, ""]
                     }
-                    gasPrice = {
-                        gasPrice: this.curGasPriceInfo.gasPrice
+                    txTyped = {
+                        gasPrice: this.curGasPriceInfo.gasPrice,
+                        gasLimit: oldethers.utils.hexlify(this.curGasLimit),
+                        value: oldethers.utils.hexlify(BigInt(txInteraction.value)),
                     }
                 } else {
-                    gasPrice = {
+                    txTyped = {
                         type: 2,
                         maxFeePerGas: this.curGasPriceInfo.maxFeePerGas,
-                        maxPriorityFeePerGas: this.curGasPriceInfo.maxPriorityFeePerGas
+                        maxPriorityFeePerGas: this.curGasPriceInfo.maxPriorityFeePerGas,
+                        gasLimit: this.curGasLimit.toString(),
+                        value: txInteraction.value,
                     }
                 }
             }
 
+
             const tx: TransactionResponse | oldethers.providers.TransactionResponse = await curSigner.sendTransaction({
                 to: txInteraction.to,
                 data: txInteraction.data,
-                value: txInteraction.value,
-                gasLimit: this.curGasLimit.toString(),
                 nonce: await curSigner.getNonce(),
-                ...gasPrice
+                ...txTyped
             })
 
             this.logger.info(`Tx:${txInteraction.name} sending transaction with tx_hash: ${tx.hash}`)

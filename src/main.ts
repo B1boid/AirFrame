@@ -8,14 +8,15 @@ let prompt = require('password-prompt')
 
 
 
-async function doTask(password: string, passwordOkx: string, address: string, walletActions: Actions) {
+async function doTask(password: string, passwordOkx: string, address: string, walletActions: Actions): Promise<boolean> {
     const addressInfo = getAddressInfo(password, address)
     const wallet: WalletI = new MyWallet(addressInfo,
         getOkxCredentials(passwordOkx),
         getOkxCredentialsForSub(addressInfo, passwordOkx)
     )
+    let actionsRes: boolean = true;
+    console.log("Starting actions for account:", address)
     for (const action of walletActions.actions) {
-        let actionsRes;
         if ("connectionName" in action) {
             console.log("Connection:", action)
             const connectionModule = connectionModules[action.connectionName]
@@ -30,6 +31,12 @@ async function doTask(password: string, passwordOkx: string, address: string, wa
             break
         }
     }
+    if (actionsRes) {
+        console.log("All done for account:", address)
+    } else {
+        console.log("Stop this thread + send emergency-alert")
+    }
+    return actionsRes
 }
 
 async function main() {

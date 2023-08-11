@@ -12,6 +12,10 @@ export function sleep(seconds: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, 1000 * seconds));
 }
 
+export function getCurTimestamp(): number {
+    return Math.floor(Date.now() / 1000);
+}
+
 export function getRandomInt(min: number, max: number): number {
     min = Math.ceil(min);
     max = Math.floor(max);
