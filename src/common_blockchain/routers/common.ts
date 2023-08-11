@@ -7,12 +7,14 @@ import {muteSwap, muteSwapNativeTo} from "./mute";
 import {Asset} from "../../config/tokens";
 import {syncSwap, syncSwapNativeTo} from "./syncswap";
 import {velocoreSwap, velocoreSwapNativeTo} from "./velocore";
+import {spaceFiSwap, spaceFiSwapNativeTo} from "./spacefi";
 
 export enum Dexes {
     OneInch = "1inch",
     Mute = "mute",
     SyncSwap = "syncswap",
-    Velocore = "velocore"
+    Velocore = "velocore",
+    SpaceFi = "spacefi"
 }
 
 export const NATIVE_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
@@ -69,6 +71,16 @@ export async function commonSwap(
                 )
             } else if (tokenTo === NATIVE_ADDRESS){
                 res = await velocoreSwap(
+                    tokenFrom, tokens.WETH, wallet, chain, contracts, name, balancePercent, stoppable
+                )
+            }
+        } else if (dex === Dexes.SpaceFi){
+            if (tokenFrom === NATIVE_ADDRESS){
+                res = await spaceFiSwapNativeTo(
+                    tokens.WETH, tokenTo, wallet, chain, contracts, name, balancePercent, stoppable
+                )
+            } else if (tokenTo === NATIVE_ADDRESS){
+                res = await spaceFiSwap(
                     tokenFrom, tokens.WETH, wallet, chain, contracts, name, balancePercent, stoppable
                 )
             }

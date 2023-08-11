@@ -3,13 +3,15 @@ import {WalletI} from "../../classes/wallet";
 import {getRandomInt, getRandomizedPercent} from "../../utils/utils";
 import {ConsoleLogger} from "../../utils/logger";
 import wrapped from "../../abi/wrapped.json";
+import erc20 from "../../abi/erc20.json";
 import zns_1 from "../../abi/zns_1.json";
 import zns_2 from "../../abi/zns_2.json";
+import eralend from "../../abi/eralend.json";
 import {commonSwap, Dexes} from "../../common_blockchain/routers/common";
 import {zkSyncChain} from "../../config/chains";
 import {zkSyncContracts, zkSyncTokens} from "./constants";
 import {ethers} from "ethers-new";
-import { generateUsername } from "unique-username-generator";
+import {generateUsername} from "unique-username-generator";
 import {getRandomApprove} from "../../common_blockchain/approvals";
 
 
@@ -61,12 +63,14 @@ export async function zkSyncWrapUnwrap_unwrap(wallet: WalletI): Promise<TxIntera
 }
 
 export async function zkSyncSwapCycleNativeToUsdc_swapto(wallet: WalletI): Promise<TxInteraction[]> {
-    return await commonSwap(tokens.ETH, tokens.USDC, [20, 40], [Dexes.Velocore],
+    return await commonSwap(tokens.ETH, tokens.USDC, [20, 40],
+        [Dexes.OneInch, Dexes.SyncSwap, Dexes.Velocore, Dexes.Mute, Dexes.SpaceFi],
         wallet, chain, contracts, tokens, "zkSyncSwapCycleNativeToUsdc_swapto")
 }
 
 export async function zkSyncSwapCycleNativeToUsdc_swapback(wallet: WalletI): Promise<TxInteraction[]> {
-    return await commonSwap(tokens.USDC, tokens.ETH, [], [Dexes.Velocore],
+    return await commonSwap(tokens.USDC, tokens.ETH, [],
+        [Dexes.OneInch, Dexes.SyncSwap, Dexes.Velocore, Dexes.Mute, Dexes.SpaceFi],
         wallet, chain, contracts, tokens,"zkSyncSwapCycleNativeToUsdc_swapback", true)
 }
 
@@ -93,38 +97,44 @@ export async function zkSyncMintTevaera_mint(wallet: WalletI): Promise<TxInterac
 }
 
 export async function zkSyncMintZnsId_mint(wallet: WalletI): Promise<TxInteraction[]> {
-    let name: string = generateUsername("", 0, getRandomInt(10, 15))
-    const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
-    let znsContract1 = new ethers.Contract(contracts.znsIdReg, zns_1, provider)
-    let data: string = znsContract1.interface.encodeFunctionData(
-        "RegisterWithConfig", [name, "2592000", [
-            wallet.getAddress(), "0x91b93e6d46ba99bd8170034441e8ca52b4608bcf", wallet.getAddress()
-        ]]
-    )
-    let txs = []
-    txs.push({
-        to: contracts.znsIdReg,
-        data: data,
-        value: "0",
-        stoppable: false,
-        confirmations: 1,
-        name: "zkSyncMintZnsId_mintId"
-    })
+    try {
+        let name: string = generateUsername("", 0, getRandomInt(10, 15))
+        const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+        let znsContract1 = new ethers.Contract(contracts.znsIdReg, zns_1, provider)
+        let data: string = znsContract1.interface.encodeFunctionData(
+            "RegisterWithConfig", [name, "2592000", [
+                wallet.getAddress(), "0x91b93e6d46ba99bd8170034441e8ca52b4608bcf", wallet.getAddress()
+            ]]
+        )
+        let txs = []
+        txs.push({
+            to: contracts.znsIdReg,
+            data: data,
+            value: "0",
+            stoppable: false,
+            confirmations: 1,
+            name: "zkSyncMintZnsId_mintId"
+        })
 
-    let znsContract2 = new ethers.Contract(contracts.znsIdName, zns_2, provider)
-    let data2: string = znsContract2.interface.encodeFunctionData(
-        "setName", [name + '.zk']
-    )
-    txs.push({
-        to: contracts.znsIdName,
-        data: data2,
-        value: "0",
-        stoppable: false,
-        confirmations: 1,
-        name: "zkSyncMintZnsId_setName"
-    })
+        let znsContract2 = new ethers.Contract(contracts.znsIdName, zns_2, provider)
+        let data2: string = znsContract2.interface.encodeFunctionData(
+            "setName", [name + '.zk']
+        )
+        txs.push({
+            to: contracts.znsIdName,
+            data: data2,
+            value: "0",
+            stoppable: false,
+            confirmations: 1,
+            name: "zkSyncMintZnsId_setName"
+        })
 
-    return txs
+        return txs
+    } catch (e) {
+        let logger = new ConsoleLogger(wallet.getAddress())
+        logger.warn(`zkSyncMintZnsId_mint failed: ${e}`)
+        return []
+    }
 }
 
 
@@ -138,4 +148,92 @@ export async function zkSyncRandomApprove_approve(wallet: WalletI): Promise<TxIn
         contracts.iziRouter, contracts.muteRouter,
     ]
     return await getRandomApprove(rndTokens, rndSpenders, wallet.getAddress(), chain)
+}
+
+export async function zkSyncEraLendInit_enter(wallet: WalletI): Promise<TxInteraction[]> {
+    let data: string = "0xc29982380000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000100000000000000000000000022d8b71599e14f20a49a397b88c1c878c86f5579"
+    return [{
+        to: contracts.zkEraLendInit,
+        data: data,
+        value: "0",
+        stoppable: false,
+        confirmations: 1,
+        name: "zkSyncEraLendInit_enter"
+    }]
+}
+
+export async function zkSyncEraLendCycle_supply(wallet: WalletI): Promise<TxInteraction[]> {
+    let balancePercent = [5, 20]
+    const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+    let tokenBalance: bigint = await provider.getBalance(wallet.getAddress())
+    tokenBalance = getRandomizedPercent(tokenBalance, balancePercent[0], balancePercent[1])
+    return [{
+        to: contracts.zkEraLendEth,
+        data: "0x1249c58b",
+        value: tokenBalance.toString(),
+        stoppable: false,
+        confirmations: 1,
+        name: "zkSyncEraLendCycle_supply"
+    }]
+}
+
+export async function zkSyncEraLendCycle_withdraw(wallet: WalletI): Promise<TxInteraction[]> {
+    const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+    let cTokenContract = new ethers.Contract(contracts.zkEraLendEth, eralend, provider)
+    let cTokenBalance: bigint = await cTokenContract.balanceOf(wallet.getAddress())
+    let data: string = cTokenContract.interface.encodeFunctionData(
+        "redeem", [cTokenBalance.toString()]
+    )
+    return [{
+        to: contracts.zkEraLendEth,
+        data: data,
+        value: "0",
+        stoppable: true,
+        confirmations: 1,
+        name: "zkSyncEraLendCycle_withdraw"
+    }]
+}
+
+export async function zkSyncReactFusionInit_enter(wallet: WalletI): Promise<TxInteraction[]> {
+    let data: string = "0xc299823800000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000001000000000000000000000000c5db68f30d21cbe0c9eac7be5ea83468d69297e6"
+    return [{
+        to: contracts.reactFusionInit,
+        data: data,
+        value: "0",
+        stoppable: false,
+        confirmations: 1,
+        name: "zkSyncReactFusion_enter"
+    }]
+}
+
+export async function zkSyncReactFusionCycle_supply(wallet: WalletI): Promise<TxInteraction[]> {
+    let balancePercent = [5, 20]
+    const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+    let tokenBalance: bigint = await provider.getBalance(wallet.getAddress())
+    tokenBalance = getRandomizedPercent(tokenBalance, balancePercent[0], balancePercent[1])
+    return [{
+        to: contracts.reactFusionEth,
+        data: "0x1249c58b",
+        value: tokenBalance.toString(),
+        stoppable: false,
+        confirmations: 1,
+        name: "zkSyncReactFusionCycle_supply"
+    }]
+}
+
+export async function zkSyncReactFusionCycle_withdraw(wallet: WalletI): Promise<TxInteraction[]> {
+    const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+    let cTokenContract = new ethers.Contract(contracts.reactFusionEth, eralend, provider)
+    let cTokenBalance: bigint = await cTokenContract.balanceOf(wallet.getAddress())
+    let data: string = cTokenContract.interface.encodeFunctionData(
+        "redeem", [cTokenBalance.toString()]
+    )
+    return [{
+        to: contracts.reactFusionEth,
+        data: data,
+        value: "0",
+        stoppable: true,
+        confirmations: 1,
+        name: "zkSyncReactFusionCycle_withdraw"
+    }]
 }

@@ -24,18 +24,24 @@ export const zkSyncTokens: EnumDictionary<Asset, string> = {
 
 
 export const zkSyncContracts: { [id: string]: string } = {
-    oneInchRouter: "0x6e2B76966cbD9cF4cC2Fa0D76d24d5241E0ABC2F",
     tevaeraId: "0xd29Aa7bdD3cbb32557973daD995A3219D307721f",
     tevaeraNft: "0x50B2b7092bCC15fbB8ac74fE9796Cf24602897Ad",
     znsIdReg: "0x8b5193BCaE3032766bEc9d07ecDB9E56aefBff0F",
     znsIdName: "0xF2372788b23DF335A260d88f349615B9d7d6918D",
 
-    // random routers
+    zkEraLendInit: "0xC955d5fa053d88E7338317cc6589635cD5B2cf09",
+    zkEraLendEth: "0x22D8b71599e14F20a49a397b88c1C878c86F5579",
+
+    reactFusionInit: "0x23848c28Af1C3AA7B999fA57e6b6E8599C17F3f2",
+    reactFusionEth: "0xC5db68F30D21cBe0C9Eac7BE5eA83468d69297e6",
+
+    oneInchRouter: "0x6e2B76966cbD9cF4cC2Fa0D76d24d5241E0ABC2F",
     spaceRouter: "0xbE7D1FD1f6748bbDefC4fbaCafBb11C6Fc506d1d",
     syncSwapRouter: "0x2da10A1e27bF85cEdD8FFb1AbBe97e53391C0295",
     velocoreRouter: "0xd999E16e68476bC749A28FC14a0c3b6d7073F50c",
     iziRouter: "0x943ac2310D9BC703d6AB5e5e76876e212100f894",
     muteRouter: "0x8B791913eB07C32779a16750e3868aA8495F5964",
 
-    syncSwapPool: "0xf2DAd89f2788a8CD54625C60b55cD3d2D0ACa7Cb"
+    syncSwapPool: "0xf2DAd89f2788a8CD54625C60b55cD3d2D0ACa7Cb",
+
 }
