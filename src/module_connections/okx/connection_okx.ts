@@ -25,7 +25,7 @@ import {getFeeData, getGasLimit} from "../../utils/gas";
 
 const MAX_TRIES = 30
 const DEFAULT_GAS_PRICE = ethers.parseUnits("20", "gwei")
-const DEFAULT_GAS_LIMIT = 100_000
+const EXTRA_GAS_LIMIT = 10_000
 
 enum DepositWithdrawType {
     DEPOSIT,
@@ -97,7 +97,9 @@ class OkxConnectionModule implements ConnectionModule {
 
                 const feeData = await getFeeData(provider, chain)
 
-                amount = balance - DEFAULT_GAS_LIMIT * Number(feeData.maxFeePerGas ?? DEFAULT_GAS_PRICE)
+                txTransferToWithdrawAddress = getTxForTransfer(asset, withdrawAddress, balance)
+                const gasLimit = EXTRA_GAS_LIMIT + (await getGasLimit(provider, wallet.getAddress(), txTransferToWithdrawAddress))
+                amount = balance - gasLimit * Number(feeData.maxFeePerGas ?? DEFAULT_GAS_PRICE)
 
                 txTransferToWithdrawAddress = getTxForTransfer(asset, withdrawAddress, amount)
                 txTransferToWithdrawAddress.feeData = feeData
