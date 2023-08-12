@@ -1,3 +1,4 @@
+import * as console from "console";
 
 
 enum LogType {
@@ -14,10 +15,9 @@ export interface ILogger {
     success(msg: string): void;
 }
 
-export class ConsoleLogger implements ILogger {
-    address: string
-    constructor(address: string) {
-        this.address = address
+class Logger implements ILogger{
+    connect(address: string): ILogger {
+        return new ConnectedLogger(address)
     }
 
     info(msg: string): void {
@@ -36,9 +36,28 @@ export class ConsoleLogger implements ILogger {
         this.log(LogType.SUCCESS, msg)
     }
 
-    private log(type: LogType, msg: string): void {
-        console.log(`${type} - ${this.address} - ${msg}`)
+    protected log(type: LogType, msg: string): void {
+        console.log(`${type} - GLOBAL - ${msg}`)
     }
 }
 
-export const globalLogger: ILogger = new ConsoleLogger("GLOBAL")
+export class ConnectedLogger extends Logger {
+    private address: string
+
+    constructor(address: string) {
+        super();
+        this.address = address
+    }
+
+    override connect(address: string): ILogger {
+        this.address = address
+        return this
+    }
+
+    protected override log(type: LogType, msg: string) {
+        console.log(`${type} - ${this.address} - ${msg}`)
+    }
+
+}
+
+export const globalLogger: Logger = new Logger()

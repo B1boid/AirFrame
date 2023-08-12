@@ -1,9 +1,8 @@
 import {TxInteraction} from "../../classes/module";
 import {WalletI} from "../../classes/wallet";
 import {getRandomInt, getRandomizedPercent} from "../../utils/utils";
-import {ConsoleLogger} from "../../utils/logger";
+import {globalLogger} from "../../utils/logger";
 import wrapped from "../../abi/wrapped.json";
-import erc20 from "../../abi/erc20.json";
 import zns_1 from "../../abi/zns_1.json";
 import zns_2 from "../../abi/zns_2.json";
 import eralend from "../../abi/eralend.json";
@@ -35,8 +34,7 @@ export async function zkSyncWrapUnwrap_wrap(wallet: WalletI): Promise<TxInteract
             name: "zkSyncWrapUnwrap_wrap"
         }]
     } catch (e) {
-        let logger = new ConsoleLogger(wallet.getAddress())
-        logger.warn(`zkSyncWrapUnwrap_wrap failed: ${e}`)
+        globalLogger.connect(wallet.getAddress()).warn(`zkSyncWrapUnwrap_wrap failed: ${e}`)
         return []
     }
 }
@@ -56,8 +54,7 @@ export async function zkSyncWrapUnwrap_unwrap(wallet: WalletI): Promise<TxIntera
             name: "zkSyncWrapUnwrap_unwrap"
         }]
     } catch (e) {
-        let logger = new ConsoleLogger(wallet.getAddress())
-        logger.warn(`zkSyncWrapUnwrap_unwrap failed: ${e}`)
+        globalLogger.connect(wallet.getAddress()).warn(`zkSyncWrapUnwrap_unwrap failed: ${e}`)
         return []
     }
 }
@@ -131,8 +128,7 @@ export async function zkSyncMintZnsId_mint(wallet: WalletI): Promise<TxInteracti
 
         return txs
     } catch (e) {
-        let logger = new ConsoleLogger(wallet.getAddress())
-        logger.warn(`zkSyncMintZnsId_mint failed: ${e}`)
+        globalLogger.connect(wallet.getAddress()).warn(`zkSyncMintZnsId_mint failed: ${e}`)
         return []
     }
 }

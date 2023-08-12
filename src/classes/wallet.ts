@@ -2,7 +2,7 @@ import {TxInteraction} from "./module";
 import {sleep} from "../utils/utils";
 import {ethers, FeeData, toBigInt, TransactionReceipt, TransactionResponse} from "ethers-new";
 import {Blockchains, Chain} from "../config/chains";
-import {ConsoleLogger, ILogger} from "../utils/logger"
+import {globalLogger, ILogger} from "../utils/logger"
 import {AddressInfo, OkxCredentials} from "./info";
 import {MAX_TX_WAITING} from "../config/online_config";
 import * as zk from "zksync-web3";
@@ -55,20 +55,20 @@ export class MyWallet implements WalletI {
     private readonly subAccountCredentials: OkxCredentials | null
     private readonly withdrawAddress: string | null
     private readonly subAccountName: string | null
-    private readonly logger: ILogger
+    private readonly logger: ILogger;
     private curGasLimit: number = 0
     private lastTxGasPrice: bigint = BigInt(0)
     private curGasPriceInfo: FeeData = new FeeData(BigInt(0), BigInt(0), BigInt(0));
 
     constructor(addressInfo: AddressInfo, masterCredentials: OkxCredentials | null,
-                subAccountCredentials: OkxCredentials | null, logger: ILogger | null = null) {
+                subAccountCredentials: OkxCredentials | null) {
         this.signer = new ethers.Wallet(addressInfo.privateKey)
         if (this.signer.address.toLowerCase() !== addressInfo.address.toLowerCase()) throw new Error("Address mismatch")
-        this.logger = logger ? logger : new ConsoleLogger(this.signer.address)
         this.withdrawAddress = addressInfo.withdrawAddress
         this.masterCredentials = masterCredentials
         this.subAccountCredentials = subAccountCredentials
         this.subAccountName = addressInfo.subAccName
+        this.logger = globalLogger.connect(this.getAddress())
     }
 
     getSubAccountName(): string | null {
@@ -114,14 +114,16 @@ export class MyWallet implements WalletI {
             let result: TxResult = await this.resetGasInfo(provider, txInteraction, chain)
             let txHash: string = ""
             if(result === TxResult.Success) {
-                this.curGasLimit += TX_LOGIC_BY_TRY[retry].addGasLimit + chain.extraGasLimit
+                if (!txInteraction.name.toLowerCase().includes("bridge")) {
+                    this.curGasLimit += TX_LOGIC_BY_TRY[retry].addGasLimit + chain.extraGasLimit
+                }
                 const [sendResponse, txInfo] = await this._sendTransaction(curSigner, txInteraction)
                 result = sendResponse
                 txHash = txInfo
             }
             switch (result) {
                 case TxResult.Success:
-                    this.logger.success(`Tx:${txInteraction.name} Gas used: ${this.curGasLimit}. Gas price: ${this.lastTxGasPrice / BigInt(10 ** 9)}`)
+                        this.logger.success(`Tx:${txInteraction.name} Gas used: ${this.curGasLimit}. Gas price: ${this.lastTxGasPrice / BigInt(10 ** 9)}`)
                     return [TxResult.Success, txHash]
                 case TxResult.Fail:
                     this.logger.warn(`Tx:${txInteraction.name} Tx failed. Try №${retry} | Gas used: ${this.curGasLimit}`)

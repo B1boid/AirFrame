@@ -25,7 +25,7 @@ export function okxWithdrawalConfig(asset: Asset, blockchain: Blockchains): OKXW
         case Asset.ETH + Blockchains.Ethereum:
             return {
                 fee: "0.00056",
-                confirmations: -1,
+                confirmations: 1,
                 withdrawalConfirmationsUnlock: -1
             }
         default:

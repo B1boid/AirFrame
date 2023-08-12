@@ -6,13 +6,13 @@ import {Chain} from "../../config/chains";
 import erc20 from "./../../abi/erc20.json";
 import {NATIVE_ADDRESS} from "./common";
 import {checkAndGetApprovalsInteraction} from "../approvals";
-import {ConsoleLogger} from "../../utils/logger";
 import {getRandomizedPercent, sleep} from "../../utils/utils";
+import {globalLogger} from "../../utils/logger";
 
 
 export async function getQuote1inch (chainId: number, fromTokenAddress: string, toTokenAddress: string, amount: string, fromAddress: string): Promise<null | string> {
     let slippages = [0.1, 0.2, 0.5]  // 0.1% starting slippage
-    let logger = new ConsoleLogger(fromAddress)
+    let logger = globalLogger.connect(fromAddress)
     let disableEstimate = true
     for (let i = 0; i < slippages.length; i++) {
         let slippage = slippages[i]
@@ -47,7 +47,7 @@ export async function oneInchSwapNativeTo(
         }
         let data = await getQuote1inch(chain.chainId, NATIVE_ADDRESS, token, tokenBalance.toString(), wallet.getAddress())
         if (data === null) {
-            let logger = new ConsoleLogger(wallet.getAddress())
+            let logger = globalLogger.connect(wallet.getAddress())
             logger.warn(`1inch quote for ${name} failed, amount: ${formatEther(tokenBalance)}`)
             return []
         }
@@ -61,7 +61,7 @@ export async function oneInchSwapNativeTo(
         })
         return txs
     } catch (e) {
-        let logger = new ConsoleLogger(wallet.getAddress())
+        let logger = globalLogger.connect(wallet.getAddress())
         logger.warn(`${name} failed: ${e}`)
         return []
     }
@@ -82,7 +82,7 @@ export async function oneInchSwap(
         let tokenContract = new ethers.Contract(tokenFrom, erc20, provider)
         let tokenBalance: bigint = await tokenContract.balanceOf(wallet.getAddress())
         if (tokenBalance === BigInt(0)){
-            let logger = new ConsoleLogger(wallet.getAddress())
+            let logger = globalLogger.connect(wallet.getAddress())
             logger.warn(`No balance for ${name}`)
             return []
         }
@@ -92,7 +92,7 @@ export async function oneInchSwap(
         let txs = await checkAndGetApprovalsInteraction(wallet.getAddress(), contracts.oneInchRouter, tokenBalance, tokenContract)
         let data = await getQuote1inch(chain.chainId, tokenFrom, tokenTo, tokenBalance.toString(), wallet.getAddress())
         if (data === null) {
-            let logger = new ConsoleLogger(wallet.getAddress())
+            let logger = globalLogger.connect(wallet.getAddress())
             let decimals = await tokenContract.decimals()
             logger.warn(`1inch quote for ${name} failed, amount: ${formatUnits(tokenBalance.toString(), decimals)}`)
             return []
@@ -107,7 +107,7 @@ export async function oneInchSwap(
         })
         return txs
     } catch (e) {
-        let logger = new ConsoleLogger(wallet.getAddress())
+        let logger = globalLogger.connect(wallet.getAddress())
         logger.warn(`${name} failed: ${e}`)
         return []
     }
