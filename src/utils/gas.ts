@@ -45,8 +45,7 @@ export async function getFeeData(provider: UnionProvider, chain: Chain) {
             )
         }
 
-        if (curGasPriceInfo.maxFeePerGas !== null ||
-            curGasPriceInfo.gasPrice !== null && curGasPriceInfo.gasPrice < GAS_PRICE_LIMITS(chain.title)) {
+        if (curGasPriceInfo.gasPrice !== null && curGasPriceInfo.gasPrice < GAS_PRICE_LIMITS(chain.title)) {
             return curGasPriceInfo
         }
         globalLogger.warn(`Gas price is too high | Gas price: ${curGasPriceInfo.gasPrice}`)
