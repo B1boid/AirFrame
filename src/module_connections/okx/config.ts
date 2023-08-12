@@ -13,7 +13,7 @@ export function okxWithdrawalConfig(asset: Asset, blockchain: Blockchains): OKXW
         case Asset.MATIC + Blockchains.Polygon:
             return {
                 fee: "0.1",
-                confirmations: 300,
+                confirmations: 1,
                 withdrawalConfirmationsUnlock: 900
             }
         case Asset.ETH + Blockchains.ZkSync:

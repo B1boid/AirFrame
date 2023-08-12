@@ -32,7 +32,7 @@ export async function getFeeData(provider: UnionProvider, chain: Chain) {
         }
         if (chain.title === Blockchains.Polygon) {
             curGasPriceInfo = new FeeData(
-                curGasPriceInfo.gasPrice,
+                curGasPriceInfo.maxFeePerGas,
                 curGasPriceInfo.maxFeePerGas,
                 toBigInt(getRandomInt(32, 70) * (10 ** 9)) // polygon min value is 30 (we multiply by 2 later, so 32 > 30)
             )
@@ -45,7 +45,8 @@ export async function getFeeData(provider: UnionProvider, chain: Chain) {
             )
         }
 
-        if (curGasPriceInfo.gasPrice !== null && curGasPriceInfo.gasPrice < GAS_PRICE_LIMITS(chain.title)) {
+        if (curGasPriceInfo.maxFeePerGas !== null ||
+            curGasPriceInfo.gasPrice !== null && curGasPriceInfo.gasPrice < GAS_PRICE_LIMITS(chain.title)) {
             return curGasPriceInfo
         }
         globalLogger.warn(`Gas price is too high | Gas price: ${curGasPriceInfo.gasPrice}`)
