@@ -4,6 +4,7 @@ import {connectionModules} from "./module_connections/connection_modules";
 import {getAddressInfo, getOkxCredentials, getOkxCredentialsForSub} from "./utils/utils";
 import {WALLETS_ACTIONS_1} from "./tests/task1";
 import {Actions} from "./classes/actions";
+import {ethers} from "ethers-new";
 let prompt = require('password-prompt')
 
 

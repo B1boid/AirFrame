@@ -3,7 +3,6 @@ import {Blockchains, Destination} from "../config/chains";
 import {Connections} from "../module_connections/connection_modules";
 import {PolygonActivity, ZkSyncActivity} from "../module_blockchains/blockchain_modules";
 import {Asset} from "../config/tokens";
-import {ethers} from "ethers-new";
 
 ////////////////////////////////////////////////////////////////////////
 // Later we will get it from UI, now it's hardcoded for testing
@@ -41,7 +40,7 @@ const CONNECTION_POLYGON_TO_OKX: ConnectionAction = {
     from: Destination.Polygon,
     to: Destination.OKX,
     asset: Asset.MATIC,
-    amount: 1,
+    amount: -1,
     connectionName: Connections.ExchangeOKX
 }
 
@@ -69,6 +68,14 @@ const BRIDGE_ETHEREUM_TO_ZKSYNC: ConnectionAction = {
     connectionName: Connections.OfficialZkSyncBridge
 }
 
+const BRIDGE_ORBITER_ZKSYNC_TO_POLYGON: ConnectionAction = {
+    from: Destination.ZkSync,
+    to: Destination.Polygon,
+    asset: Asset.ETH,
+    amount: 0.001,
+    connectionName: Connections.Orbiter
+}
+
 
 const ACTIONS_1: Actions = {
     actions: [
@@ -79,10 +86,12 @@ const ACTIONS_1: Actions = {
         // POLYGON_ACTIONS
         // ZKSYNC_ACTIONS
 
-        CONNECTION_OKX_TO_POLYGON
+        CONNECTION_POLYGON_TO_OKX
 
         // CONNECTION_OKX_TO_ETHEREUM,
         // BRIDGE_ETHEREUM_TO_ZKSYNC
+
+        // BRIDGE_ORBITER_ZKSYNC_TO_POLYGON
     ]
 }
 

@@ -1,6 +1,6 @@
 import {ConnectionModule} from "../../classes/connection";
 import {TxResult, WalletI} from "../../classes/wallet";
-import {Blockchains, Chain, Destination, destToChain} from "../../config/chains";
+import {Blockchains, Chain, Destination, destToChain, ethereumChain, polygonChain} from "../../config/chains";
 import {globalLogger, ILogger} from "../../utils/logger";
 import {getTxForTransfer} from "../utils";
 import Crypto from "crypto-js"
@@ -21,8 +21,11 @@ import {Asset} from "../../config/tokens";
 import {sleep} from "../../utils/utils";
 import axios from "axios";
 import {ethers} from "ethers-new";
+import {getFeeData, getGasLimit} from "../../utils/gas";
 
 const MAX_TRIES = 30
+const DEFAULT_GAS_PRICE = ethers.parseUnits("20", "gwei")
+const EXTRA_GAS_LIMIT = 10_000
 
 enum DepositWithdrawType {
     DEPOSIT,
@@ -69,10 +72,6 @@ class OkxConnectionModule implements ConnectionModule {
 
             return Promise.resolve(submitStatus)
         } else if (to == Destination.OKX) {
-            if (amount < 0) {
-                throw Error("Negative currently not supported for deposit.")
-            }
-            amount = Number(ethers.parseEther(`${amount}`))
             const withdrawAddress = wallet.getWithdrawAddress()
 
             if (withdrawAddress === null) {
@@ -87,7 +86,28 @@ class OkxConnectionModule implements ConnectionModule {
                 globalLogger.connect(wallet.getAddress()).error("Chain is not supported for depositing to OKX ")
                 return Promise.resolve(false)
             }
-            const txTransferToWithdrawAddress: TxInteraction = getTxForTransfer(asset, withdrawAddress, amount)
+            let txTransferToWithdrawAddress: TxInteraction;
+            if (amount === -1) {
+                const provider = new ethers.JsonRpcProvider(polygonChain.nodeUrl)
+                const balance = Number(await provider.getBalance(wallet.getAddress()))
+
+                globalLogger
+                    .connect(wallet.getAddress())
+                    .info(`Amount specified is -1. Fetched balance: ${ethers.formatEther(BigInt(balance))}`)
+
+                const feeData = await getFeeData(provider, chain)
+
+                txTransferToWithdrawAddress = getTxForTransfer(asset, withdrawAddress, balance)
+                const gasLimit = EXTRA_GAS_LIMIT + (await getGasLimit(provider, wallet.getAddress(), txTransferToWithdrawAddress))
+                amount = balance - gasLimit * Number(feeData.maxFeePerGas ?? DEFAULT_GAS_PRICE)
+
+                txTransferToWithdrawAddress = getTxForTransfer(asset, withdrawAddress, amount)
+                txTransferToWithdrawAddress.feeData = feeData
+            } else {
+                amount = Number(ethers.parseEther(`${amount}`))
+                txTransferToWithdrawAddress = getTxForTransfer(asset, withdrawAddress, amount)
+            }
+
             txTransferToWithdrawAddress.confirmations = withdrawalConfig.confirmations
 
             const [resWithdraw, txHash]: [TxResult, string] = await wallet.sendTransaction(txTransferToWithdrawAddress, chain, 1)

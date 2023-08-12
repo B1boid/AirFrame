@@ -8,7 +8,7 @@ import {getRandomInt, sleep} from "./utils";
 import {GAS_PRICE_LIMITS} from "../config/online_config";
 import {globalLogger} from "./logger";
 
-export async function getGasLimit(provider: UnionProvider, from: string,  txInteraction: TxInteraction) {
+export async function getGasLimit(provider: UnionProvider, from: string, txInteraction: TxInteraction) {
     return Number((await provider.estimateGas({
         from: from,
         to: txInteraction.to,
@@ -32,7 +32,7 @@ export async function getFeeData(provider: UnionProvider, chain: Chain) {
         }
         if (chain.title === Blockchains.Polygon) {
             curGasPriceInfo = new FeeData(
-                curGasPriceInfo.gasPrice,
+                curGasPriceInfo.maxFeePerGas,
                 curGasPriceInfo.maxFeePerGas,
                 toBigInt(getRandomInt(32, 70) * (10 ** 9)) // polygon min value is 30 (we multiply by 2 later, so 32 > 30)
             )
