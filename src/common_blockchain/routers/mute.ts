@@ -5,7 +5,7 @@ import {Chain} from "../../config/chains";
 import erc20 from "./../../abi/erc20.json";
 import mute from "./../../abi/mute.json";
 import {checkAndGetApprovalsInteraction} from "../approvals";
-import {ConsoleLogger} from "../../utils/logger";
+import {globalLogger} from "../../utils/logger";
 import {getCurTimestamp, getRandomizedPercent} from "../../utils/utils";
 
 
@@ -42,8 +42,7 @@ export async function muteSwapNativeTo(
         })
         return txs
     } catch (e) {
-        let logger = new ConsoleLogger(wallet.getAddress())
-        logger.warn(`${name} failed: ${e}`)
+        globalLogger.connect(wallet.getAddress()).warn(`${name} failed: ${e}`)
         return []
     }
 }
@@ -64,8 +63,7 @@ export async function muteSwap(
         let tokenContract = new ethers.Contract(tokenFrom, erc20, provider)
         let tokenBalance: bigint = await tokenContract.balanceOf(wallet.getAddress())
         if (tokenBalance === BigInt(0)){
-            let logger = new ConsoleLogger(wallet.getAddress())
-            logger.warn(`No balance for ${name}`)
+            globalLogger.connect(wallet.getAddress()).warn(`No balance for ${name}`)
             return []
         }
         if (balancePercent.length > 0) {
@@ -86,8 +84,7 @@ export async function muteSwap(
         })
         return txs
     } catch (e) {
-        let logger = new ConsoleLogger(wallet.getAddress())
-        logger.warn(`${name} failed: ${e}`)
+        globalLogger.connect(wallet.getAddress()).warn(`${name} failed: ${e}`)
         return []
     }
 }

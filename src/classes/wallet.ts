@@ -1,18 +1,17 @@
 import {TxInteraction} from "./module";
-import {getRandomInt, sleep} from "../utils/utils";
-import {
-    ethers,
-    FeeData,
-    toBigInt,
-    TransactionReceipt,
-    TransactionResponse,
-} from "ethers-new";
+import {sleep} from "../utils/utils";
+import {ethers, FeeData, toBigInt, TransactionReceipt, TransactionResponse} from "ethers-new";
 import {Blockchains, Chain} from "../config/chains";
-import {ConsoleLogger, ILogger} from "../utils/logger"
+import {globalLogger, ILogger} from "../utils/logger"
 import {AddressInfo, OkxCredentials} from "./info";
-import {GAS_PRICE_LIMITS, MAX_TX_WAITING} from "../config/online_config";
+import {MAX_TX_WAITING} from "../config/online_config";
 import * as zk from "zksync-web3";
 import * as oldethers from "ethers";
+import {getFeeData, getGasLimit} from "../utils/gas";
+import {
+    DEFAULT_GAS_PRICE_ZKSYNC_OFFICIAL_BRIDGE,
+    ZKSYNC_BRIDGE_NAME
+} from "../module_connections/eth-zksyncofficial/connection_eth_zksync_official";
 
 
 export enum TxResult {
@@ -47,7 +46,7 @@ export interface WalletI {
     sendTransaction(tx: TxInteraction, chain: Chain, maxRetries: number): Promise<[TxResult, string]>
 }
 
-type UnionProvider = ethers.JsonRpcProvider | zk.Provider
+export type UnionProvider = ethers.JsonRpcProvider | zk.Provider
 type UnionWallet = ethers.Wallet | zk.Wallet
 
 export class MyWallet implements WalletI {
@@ -56,20 +55,20 @@ export class MyWallet implements WalletI {
     private readonly subAccountCredentials: OkxCredentials | null
     private readonly withdrawAddress: string | null
     private readonly subAccountName: string | null
-    private readonly logger: ILogger
+    private readonly logger: ILogger;
     private curGasLimit: number = 0
     private lastTxGasPrice: bigint = BigInt(0)
     private curGasPriceInfo: FeeData = new FeeData(BigInt(0), BigInt(0), BigInt(0));
 
     constructor(addressInfo: AddressInfo, masterCredentials: OkxCredentials | null,
-                subAccountCredentials: OkxCredentials | null, logger: ILogger | null = null) {
+                subAccountCredentials: OkxCredentials | null) {
         this.signer = new ethers.Wallet(addressInfo.privateKey)
         if (this.signer.address.toLowerCase() !== addressInfo.address.toLowerCase()) throw new Error("Address mismatch")
-        this.logger = logger ? logger : new ConsoleLogger(this.signer.address)
         this.withdrawAddress = addressInfo.withdrawAddress
         this.masterCredentials = masterCredentials
         this.subAccountCredentials = subAccountCredentials
         this.subAccountName = addressInfo.subAccName
+        this.logger = globalLogger.connect(this.getAddress())
     }
 
     getSubAccountName(): string | null {
@@ -90,34 +89,13 @@ export class MyWallet implements WalletI {
 
     private async resetGasInfo(provider: UnionProvider, txInteraction: TxInteraction, chain: Chain): Promise<TxResult> {
         try {
-            this.curGasLimit = Number((await provider.estimateGas({
-                from: this.getAddress(),
-                to: txInteraction.to,
-                data: txInteraction.data,
-                value: txInteraction.value
-            })).toString())
-
-            if (chain.title === Blockchains.ZkSync) {
-                const tmpGasInfo: oldethers.providers.FeeData = await (provider as zk.Provider).getFeeData()
-                this.curGasPriceInfo = new FeeData(
-                    tmpGasInfo.gasPrice?.toBigInt() ?? null,
-                    null,
-                    null
-                )
+            this.curGasLimit = await getGasLimit(provider, this.getAddress(), txInteraction)
+            if (txInteraction.feeData !== undefined) {
+                this.curGasPriceInfo = txInteraction.feeData
             } else {
-                this.curGasPriceInfo = await (provider as ethers.JsonRpcProvider).getFeeData()
+                this.curGasPriceInfo = await getFeeData(provider, chain)
             }
-            if (chain.title === Blockchains.Polygon) {
-                this.curGasPriceInfo = new FeeData(
-                    this.curGasPriceInfo.gasPrice,
-                    this.curGasPriceInfo.maxFeePerGas,
-                    toBigInt(getRandomInt(32, 70) * (10 ** 9)) // polygon min value is 30 (we multiply by 2 later, so 32 > 30)
-                )
-            }
-            while (this.curGasPriceInfo.gasPrice !== null && this.curGasPriceInfo.gasPrice > GAS_PRICE_LIMITS(chain.title)) {
-                await sleep(60)
-                this.logger.warn(`Gas price is too high | Gas price: ${this.curGasPriceInfo.gasPrice}`)
-            }
+
             return TxResult.Success
         } catch (e) {
             this.logger.warn(`Error while simulating tx ${txInteraction.name}, ${e}`)
@@ -140,14 +118,16 @@ export class MyWallet implements WalletI {
             let result: TxResult = await this.resetGasInfo(provider, txInteraction, chain)
             let txHash: string = ""
             if(result === TxResult.Success) {
-                this.curGasLimit += TX_LOGIC_BY_TRY[retry].addGasLimit + chain.extraGasLimit
+                if (!txInteraction.name.toLowerCase().includes("bridge")) {
+                    this.curGasLimit += TX_LOGIC_BY_TRY[retry].addGasLimit + chain.extraGasLimit
+                }
                 const [sendResponse, txInfo] = await this._sendTransaction(curSigner, txInteraction)
                 result = sendResponse
                 txHash = txInfo
             }
             switch (result) {
                 case TxResult.Success:
-                    this.logger.success(`Tx:${txInteraction.name} Gas used: ${this.curGasLimit}. Gas price: ${this.lastTxGasPrice / BigInt(10 ** 9)}`)
+                        this.logger.success(`Tx:${txInteraction.name} Gas used: ${this.curGasLimit}. Gas price: ${this.lastTxGasPrice / BigInt(10 ** 9)}`)
                     return [TxResult.Success, txHash]
                 case TxResult.Fail:
                     this.logger.warn(`Tx:${txInteraction.name} Tx failed. Try №${retry} | Gas used: ${this.curGasLimit}`)
@@ -184,7 +164,6 @@ export class MyWallet implements WalletI {
                     value: txInteraction.value,
                 }
             }
-
 
             const tx: TransactionResponse | oldethers.providers.TransactionResponse = await curSigner.sendTransaction({
                 to: txInteraction.to,

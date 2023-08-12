@@ -6,9 +6,9 @@ import erc20 from "./../../abi/erc20.json";
 import SyncPool from "../../abi/syncPool.json";
 import SyncSwapRouter from "../../abi/syncSwapRouter.json";
 import {checkAndGetApprovalsInteraction} from "../approvals";
-import {ConsoleLogger} from "../../utils/logger";
 import {getCurTimestamp, getRandomizedPercent} from "../../utils/utils";
 import {defaultAbiCoder} from "ethers/lib/utils";
+import {globalLogger} from "../../utils/logger";
 
 
 let ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
@@ -64,7 +64,7 @@ export async function syncSwapNativeTo(
         })
         return txs
     } catch (e) {
-        let logger = new ConsoleLogger(wallet.getAddress())
+        let logger = globalLogger.connect(wallet.getAddress())
         logger.warn(`${name} failed: ${e}`)
         return []
     }
@@ -85,7 +85,7 @@ export async function syncSwap(
         let tokenContract = new ethers.Contract(tokenFrom, erc20, provider)
         let tokenBalance: bigint = await tokenContract.balanceOf(wallet.getAddress())
         if (tokenBalance === BigInt(0)){
-            let logger = new ConsoleLogger(wallet.getAddress())
+            let logger = globalLogger.connect(wallet.getAddress())
             logger.warn(`No balance for ${name}`)
             return []
         }
@@ -130,7 +130,7 @@ export async function syncSwap(
         })
         return txs
     } catch (e) {
-        let logger = new ConsoleLogger(wallet.getAddress())
+        let logger = globalLogger.connect(wallet.getAddress())
         logger.warn(`${name} failed: ${e}`)
         return []
     }
