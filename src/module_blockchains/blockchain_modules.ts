@@ -26,7 +26,8 @@ export const enum ZkSyncActivity {
 }
 
 export const enum EthereumActivity {
-
+    wrapUnwrap = "wrapUnwrap",
+    ethRandomApprove = "ethRandomApprove"
 }
 
 export type ActivityTag = PolygonActivity | ZkSyncActivity | EthereumActivity

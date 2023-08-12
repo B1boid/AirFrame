@@ -1,5 +1,6 @@
 import {Chain, ethereumChain} from "../../config/chains";
 import {Activity, BlockchainModule} from "../../classes/module";
+import {ethRandomApprove, ethWrapUnwrap} from "./activities";
 
 
 class EthereumModule extends BlockchainModule {
@@ -13,6 +14,6 @@ class EthereumModule extends BlockchainModule {
 export const moduleEthereum: EthereumModule = new EthereumModule(
     ethereumChain,
     [
-
+        ethWrapUnwrap, ethRandomApprove
     ]
 )
