@@ -4,7 +4,6 @@ import {modulePolygon} from "./polygon/polygon";
 import {EnumDictionary} from "../utils/utils";
 import {Blockchains} from "../config/chains";
 import {moduleEthereum} from "./ethereum/ethereum";
-import {zkSyncEraLendInit} from "./zksync/activities";
 
 
 export const enum PolygonActivity {
@@ -22,7 +21,7 @@ export const enum ZkSyncActivity {
     zkSyncEraLendCycle = "zkSyncEraLendCycle",
     zkSyncReactFusionInit = "zkSyncReactFusionInit",
     zkSyncReactFusionCycle = "zkSyncReactFusionCycle",
-    zkSyncSynFuturesTest = "zkSyncSynFuturesTest"
+    zkSyncSynFuturesTest = "zkSyncSynFuturesTest",
 }
 
 export const enum EthereumActivity {

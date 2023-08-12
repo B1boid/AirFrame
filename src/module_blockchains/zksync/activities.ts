@@ -8,9 +8,13 @@ import {
     zkSyncMintTevaera_mint,
     zkSyncMintZnsId_mint,
     zkSyncRandomApprove_approve,
-    zkSyncReactFusionCycle_supply, zkSyncReactFusionCycle_withdraw, zkSyncReactFusionInit_enter,
+    zkSyncReactFusionCycle_supply,
+    zkSyncReactFusionCycle_withdraw,
+    zkSyncReactFusionInit_enter,
+    zkSyncRhinoCycle_deposit,
     zkSyncSwapCycleNativeToUsdc_swapback,
-    zkSyncSwapCycleNativeToUsdc_swapto, zkSyncSynFuturesTest_mint,
+    zkSyncSwapCycleNativeToUsdc_swapto,
+    zkSyncSynFuturesTest_mint,
     zkSyncWrapUnwrap_unwrap,
     zkSyncWrapUnwrap_wrap
 } from "./interations";
