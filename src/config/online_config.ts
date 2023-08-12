@@ -10,6 +10,9 @@ export function GAS_PRICE_LIMITS(chain: Blockchains, randomized_percent: number 
         case Blockchains.Polygon:
             value = 900 * (10 ** 9) // 900 gwei
             break
+        case Blockchains.Ethereum:
+            value = 35 * (10 ** 9) // 35 gwei
+            break
     }
     if (randomized_percent != 0) {
         value += Math.floor(getRandomInt(-randomized_percent / 100 * value, randomized_percent / 100 * value))

@@ -5,7 +5,7 @@ import {ethers} from "ethers-new";
 import wrapped from "./../../abi/wrapped.json";
 import {polygonChain} from "../../config/chains";
 import {getRandomizedPercent} from "../../utils/utils";
-import {ConsoleLogger} from "../../utils/logger";
+import {globalLogger} from "../../utils/logger";
 import {commonSwap, Dexes} from "../../common_blockchain/routers/common";
 
 let tokens = polygonTokens
@@ -28,8 +28,7 @@ export async function polygonWrapUnwrap_wrap(wallet: WalletI): Promise<TxInterac
             name: "polygonWrapUnwrap_wrap"
         }]
     } catch (e) {
-        let logger = new ConsoleLogger(wallet.getAddress())
-        logger.warn(`polygonWrapUnwrap_wrap failed: ${e}`)
+        globalLogger.connect(wallet.getAddress()).warn(`polygonWrapUnwrap_wrap failed: ${e}`)
         return []
     }
 }
@@ -49,8 +48,7 @@ export async function polygonWrapUnwrap_unwrap(wallet: WalletI): Promise<TxInter
             name: "polygonWrapUnwrap_unwrap"
         }]
     } catch (e) {
-        let logger = new ConsoleLogger(wallet.getAddress())
-        logger.warn(`polygonWrapUnwrap_unwrap failed: ${e}`)
+        globalLogger.connect(wallet.getAddress()).warn(`polygonWrapUnwrap_unwrap failed: ${e}`)
         return []
     }
 }
