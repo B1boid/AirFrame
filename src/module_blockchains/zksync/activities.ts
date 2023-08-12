@@ -11,7 +11,6 @@ import {
     zkSyncReactFusionCycle_supply,
     zkSyncReactFusionCycle_withdraw,
     zkSyncReactFusionInit_enter,
-    zkSyncRhinoCycle_deposit,
     zkSyncSwapCycleNativeToUsdc_swapback,
     zkSyncSwapCycleNativeToUsdc_swapto,
     zkSyncSynFuturesTest_mint,

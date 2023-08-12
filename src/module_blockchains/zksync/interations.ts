@@ -173,8 +173,7 @@ export async function zkSyncEraLendCycle_supply(wallet: WalletI): Promise<TxInte
             name: "zkSyncEraLendCycle_supply"
         }]
     } catch (e) {
-        let logger = globalLogger.connect(wallet.getAddress())
-        logger.warn(`zkSyncEraLendCycle_supply failed: ${e}`)
+        globalLogger.connect(wallet.getAddress()).warn(`zkSyncEraLendCycle_supply failed: ${e}`)
         return []
     }
 }
@@ -196,8 +195,7 @@ export async function zkSyncEraLendCycle_withdraw(wallet: WalletI): Promise<TxIn
             name: "zkSyncEraLendCycle_withdraw"
         }]
     } catch (e) {
-        let logger = globalLogger.connect(wallet.getAddress())
-        logger.warn(`zkSyncEraLendCycle_withdraw failed: ${e}`)
+        globalLogger.connect(wallet.getAddress()).warn(`zkSyncEraLendCycle_withdraw failed: ${e}`)
         return []
     }
 }
@@ -229,8 +227,7 @@ export async function zkSyncReactFusionCycle_supply(wallet: WalletI): Promise<Tx
             name: "zkSyncReactFusionCycle_supply"
         }]
     } catch (e) {
-        let logger = globalLogger.connect(wallet.getAddress())
-        logger.warn(`zkSyncReactFusionCycle_supply failed: ${e}`)
+        globalLogger.connect(wallet.getAddress()).warn(`zkSyncReactFusionCycle_supply failed: ${e}`)
         return []
     }
 }
@@ -252,8 +249,7 @@ export async function zkSyncReactFusionCycle_withdraw(wallet: WalletI): Promise<
             name: "zkSyncReactFusionCycle_withdraw"
         }]
     } catch (e) {
-        let logger = globalLogger.connect(wallet.getAddress())
-        logger.warn(`zkSyncReactFusionCycle_withdraw failed: ${e}`)
+        globalLogger.connect(wallet.getAddress()).warn(`zkSyncReactFusionCycle_withdraw failed: ${e}`)
         return []
     }
 }
@@ -285,8 +281,7 @@ export async function zkSyncRhinoCycle_deposit(wallet: WalletI): Promise<TxInter
             name: "zkSyncRhinoCycle_deposit"
         }]
     } catch (e){
-        let logger = globalLogger.connect(wallet.getAddress())
-        logger.warn(`zkSyncRhinoCycle_deposit failed: ${e}`)
+        globalLogger.connect(wallet.getAddress()).warn(`zkSyncRhinoCycle_deposit failed: ${e}`)
         return []
     }
 }
