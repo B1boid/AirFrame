@@ -1,6 +1,6 @@
 import {TxInteraction} from "../../classes/module";
 import {WalletI} from "../../classes/wallet";
-import {getRandomInt, getRandomizedPercent} from "../../utils/utils";
+import {getRandomElement, getRandomInt, getRandomizedPercent} from "../../utils/utils";
 import {globalLogger} from "../../utils/logger";
 import wrapped from "../../abi/wrapped.json";
 import zns_1 from "../../abi/zns_1.json";
@@ -159,35 +159,47 @@ export async function zkSyncEraLendInit_enter(wallet: WalletI): Promise<TxIntera
 }
 
 export async function zkSyncEraLendCycle_supply(wallet: WalletI): Promise<TxInteraction[]> {
-    let balancePercent = [5, 20]
-    const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
-    let tokenBalance: bigint = await provider.getBalance(wallet.getAddress())
-    tokenBalance = getRandomizedPercent(tokenBalance, balancePercent[0], balancePercent[1])
-    return [{
-        to: contracts.zkEraLendEth,
-        data: "0x1249c58b",
-        value: tokenBalance.toString(),
-        stoppable: false,
-        confirmations: 1,
-        name: "zkSyncEraLendCycle_supply"
-    }]
+    try {
+        let balancePercent = [5, 20]
+        const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+        let tokenBalance: bigint = await provider.getBalance(wallet.getAddress())
+        tokenBalance = getRandomizedPercent(tokenBalance, balancePercent[0], balancePercent[1])
+        return [{
+            to: contracts.zkEraLendEth,
+            data: "0x1249c58b",
+            value: tokenBalance.toString(),
+            stoppable: false,
+            confirmations: 1,
+            name: "zkSyncEraLendCycle_supply"
+        }]
+    } catch (e) {
+        let logger = new ConsoleLogger(wallet.getAddress())
+        logger.warn(`zkSyncEraLendCycle_supply failed: ${e}`)
+        return []
+    }
 }
 
 export async function zkSyncEraLendCycle_withdraw(wallet: WalletI): Promise<TxInteraction[]> {
-    const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
-    let cTokenContract = new ethers.Contract(contracts.zkEraLendEth, eralend, provider)
-    let cTokenBalance: bigint = await cTokenContract.balanceOf(wallet.getAddress())
-    let data: string = cTokenContract.interface.encodeFunctionData(
-        "redeem", [cTokenBalance.toString()]
-    )
-    return [{
-        to: contracts.zkEraLendEth,
-        data: data,
-        value: "0",
-        stoppable: true,
-        confirmations: 1,
-        name: "zkSyncEraLendCycle_withdraw"
-    }]
+    try {
+        const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+        let cTokenContract = new ethers.Contract(contracts.zkEraLendEth, eralend, provider)
+        let cTokenBalance: bigint = await cTokenContract.balanceOf(wallet.getAddress())
+        let data: string = cTokenContract.interface.encodeFunctionData(
+            "redeem", [cTokenBalance.toString()]
+        )
+        return [{
+            to: contracts.zkEraLendEth,
+            data: data,
+            value: "0",
+            stoppable: true,
+            confirmations: 1,
+            name: "zkSyncEraLendCycle_withdraw"
+        }]
+    } catch (e) {
+        let logger = new ConsoleLogger(wallet.getAddress())
+        logger.warn(`zkSyncEraLendCycle_withdraw failed: ${e}`)
+        return []
+    }
 }
 
 export async function zkSyncReactFusionInit_enter(wallet: WalletI): Promise<TxInteraction[]> {
@@ -203,33 +215,78 @@ export async function zkSyncReactFusionInit_enter(wallet: WalletI): Promise<TxIn
 }
 
 export async function zkSyncReactFusionCycle_supply(wallet: WalletI): Promise<TxInteraction[]> {
-    let balancePercent = [5, 20]
-    const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
-    let tokenBalance: bigint = await provider.getBalance(wallet.getAddress())
-    tokenBalance = getRandomizedPercent(tokenBalance, balancePercent[0], balancePercent[1])
-    return [{
-        to: contracts.reactFusionEth,
-        data: "0x1249c58b",
-        value: tokenBalance.toString(),
-        stoppable: false,
-        confirmations: 1,
-        name: "zkSyncReactFusionCycle_supply"
-    }]
+    try {
+        let balancePercent = [5, 20]
+        const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+        let tokenBalance: bigint = await provider.getBalance(wallet.getAddress())
+        tokenBalance = getRandomizedPercent(tokenBalance, balancePercent[0], balancePercent[1])
+        return [{
+            to: contracts.reactFusionEth,
+            data: "0x1249c58b",
+            value: tokenBalance.toString(),
+            stoppable: false,
+            confirmations: 1,
+            name: "zkSyncReactFusionCycle_supply"
+        }]
+    } catch (e) {
+        let logger = new ConsoleLogger(wallet.getAddress())
+        logger.warn(`zkSyncReactFusionCycle_supply failed: ${e}`)
+        return []
+    }
 }
 
 export async function zkSyncReactFusionCycle_withdraw(wallet: WalletI): Promise<TxInteraction[]> {
-    const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
-    let cTokenContract = new ethers.Contract(contracts.reactFusionEth, eralend, provider)
-    let cTokenBalance: bigint = await cTokenContract.balanceOf(wallet.getAddress())
-    let data: string = cTokenContract.interface.encodeFunctionData(
-        "redeem", [cTokenBalance.toString()]
-    )
+    try {
+        const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+        let cTokenContract = new ethers.Contract(contracts.reactFusionEth, eralend, provider)
+        let cTokenBalance: bigint = await cTokenContract.balanceOf(wallet.getAddress())
+        let data: string = cTokenContract.interface.encodeFunctionData(
+            "redeem", [cTokenBalance.toString()]
+        )
+        return [{
+            to: contracts.reactFusionEth,
+            data: data,
+            value: "0",
+            stoppable: true,
+            confirmations: 1,
+            name: "zkSyncReactFusionCycle_withdraw"
+        }]
+    } catch (e) {
+        let logger = new ConsoleLogger(wallet.getAddress())
+        logger.warn(`zkSyncReactFusionCycle_withdraw failed: ${e}`)
+        return []
+    }
+}
+
+export async function zkSyncSynFuturesTest_mint(wallet: WalletI): Promise<TxInteraction[]> {
+    let testTokens = [contracts.synFuturesMint1, contracts.synFuturesMint2]
     return [{
-        to: contracts.reactFusionEth,
-        data: data,
+        to: getRandomElement(testTokens),
+        data: "0x1249c58b",
         value: "0",
-        stoppable: true,
+        stoppable: false,
         confirmations: 1,
-        name: "zkSyncReactFusionCycle_withdraw"
+        name: "zkSyncSynFuturesTest_mint"
     }]
+}
+
+export async function zkSyncRhinoCycle_deposit(wallet: WalletI): Promise<TxInteraction[]> {
+    try {
+        let balancePercent = [20, 35]
+        const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+        let tokenBalance: bigint = await provider.getBalance(wallet.getAddress())
+        tokenBalance = getRandomizedPercent(tokenBalance, balancePercent[0], balancePercent[1])
+        return [{
+            to: contracts.rhinoDeposit,
+            data: "0xdb6b5246",
+            value: tokenBalance.toString(),
+            stoppable: false,
+            confirmations: 1,
+            name: "zkSyncRhinoCycle_deposit"
+        }]
+    } catch (e){
+        let logger = new ConsoleLogger(wallet.getAddress())
+        logger.warn(`zkSyncRhinoCycle_deposit failed: ${e}`)
+        return []
+    }
 }

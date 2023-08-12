@@ -8,9 +8,13 @@ import {
     zkSyncMintTevaera_mint,
     zkSyncMintZnsId_mint,
     zkSyncRandomApprove_approve,
-    zkSyncReactFusionCycle_supply, zkSyncReactFusionCycle_withdraw, zkSyncReactFusionInit_enter,
+    zkSyncReactFusionCycle_supply,
+    zkSyncReactFusionCycle_withdraw,
+    zkSyncReactFusionInit_enter,
+    zkSyncRhinoCycle_deposit,
     zkSyncSwapCycleNativeToUsdc_swapback,
     zkSyncSwapCycleNativeToUsdc_swapto,
+    zkSyncSynFuturesTest_mint,
     zkSyncWrapUnwrap_unwrap,
     zkSyncWrapUnwrap_wrap
 } from "./interations";
@@ -81,5 +85,12 @@ export const zkSyncReactFusionCycle: Activity = {
     txs: [
         zkSyncReactFusionCycle_supply,
         zkSyncReactFusionCycle_withdraw
+    ]
+}
+
+export const zkSyncSynFuturesTest: Activity = {
+    name: ZkSyncActivity.zkSyncSynFuturesTest,
+    txs: [
+        zkSyncSynFuturesTest_mint
     ]
 }
