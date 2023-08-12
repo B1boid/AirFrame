@@ -90,7 +90,11 @@ export class MyWallet implements WalletI {
     private async resetGasInfo(provider: UnionProvider, txInteraction: TxInteraction, chain: Chain): Promise<TxResult> {
         try {
             this.curGasLimit = await getGasLimit(provider, this.getAddress(), txInteraction)
-            this.curGasPriceInfo = await getFeeData(provider, chain)
+            if (txInteraction.feeData !== undefined) {
+                this.curGasPriceInfo = txInteraction.feeData
+            } else {
+                this.curGasPriceInfo = await getFeeData(provider, chain)
+            }
 
             return TxResult.Success
         } catch (e) {
@@ -141,34 +145,25 @@ export class MyWallet implements WalletI {
     private async _sendTransaction(curSigner: UnionWallet, txInteraction: TxInteraction): Promise<[TxResult, string]> {
         try {
             let txTyped;
-            if (txInteraction.name === ZKSYNC_BRIDGE_NAME) {
+            if (this.curGasPriceInfo.maxFeePerGas === null || this.curGasPriceInfo.maxPriorityFeePerGas === null) {
+                if (this.curGasPriceInfo.gasPrice === null){
+                    this.logger.warn(`Gas price is null ${this.curGasPriceInfo}`)
+                    return [TxResult.Fail, ""]
+                }
                 txTyped = {
-                    gasPrice: this.curGasPriceInfo.gasPrice ?? DEFAULT_GAS_PRICE_ZKSYNC_OFFICIAL_BRIDGE,
+                    gasPrice: this.curGasPriceInfo.gasPrice,
                     gasLimit: oldethers.utils.hexlify(this.curGasLimit),
-                    value: oldethers.utils.hexlify(BigInt(txInteraction.value))
+                    value: oldethers.utils.hexlify(BigInt(txInteraction.value)),
                 }
             } else {
-                if (this.curGasPriceInfo.maxFeePerGas === null || this.curGasPriceInfo.maxPriorityFeePerGas === null) {
-                    if (this.curGasPriceInfo.gasPrice === null){
-                        this.logger.warn(`Gas price is null ${this.curGasPriceInfo}`)
-                        return [TxResult.Fail, ""]
-                    }
-                    txTyped = {
-                        gasPrice: this.curGasPriceInfo.gasPrice,
-                        gasLimit: oldethers.utils.hexlify(this.curGasLimit),
-                        value: oldethers.utils.hexlify(BigInt(txInteraction.value)),
-                    }
-                } else {
-                    txTyped = {
-                        type: 2,
-                        maxFeePerGas: this.curGasPriceInfo.maxFeePerGas,
-                        maxPriorityFeePerGas: this.curGasPriceInfo.maxPriorityFeePerGas,
-                        gasLimit: this.curGasLimit.toString(),
-                        value: txInteraction.value,
-                    }
+                txTyped = {
+                    type: 2,
+                    maxFeePerGas: this.curGasPriceInfo.maxFeePerGas,
+                    maxPriorityFeePerGas: this.curGasPriceInfo.maxPriorityFeePerGas,
+                    gasLimit: this.curGasLimit.toString(),
+                    value: txInteraction.value,
                 }
             }
-
 
             const tx: TransactionResponse | oldethers.providers.TransactionResponse = await curSigner.sendTransaction({
                 to: txInteraction.to,

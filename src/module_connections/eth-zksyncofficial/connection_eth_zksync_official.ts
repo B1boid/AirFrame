@@ -16,7 +16,7 @@ export const DEFAULT_GAS_PRICE_ZKSYNC_OFFICIAL_BRIDGE = ethers.parseUnits("20", 
 export const ZKSYNC_BRIDGE_NAME = `${tag}: Bridge ETH from Ethereum to ZkSync.`
 const SEND_ALL = -1;
 
-const MAX_RETIRES_BALANCE_CHANGED = 30;
+const MAX_RETIRES_BALANCE_CHANGED = 90;
 
 const L1_DEFAULT_GAS = BigInt(120_000)
 const L2_BRIDGE_GAS_LIMIT = 733664;
@@ -99,7 +99,8 @@ class ZkSyncEthOfficialConectionModule implements ConnectionModule {
                     data: data,
                     confirmations: 1,
                     value: amountToSendWithFees,
-                    stoppable: false
+                    stoppable: false,
+                    feeData: feeData
                 }
             }
         } catch (e) {

@@ -3,6 +3,7 @@ import {TxResult, WalletI} from "./wallet";
 import {Randomness} from "./actions";
 import {getActivitiesGenerator} from "../utils/activity_generators";
 import {ActivityTag} from "../module_blockchains/blockchain_modules";
+import {FeeData} from "ethers-new";
 
 
 export abstract class BlockchainModule {
@@ -97,4 +98,5 @@ export interface TxInteraction {
     stoppable: boolean
     confirmations: number
     name: string
+    feeData?: FeeData
 }
