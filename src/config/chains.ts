@@ -6,7 +6,7 @@ export interface Chain {
   nodeUrl: string
   symbol: string
   extraGasLimit: number
-  orbitrumCode?: number
+  orbiterCode?: number
 }
 export enum Blockchains {
     ZkSync = "ZkSync",
@@ -29,7 +29,7 @@ export const zkSyncChain: Chain = {
   nodeUrl: "https://mainnet.era.zksync.io",
   symbol: "ETH",
   extraGasLimit: 100000,
-  orbitrumCode: 9014
+  orbiterCode: 9014
 }
 
 export const polygonChain: Chain = {
@@ -38,7 +38,7 @@ export const polygonChain: Chain = {
   nodeUrl: "https://polygon.llamarpc.com",
   symbol: "MATIC",
   extraGasLimit: 100000,
-  orbitrumCode: 9006
+  orbiterCode: 9006
 }
 
 export const ethereumChain: Chain = {
@@ -47,7 +47,7 @@ export const ethereumChain: Chain = {
     nodeUrl: "https://eth.llamarpc.com",
     symbol: "ETH",
     extraGasLimit: 100000,
-    orbitrumCode: 9001
+    orbiterCode: 9001
 }
 
 export const optimismChain: Chain = {
@@ -56,7 +56,7 @@ export const optimismChain: Chain = {
     nodeUrl: "https://rpc.ankr.com/optimism",
     symbol: "ETH",
     extraGasLimit: 0,
-    orbitrumCode: 9007
+    orbiterCode: 9007
 }
 
 export const destToChain = (destination: Destination): Chain => {

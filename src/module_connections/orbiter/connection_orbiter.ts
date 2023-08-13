@@ -17,8 +17,8 @@ class OrbiterConnectionModule implements ConnectionModule {
         const chainFrom: Chain = destToChain(from)
         const chainTo: Chain = destToChain(to)
 
-        if (chainTo.orbitrumCode === undefined) {
-            logger.error(`Destination chain ${chainTo.title} does not have orbitrum.code field. Cannot transfer via Orbiter.`)
+        if (chainTo.orbiterCode === undefined) {
+            logger.error(`Destination chain ${chainTo.title} does not have orbiter.code field. Cannot transfer via Orbiter.`)
             return Promise.resolve(false)
         }
 
@@ -30,11 +30,11 @@ class OrbiterConnectionModule implements ConnectionModule {
         let transferTx: TxInteraction;
         if (amount === -1) {
             [amount, transferTx] = await getTxDataForAllBalanceTransfer(wallet, ETH_BRIDGE_ROUTER, asset, chainFrom, EXTRA_GAS_LIMIT, DEFAULT_GAS_PRICE)
-            transferTx.value = transferTx.value.substring(0, transferTx.value.length - 4) + chainTo.orbitrumCode.toString()
+            transferTx.value = transferTx.value.substring(0, transferTx.value.length - 4) + chainTo.orbiterCode.toString()
         } else {
             amount = Number(ethers.parseEther(`${amount}`))
             transferTx = getTxForTransfer(asset, ETH_BRIDGE_ROUTER, amount)
-            transferTx.value = transferTx.value.substring(0, transferTx.value.length - 4) + chainTo.orbitrumCode.toString()
+            transferTx.value = transferTx.value.substring(0, transferTx.value.length - 4) + chainTo.orbiterCode.toString()
         }
 
         const toProvider = new ethers.JsonRpcProvider(chainTo.nodeUrl)
