@@ -49,5 +49,13 @@ export const ethContracts: { [id: string]: string } = {
     oneInchRouter: "0x1111111254EEB25477B68fb85Ed929f73A960582",
     lifiRouter: "0x1231DEB6f5749EF6cE6943a275A1D3E7486F4EaE",
     openOceanRouter: "0x6352a56caadC4F1E25CD6c75970Fa768A3304e64",
-    metamaskRouter: "0x881D40237659C251811CEC9c364ef91dC08D300C"
+    metamaskRouter: "0x881D40237659C251811CEC9c364ef91dC08D300C",
+
+    // NFTs to mint
+    nftMintZerion: "0x932261f9Fc8DA46C4a22e31B45c4De60623848bF",
+    nftMintParrot: "0x2F47cA81a38CB76F94256706750a4eA879E7CF9F",
+    nftMintDream: "0xCAE5E96069cdc4bCbc05f81bA0707d51BC02BFf5",
+    nftMintRaid: "0x0A791089ACf48912a9Cfde00E3A6aFe9eDBC3221",
+    nftMintGlow: "0x7BB824EceD0a777C17ac0000B0E7f8e036F1538f"
+
 }

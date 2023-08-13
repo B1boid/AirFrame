@@ -1,7 +1,7 @@
 import {WalletI} from "../../classes/wallet";
 import {TxInteraction} from "../../classes/module";
 import {ethers} from "ethers-new";
-import {getRandomizedPercent} from "../../utils/utils";
+import {getRandomElement, getRandomizedPercent} from "../../utils/utils";
 import {globalLogger} from "../../utils/logger";
 import wrapped from "../../abi/wrapped.json";
 import {ethereumChain} from "../../config/chains";
@@ -64,4 +64,24 @@ export async function ethRandomApprove_approve(wallet: WalletI): Promise<TxInter
         contracts.lifiRouter, contracts.openOceanRouter, contracts.metamaskRouter
     ]
     return await getRandomApprove(rndTokens, rndSpenders, wallet.getAddress(), chain)
+}
+
+export async function ethRandomMint_mint(wallet: WalletI): Promise<TxInteraction[]> {
+    let nft = getRandomElement([
+        {to: contracts.nftMintZerion, value: "0", data: "0x1249c58b72db8c0b"},
+        {to: contracts.nftMintZerion, value: "0", data: "0x1249c58b72db8c0b"},
+        {to: contracts.nftMintZerion, value: "0", data: "0x1249c58b72db8c0b"},
+        {to: contracts.nftMintParrot, value: "0", data: "0xa0712d68000000000000000000000000000000000000000000000000000000000000000172db8c0b"},
+        {to: contracts.nftMintParrot, value: "0", data: "0xa0712d68000000000000000000000000000000000000000000000000000000000000000172db8c0b"},
+        {to: contracts.nftMintDream, value: "0", data: "0xa0712d68000000000000000000000000000000000000000000000000000000000000000172db8c0b"},
+        {to: contracts.nftMintRaid, value: "0", data: "0xa0712d68000000000000000000000000000000000000000000000000000000000000000172db8c0b"},
+        {to: contracts.nftMintGlow, value: "0.00005", data: "0xa0712d68000000000000000000000000000000000000000000000000000000000000000172db8c0b"}
+    ])
+    return [{
+        ...nft,
+        value: "0",
+        stoppable: false,
+        confirmations: 1,
+        name: "mintNft"
+    }]
 }
