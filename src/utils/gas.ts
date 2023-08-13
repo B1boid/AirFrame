@@ -8,7 +8,7 @@ import {getRandomInt, sleep} from "./utils";
 import {GAS_PRICE_LIMITS} from "../config/online_config";
 import {globalLogger} from "./logger";
 
-export async function getGasLimit(provider: UnionProvider, from: string,  txInteraction: TxInteraction) {
+export async function getGasLimit(provider: UnionProvider, from: string, txInteraction: TxInteraction) {
     return Number((await provider.estimateGas({
         from: from,
         to: txInteraction.to,
