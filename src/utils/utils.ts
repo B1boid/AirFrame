@@ -2,6 +2,14 @@ import {AddressInfo, OkxCredentials} from "../classes/info";
 import dotenv from 'dotenv';
 import { readFileSync } from 'fs';
 import CryptoJS from "crypto-js/core";
+import {ethers} from "ethers-new";
+import {globalLogger} from "./logger";
+import {getFeeData, getGasLimit} from "./gas";
+import {getTxForTransfer} from "../module_connections/utils";
+import {WalletI} from "../classes/wallet";
+import {Chain} from "../config/chains";
+import {Asset} from "../config/tokens";
+import {TxInteraction} from "../classes/module";
 dotenv.config();
 
 export type EnumDictionary<T extends string | symbol | number, U> = {
@@ -80,4 +88,24 @@ export function getOkxCredentialsForSub(addressInfo : AddressInfo, password: str
         }
     }
     throw new Error(`Missing OKX credentials for ${addressInfo.subAccName}.`)
+}
+
+const ESTIMATE_GAS_LIMIT = 200_000 // берем сразу много, чтобы точно на любом чейне сработало. Нужно только для эстимейта, тк если эстимейтить с фул балансом, то падает тк не хватает средств на газ
+export async function getTxDataForAllBalanceTransfer(wallet: WalletI, toAddress: string, asset: Asset, fromChain: Chain, extraGasLimit: number, defaultGasPrice: bigint): Promise<[number, TxInteraction]> {
+    const provider = new ethers.JsonRpcProvider(fromChain.nodeUrl)
+    const balance = Number(await provider.getBalance(wallet.getAddress()))
+
+    globalLogger
+        .connect(wallet.getAddress())
+        .info(`Amount specified is -1. Fetched balance: ${ethers.formatEther(BigInt(balance))}`)
+
+    const feeData = await getFeeData(provider, fromChain)
+
+    let txTransferToWithdrawAddress = getTxForTransfer(asset, toAddress, balance - (ESTIMATE_GAS_LIMIT * Number(feeData.gasPrice ?? defaultGasPrice)))
+    const gasLimit = extraGasLimit + (await getGasLimit(provider, wallet.getAddress(), txTransferToWithdrawAddress))
+    const amount = balance - gasLimit * Number(feeData.maxFeePerGas ?? defaultGasPrice)
+
+    txTransferToWithdrawAddress = getTxForTransfer(asset, toAddress, amount)
+    txTransferToWithdrawAddress.feeData = feeData
+    return [amount, txTransferToWithdrawAddress]
 }

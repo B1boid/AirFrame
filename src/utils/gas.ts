@@ -23,9 +23,9 @@ export async function getFeeData(provider: UnionProvider, chain: Chain) {
         if (chain.title === Blockchains.ZkSync) {
             const tmpGasInfo: oldethers.providers.FeeData = await (provider as zk.Provider).getFeeData()
             curGasPriceInfo = new FeeData(
-                tmpGasInfo.gasPrice?.toBigInt() ?? null,
-                tmpGasInfo.maxFeePerGas?.toBigInt() ?? null,
-                tmpGasInfo.maxPriorityFeePerGas?.toBigInt() ?? null
+                tmpGasInfo.gasPrice ? BigInt(tmpGasInfo.gasPrice.toString()) : null,
+                tmpGasInfo.maxFeePerGas ? BigInt(tmpGasInfo.maxFeePerGas.toString()) : null,
+                tmpGasInfo.maxPriorityFeePerGas ? BigInt(tmpGasInfo.maxPriorityFeePerGas.toString()) : null,
             )
         } else {
             curGasPriceInfo = await (provider as ethers.JsonRpcProvider).getFeeData()

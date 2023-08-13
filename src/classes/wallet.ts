@@ -118,7 +118,7 @@ export class MyWallet implements WalletI {
             let result: TxResult = await this.resetGasInfo(provider, txInteraction, chain)
             let txHash: string = ""
             if(result === TxResult.Success) {
-                if (!txInteraction.name.toLowerCase().includes("bridge") && !txInteraction.name.toLowerCase().includes("okx")) {
+                if (!txInteraction.name.toLowerCase().includes("bridge") && !txInteraction.name.toLowerCase().endsWith("-transfer")) {
                     this.curGasLimit += TX_LOGIC_BY_TRY[retry].addGasLimit + chain.extraGasLimit
                 }
                 const [sendResponse, txInfo] = await this._sendTransaction(curSigner, txInteraction)
