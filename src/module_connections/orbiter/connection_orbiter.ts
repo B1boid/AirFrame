@@ -18,12 +18,12 @@ class OrbiterConnectionModule implements ConnectionModule {
         const chainTo: Chain = destToChain(to)
 
         if (chainTo.orbitrumCode === undefined) {
-            logger.error(`Destination chain ${chainTo.title} does not have orbitrum.code field. Cannot transfer via orbitrum.`)
+            logger.error(`Destination chain ${chainTo.title} does not have orbitrum.code field. Cannot transfer via Orbiter.`)
             return Promise.resolve(false)
         }
 
         if (asset !== Asset.ETH) {
-            logger.error(`It is possible to tranfer ETH only via Orbitrum.`)
+            logger.error(`It is possible to tranfer ETH only via Orbiter.`)
             return Promise.resolve(false)
         }
 
@@ -41,7 +41,7 @@ class OrbiterConnectionModule implements ConnectionModule {
         const [success, hash] = await wallet.sendTransaction(transferTx, chainFrom, 1)
 
         if (success === TxResult.Fail) {
-            logger.error(`Failed to send transfer tx ${chainFrom.title} -> ${chainTo.title} using Orbitrum.`)
+            logger.error(`Failed to send transfer tx ${chainFrom.title} -> ${chainTo.title} using Orbiter.`)
             return Promise.resolve(false)
         }
 
