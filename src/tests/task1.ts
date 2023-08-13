@@ -44,6 +44,14 @@ const CONNECTION_POLYGON_TO_OKX: ConnectionAction = {
     connectionName: Connections.ExchangeOKX
 }
 
+const CONNECTION_OPTIMISM_TO_OKX: ConnectionAction = {
+    from: Destination.Optimism,
+    to: Destination.OKX,
+    asset: Asset.ETH,
+    amount: -1,
+    connectionName: Connections.ExchangeOKX
+}
+
 const CONNECTION_OKX_TO_ETHEREUM: ConnectionAction = {
     from: Destination.OKX,
     to: Destination.Ethereum,
@@ -91,7 +99,8 @@ const ACTIONS_1: Actions = {
         // CONNECTION_OKX_TO_ETHEREUM,
         // BRIDGE_ETHEREUM_TO_ZKSYNC
 
-        BRIDGE_ORBITER_ZKSYNC_TO_OPTIMISM
+        // BRIDGE_ORBITER_ZKSYNC_TO_OPTIMISM,
+        CONNECTION_OPTIMISM_TO_OKX
     ]
 }
 

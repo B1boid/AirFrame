@@ -84,7 +84,7 @@ class ZkSyncEthOfficialConectionModule implements ConnectionModule {
                         value: (balance - gasPrice * L1_DEFAULT_GAS).toString(),
                         stoppable: false
                     }
-                    const estimatedGas = await getGasLimit(provider, wallet.getAddress(), estimateData)
+                    const estimatedGas = await getGasLimit(provider, ethereumChain, wallet.getAddress(), estimateData)
                     const l1FeesToPay = BigInt(estimatedGas) * (feeData.maxFeePerGas ?? DEFAULT_GAS_PRICE_ZKSYNC_OFFICIAL_BRIDGE)
 
                     amountToSendWithFees = (balance - l1FeesToPay).toString()

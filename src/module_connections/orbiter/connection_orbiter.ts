@@ -34,6 +34,7 @@ class OrbiterConnectionModule implements ConnectionModule {
         } else {
             amount = Number(ethers.parseEther(`${amount}`))
             transferTx = getTxForTransfer(asset, ETH_BRIDGE_ROUTER, amount)
+            transferTx.value = transferTx.value.substring(0, transferTx.value.length - 4) + chainTo.orbitrumCode.toString()
         }
 
         const toProvider = new ethers.JsonRpcProvider(chainTo.nodeUrl)

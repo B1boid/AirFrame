@@ -25,8 +25,14 @@ export function okxWithdrawalConfig(asset: Asset, blockchain: Blockchains): OKXW
         case Asset.ETH + Blockchains.Ethereum:
             return {
                 fee: "0.00056",
-                confirmations: 1,
-                withdrawalConfirmationsUnlock: -1
+                confirmations: 64,
+                withdrawalConfirmationsUnlock: 96
+            }
+        case Asset.ETH + Blockchains.Optimism:
+            return {
+                fee: "0.0001",
+                confirmations: 150,
+                withdrawalConfirmationsUnlock: 200
             }
         default:
             return {
@@ -43,6 +49,8 @@ export function destToOkxChain(blockchain: Blockchains) {
             return "Polygon"
         case Blockchains.ZkSync:
             return "zkSync Era"
+        case Blockchains.Optimism:
+            return "Optimism"
         case Blockchains.Ethereum:
             return "ERC20"
         default:

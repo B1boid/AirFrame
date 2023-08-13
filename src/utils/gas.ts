@@ -7,8 +7,9 @@ import {ethers, FeeData, toBigInt} from "ethers-new";
 import {getRandomInt, sleep} from "./utils";
 import {GAS_PRICE_LIMITS} from "../config/online_config";
 import {globalLogger} from "./logger";
+import {asL2Provider} from "@eth-optimism/sdk"
 
-export async function getGasLimit(provider: UnionProvider, from: string, txInteraction: TxInteraction) {
+export async function getGasLimit(provider: UnionProvider, chain: Chain, from: string, txInteraction: TxInteraction): Promise<number> {
     return Number((await provider.estimateGas({
         from: from,
         to: txInteraction.to,
@@ -17,38 +18,66 @@ export async function getGasLimit(provider: UnionProvider, from: string, txInter
     })).toString())
 }
 
-export async function getFeeData(provider: UnionProvider, chain: Chain) {
+export async function getFeeData(provider: UnionProvider, chain: Chain): Promise<FeeData> {
     let curGasPriceInfo: FeeData
     while (true) {
-        if (chain.title === Blockchains.ZkSync) {
-            const tmpGasInfo: oldethers.providers.FeeData = await (provider as zk.Provider).getFeeData()
-            curGasPriceInfo = new FeeData(
-                tmpGasInfo.gasPrice ? BigInt(tmpGasInfo.gasPrice.toString()) : null,
-                tmpGasInfo.maxFeePerGas ? BigInt(tmpGasInfo.maxFeePerGas.toString()) : null,
-                tmpGasInfo.maxPriorityFeePerGas ? BigInt(tmpGasInfo.maxPriorityFeePerGas.toString()) : null,
-            )
-        } else {
-            curGasPriceInfo = await (provider as ethers.JsonRpcProvider).getFeeData()
+        try {
+            if (chain.title === Blockchains.ZkSync) {
+                const tmpGasInfo: oldethers.providers.FeeData = await (provider as zk.Provider).getFeeData()
+                curGasPriceInfo = new FeeData(
+                    tmpGasInfo.gasPrice ? BigInt(tmpGasInfo.gasPrice.toString()) : null,
+                    tmpGasInfo.gasPrice ? BigInt(tmpGasInfo.gasPrice.toString()) : null,
+                    tmpGasInfo.gasPrice ? BigInt(tmpGasInfo.gasPrice.toString()) : null,
+                )
+            } else {
+                curGasPriceInfo = await (provider as ethers.JsonRpcProvider).getFeeData()
+            }
+            if (chain.title === Blockchains.Optimism) {
+                curGasPriceInfo = new FeeData(
+                    curGasPriceInfo.maxFeePerGas,
+                    curGasPriceInfo.maxFeePerGas,
+                    curGasPriceInfo.maxPriorityFeePerGas
+                )
+            }
+            if (chain.title === Blockchains.Polygon) {
+                curGasPriceInfo = new FeeData(
+                    curGasPriceInfo.maxFeePerGas,
+                    curGasPriceInfo.maxFeePerGas,
+                    toBigInt(getRandomInt(32, 70) * (10 ** 9)) // polygon min value is 30 (we multiply by 2 later, so 32 > 30)
+                )
+            }
+            if (chain.title === Blockchains.Ethereum) {
+                curGasPriceInfo = new FeeData(
+                    curGasPriceInfo.gasPrice,
+                    curGasPriceInfo.gasPrice,
+                    curGasPriceInfo.maxPriorityFeePerGas
+                )
+            }
+            if (curGasPriceInfo.gasPrice !== null && curGasPriceInfo.gasPrice < GAS_PRICE_LIMITS(chain.title)) {
+                return curGasPriceInfo
+            }
+            globalLogger.warn(`Gas price is too high | Gas price: ${curGasPriceInfo.gasPrice}`)
+            await sleep(60)
+        } catch (e) {
+            globalLogger.error(`Error getting gas price | ${e}`)
+            await sleep(60)
         }
-        if (chain.title === Blockchains.Polygon) {
-            curGasPriceInfo = new FeeData(
-                curGasPriceInfo.maxFeePerGas,
-                curGasPriceInfo.maxFeePerGas,
-                toBigInt(getRandomInt(32, 70) * (10 ** 9)) // polygon min value is 30 (we multiply by 2 later, so 32 > 30)
-            )
-        }
-        if (chain.title === Blockchains.Ethereum) {
-            curGasPriceInfo = new FeeData(
-                curGasPriceInfo.gasPrice,
-                curGasPriceInfo.gasPrice,
-                curGasPriceInfo.maxPriorityFeePerGas
-            )
-        }
-
-        if (curGasPriceInfo.gasPrice !== null && curGasPriceInfo.gasPrice < GAS_PRICE_LIMITS(chain.title)) {
-            return curGasPriceInfo
-        }
-        globalLogger.warn(`Gas price is too high | Gas price: ${curGasPriceInfo.gasPrice}`)
-        await sleep(60)
     }
+}
+
+export async function getL1Cost(provider: UnionProvider, chain: Chain, from: string, txInteraction: TxInteraction): Promise<number> {
+    try {
+        let optProvider = asL2Provider(new oldethers.providers.JsonRpcProvider(chain.nodeUrl, chain.chainId))
+        let l1GasCost: number = Number((await optProvider.estimateL1GasCost({
+            from: from,
+            to: txInteraction.to,
+            data: txInteraction.data,
+            value: txInteraction.value
+        })).toString())
+        return Math.floor(l1GasCost * 1.2) // 20% more to avoid errors if gas price will be higher
+    } catch (e) {
+        globalLogger.error(`Error getting L1 cost | ${e}`)
+        return 0
+    }
+
 }
