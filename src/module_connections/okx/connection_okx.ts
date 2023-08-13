@@ -18,10 +18,9 @@ import {
 } from "../../utils/okx_api";
 import {TxInteraction} from "../../classes/module";
 import {Asset} from "../../config/tokens";
-import {sleep} from "../../utils/utils";
+import {getTxDataForAllBalanceTransfer, sleep} from "../../utils/utils";
 import axios from "axios";
 import {ethers} from "ethers-new";
-import {getFeeData, getGasLimit} from "../../utils/gas";
 
 const MAX_TRIES = 30
 const DEFAULT_GAS_PRICE = ethers.parseUnits("20", "gwei")
@@ -88,21 +87,7 @@ class OkxConnectionModule implements ConnectionModule {
             }
             let txTransferToWithdrawAddress: TxInteraction;
             if (amount === -1) {
-                const provider = new ethers.JsonRpcProvider(polygonChain.nodeUrl)
-                const balance = Number(await provider.getBalance(wallet.getAddress()))
-
-                globalLogger
-                    .connect(wallet.getAddress())
-                    .info(`Amount specified is -1. Fetched balance: ${ethers.formatEther(BigInt(balance))}`)
-
-                const feeData = await getFeeData(provider, chain)
-
-                txTransferToWithdrawAddress = getTxForTransfer(asset, withdrawAddress, balance)
-                const gasLimit = EXTRA_GAS_LIMIT + (await getGasLimit(provider, wallet.getAddress(), txTransferToWithdrawAddress))
-                amount = balance - gasLimit * Number(feeData.maxFeePerGas ?? DEFAULT_GAS_PRICE)
-
-                txTransferToWithdrawAddress = getTxForTransfer(asset, withdrawAddress, amount)
-                txTransferToWithdrawAddress.feeData = feeData
+                [amount, txTransferToWithdrawAddress] = await getTxDataForAllBalanceTransfer(wallet, withdrawAddress, asset, chain, EXTRA_GAS_LIMIT, DEFAULT_GAS_PRICE)
             } else {
                 amount = Number(ethers.parseEther(`${amount}`))
                 txTransferToWithdrawAddress = getTxForTransfer(asset, withdrawAddress, amount)

@@ -4,6 +4,7 @@ import {modulePolygon} from "./polygon/polygon";
 import {EnumDictionary} from "../utils/utils";
 import {Blockchains} from "../config/chains";
 import {moduleEthereum} from "./ethereum/ethereum";
+import {moduleOptimism} from "./optimism/optimism";
 
 
 export const enum PolygonActivity {
@@ -33,5 +34,6 @@ export type ActivityTag = PolygonActivity | ZkSyncActivity | EthereumActivity
 export const blockchainModules: EnumDictionary<Blockchains, BlockchainModule> = {
     [Blockchains.ZkSync]: moduleZkSync,
     [Blockchains.Polygon]: modulePolygon,
-    [Blockchains.Ethereum]: moduleEthereum
+    [Blockchains.Ethereum]: moduleEthereum,
+    [Blockchains.Optimism]: moduleOptimism
 }

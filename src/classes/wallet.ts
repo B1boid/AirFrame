@@ -8,10 +8,6 @@ import {MAX_TX_WAITING} from "../config/online_config";
 import * as zk from "zksync-web3";
 import * as oldethers from "ethers";
 import {getFeeData, getGasLimit} from "../utils/gas";
-import {
-    DEFAULT_GAS_PRICE_ZKSYNC_OFFICIAL_BRIDGE,
-    ZKSYNC_BRIDGE_NAME
-} from "../module_connections/eth-zksyncofficial/connection_eth_zksync_official";
 
 
 export enum TxResult {
@@ -89,7 +85,7 @@ export class MyWallet implements WalletI {
 
     private async resetGasInfo(provider: UnionProvider, txInteraction: TxInteraction, chain: Chain): Promise<TxResult> {
         try {
-            this.curGasLimit = await getGasLimit(provider, this.getAddress(), txInteraction)
+            this.curGasLimit = await getGasLimit(provider, chain, this.getAddress(), txInteraction)
             if (txInteraction.feeData !== undefined) {
                 this.curGasPriceInfo = txInteraction.feeData
             } else {
@@ -104,8 +100,8 @@ export class MyWallet implements WalletI {
     }
 
     async sendTransaction(txInteraction: TxInteraction, chain: Chain, maxRetries: number = 1): Promise<[TxResult, string]> {
-        let provider: ethers.JsonRpcProvider | zk.Provider
-        let curSigner: ethers.Wallet | zk.Wallet
+        let provider: UnionProvider
+        let curSigner: UnionWallet
         if (chain.title === Blockchains.ZkSync) {
             provider = new zk.Provider(chain.nodeUrl)
             curSigner = new zk.Wallet(this.signer.privateKey, provider, oldethers.getDefaultProvider())
@@ -118,7 +114,7 @@ export class MyWallet implements WalletI {
             let result: TxResult = await this.resetGasInfo(provider, txInteraction, chain)
             let txHash: string = ""
             if(result === TxResult.Success) {
-                if (!txInteraction.name.toLowerCase().includes("bridge") && !txInteraction.name.toLowerCase().includes("okx")) {
+                if (!txInteraction.name.toLowerCase().includes("bridge") && !txInteraction.name.toLowerCase().endsWith("-transfer")) {
                     this.curGasLimit += TX_LOGIC_BY_TRY[retry].addGasLimit + chain.extraGasLimit
                 }
                 const [sendResponse, txInfo] = await this._sendTransaction(curSigner, txInteraction)
