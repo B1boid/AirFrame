@@ -1,12 +1,15 @@
 import {WalletI} from "../../classes/wallet";
 import {TxInteraction} from "../../classes/module";
-import {ethers} from "ethers-new";
-import {getRandomElement, getRandomizedPercent} from "../../utils/utils";
+import {ethers, parseEther} from "ethers-new";
+import {getRandomElement, getRandomFloat, getRandomizedPercent} from "../../utils/utils";
 import {globalLogger} from "../../utils/logger";
 import wrapped from "../../abi/wrapped.json";
-import {ethereumChain} from "../../config/chains";
+import zklite from "../../abi/zklite.json";
+import allAbi from "../../abi/all.json";
+import {ethereumChain, optimismChain, polygonChain} from "../../config/chains";
 import {ethContracts, ethTokens} from "./constants";
 import {getRandomApprove} from "../../common_blockchain/approvals";
+import {commonRefuel, Refuels} from "../../common_blockchain/refuel";
 
 let tokens = ethTokens
 let chain = ethereumChain
@@ -14,7 +17,7 @@ let contracts = ethContracts
 
 export async function ethWrapUnwrap_wrap(wallet: WalletI): Promise<TxInteraction[]> {
     try {
-        let balancePercent = [30, 50] // from 30% to 50%
+        let balancePercent = [20, 40]
         const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
         let tokenBalance: bigint = await provider.getBalance(wallet.getAddress())
         tokenBalance = getRandomizedPercent(tokenBalance, balancePercent[0], balancePercent[1])
@@ -84,4 +87,133 @@ export async function ethRandomMint_mint(wallet: WalletI): Promise<TxInteraction
         confirmations: 1,
         name: "mintNft"
     }]
+}
+
+
+export async function ethDepositToZkLite_deposit(wallet: WalletI): Promise<TxInteraction[]> {
+    try {
+        const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+        let zkLiteContract = new ethers.Contract(contracts.zkLite, zklite, provider)
+        let data: string = zkLiteContract.interface.encodeFunctionData("depositETH", [wallet.getAddress()])
+        let balance = getRandomFloat(0.00003, 0.00013, 5) // dust ready to lose
+        return [{
+            to: contracts.zkLite,
+            data: data,
+            value: parseEther(balance.toString()).toString(),
+            stoppable: false,
+            confirmations: 1,
+            name: "ethDepositToZkLite_deposit"
+        }]
+    } catch (e) {
+        globalLogger.connect(wallet.getAddress()).warn(`ethDepositToZkLite_deposit failed: ${e}`)
+        return []
+    }
+}
+
+export async function ethDepositToArbOfficial_deposit(wallet: WalletI): Promise<TxInteraction[]> {
+    let balance = getRandomFloat(0.00003, 0.00013, 5) // dust ready to lose
+    return [{
+        to: contracts.arbOffBridge,
+        data: "0x439370b1",
+        value: parseEther(balance.toString()).toString(),
+        stoppable: false,
+        confirmations: 1,
+        name: "ethDepositToArbOfficial_deposit"
+    }]
+}
+
+export async function ethBlurCycle_deposit(wallet: WalletI): Promise<TxInteraction[]> {
+    let balancePercent = [5, 20]
+    const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+    let tokenBalance: bigint = await provider.getBalance(wallet.getAddress())
+    tokenBalance = getRandomizedPercent(tokenBalance, balancePercent[0], balancePercent[1])
+    return [{
+        to: contracts.blurDeposit,
+        data: "0xd0e30db0",
+        value: tokenBalance.toString(),
+        stoppable: false,
+        confirmations: 1,
+        name: "ethBlurCycle_deposit"
+    }]
+}
+
+export async function ethBlurCycle_withdraw(wallet: WalletI): Promise<TxInteraction[]> {
+    try {
+        const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+        let tokenContract = new ethers.Contract(contracts.blurDeposit, wrapped, provider)
+        let tokenBalance: bigint = await tokenContract.balanceOf(wallet.getAddress())
+        let data: string = tokenContract.interface.encodeFunctionData("withdraw", [tokenBalance])
+        return [{
+            to: contracts.blurDeposit,
+            data: data,
+            value: "0",
+            stoppable: true,
+            confirmations: 1,
+            name: "ethBlurCycle_withdraw"
+        }]
+    } catch (e) {
+        globalLogger.connect(wallet.getAddress()).warn(`ethBlurCycle_withdraw failed: ${e}`)
+        return []
+    }
+}
+
+export async function ethMoveDustGas_move(wallet: WalletI): Promise<TxInteraction[]> {
+    let balance = getRandomFloat(0.00003, 0.00013, 5) // dust ready to lose
+    let chainIds = [optimismChain.chainId, polygonChain.chainId, 100, 56]
+    return await commonRefuel(
+        [balance], [Refuels.Socket], wallet, chain, getRandomElement(chainIds), contracts,
+        "ethMoveDustGas_move", false
+    )
+}
+
+export async function ethRandomStuff_do(wallet: WalletI): Promise<TxInteraction[]> {
+    try {
+        let type = getRandomElement(["nftx", "ape", "looks"])
+        if (type === "nftx") {
+            let datas = [
+                "0x0962ef790000000000000000000000000000000000000000000000000000000000000183",
+                "0x0962ef790000000000000000000000000000000000000000000000000000000000000022",
+                "0x0962ef79000000000000000000000000000000000000000000000000000000000000032f",
+                "0x0962ef790000000000000000000000000000000000000000000000000000000000000131",
+                "0x0962ef790000000000000000000000000000000000000000000000000000000000000328",
+                "0x0962ef790000000000000000000000000000000000000000000000000000000000000155",
+                "0x0962ef790000000000000000000000000000000000000000000000000000000000000335"
+            ]
+            return [{
+                to: contracts.claimNFTx,
+                data: getRandomElement(datas),
+                value: "0",
+                stoppable: false,
+                confirmations: 1,
+                name: "ethRandomStuff_do"
+            }]
+        }
+        if (type === "ape") {
+            const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+            let tokenContract = new ethers.Contract(contracts.claimApe, allAbi, provider)
+            let data: string = tokenContract.interface.encodeFunctionData("claimSelfBAYC", [[]])
+            return [{
+                to: contracts.claimApe,
+                data: data,
+                value: "0",
+                stoppable: false,
+                confirmations: 1,
+                name: "ethRandomStuff_do"
+            }]
+        }
+        if (type === "looks") {
+            return [{
+                to: "0x000000000060C4Ca14CfC4325359062ace33Fe3D",
+                data: "0xe8f9f1dc000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000e655fae4d56241588680f86e3b2377",
+                value: "0",
+                stoppable: false,
+                confirmations: 1,
+                name: "ethRandomStuff_do"
+            }]
+        }
+        return []
+    } catch (e) {
+        globalLogger.connect(wallet.getAddress()).warn(`ethRandomStuff_do failed: ${e}`)
+        return []
+    }
 }

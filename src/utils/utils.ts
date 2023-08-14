@@ -40,6 +40,13 @@ export function getRandomizedPercent(value: bigint, minPercent: number, maxPerce
     return value * BigInt(randomPercent) / BigInt(100);
 }
 
+export function getRandomFloat(min: number, max: number, decimals: number): number {
+    const str = (Math.random() * (max - min) + min).toFixed(
+        decimals,
+    );
+    return parseFloat(str);
+}
+
 export function shuffleArray<T>(array: T[]) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));

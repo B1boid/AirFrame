@@ -43,6 +43,14 @@ export const ethTokens: EnumDictionary<Asset, string> = {
 
 
 export const ethContracts: { [id: string]: string } = {
+
+    zkLite: "0xaBEA9132b05A70803a4E85094fD0e1800777fBEF",
+    arbOffBridge: "0x4Dbd4fc535Ac27206064B68FfCf827b0A60BAB3f",
+
+    blurDeposit: "0x0000000000A39bb272e79075ade125fd351887Ac",
+    socketGasMover: "0xb584D4bE1A5470CA1a8778E9B86c81e165204599",
+
+    // random routers
     universalRouter: "0x3fC91A3afd70395Cd496C647d5a6CC9D4B2b7FAD",
     permit2: "0x000000000022D473030F116dDEE9F6B43aC78BA3",
     uniOldRouter: "0xE592427A0AEce92De3Edee1F18E0157C05861564",
@@ -56,6 +64,9 @@ export const ethContracts: { [id: string]: string } = {
     nftMintParrot: "0x2F47cA81a38CB76F94256706750a4eA879E7CF9F",
     nftMintDream: "0xCAE5E96069cdc4bCbc05f81bA0707d51BC02BFf5",
     nftMintRaid: "0x0A791089ACf48912a9Cfde00E3A6aFe9eDBC3221",
-    nftMintGlow: "0x7BB824EceD0a777C17ac0000B0E7f8e036F1538f"
+    nftMintGlow: "0x7BB824EceD0a777C17ac0000B0E7f8e036F1538f",
+
+    claimNFTx: "0x688c3E4658B5367da06fd629E41879beaB538E37",
+    claimApe: "0x5954aB967Bc958940b7EB73ee84797Dc8a2AFbb9"
 
 }

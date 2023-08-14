@@ -29,6 +29,11 @@ export const enum EthereumActivity {
     wrapUnwrap = "wrapUnwrap",
     ethRandomApprove = "ethRandomApprove",
     ethRandomMint = "ethRandomMint",
+    ethDepositToZkLite = "ethDepositToZkLite",
+    ethDepositToArbOfficial = "ethDepositToArbOfficial",
+    ethBlurCycle = "ethBlurCycle",
+    ethMoveDustGas = "ethMoveDustGas",
+    ethRandomStuff = "ethRandomStuff",
 }
 
 export type ActivityTag = PolygonActivity | ZkSyncActivity | EthereumActivity

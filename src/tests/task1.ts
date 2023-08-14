@@ -23,7 +23,7 @@ const ZKSYNC_ACTIONS: ModuleActions = {
 const ETH_ACTIONS: ModuleActions = {
     chainName: Blockchains.Ethereum,
     randomOrder: Randomness.Full,
-    activityNames: [EthereumActivity.wrapUnwrap]
+    activityNames: [EthereumActivity.ethRandomStuff]
 }
 
 const CONNECTION_OKX_TO_POLYGON: ConnectionAction = {
@@ -62,7 +62,7 @@ const CONNECTION_OKX_TO_ETHEREUM: ConnectionAction = {
     from: Destination.OKX,
     to: Destination.Ethereum,
     asset: Asset.ETH,
-    amount: 0.05,
+    amount: 0.01,
     connectionName: Connections.ExchangeOKX
 }
 
@@ -100,6 +100,7 @@ const ACTIONS_1: Actions = {
         // POLYGON_ACTIONS
         // ZKSYNC_ACTIONS
         ETH_ACTIONS
+        //CONNECTION_OKX_TO_ETHEREUM
     ]
 }
 
