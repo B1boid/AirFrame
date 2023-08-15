@@ -168,7 +168,9 @@ export async function ethMoveDustGas_move(wallet: WalletI): Promise<TxInteractio
 
 export async function ethRandomStuff_do(wallet: WalletI): Promise<TxInteraction[]> {
     try {
-        let type = getRandomElement(["nftx", "ape", "looks"])
+        let type = getRandomElement(
+            ["nftx", "ape", "looks", "beans", "lido", "sea", "inch"]
+        )
         if (type === "nftx") {
             let datas = [
                 "0x0962ef790000000000000000000000000000000000000000000000000000000000000183",
@@ -205,6 +207,55 @@ export async function ethRandomStuff_do(wallet: WalletI): Promise<TxInteraction[
             return [{
                 to: "0x000000000060C4Ca14CfC4325359062ace33Fe3D",
                 data: "0xe8f9f1dc000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000e655fae4d56241588680f86e3b2377",
+                value: "0",
+                stoppable: false,
+                confirmations: 1,
+                name: "ethRandomStuff_do"
+            }]
+        }
+        if (type === "beans") {
+            const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+            let tokenContract = new ethers.Contract("0x3Af2A97414d1101E2107a70E7F33955da1346305", allAbi, provider)
+            let data: string = tokenContract.interface.encodeFunctionData("redeemBeans", [[]])
+            return [{
+                to: "0x3Af2A97414d1101E2107a70E7F33955da1346305",
+                data: data,
+                value: "0",
+                stoppable: false,
+                confirmations: 1,
+                name: "ethRandomStuff_do"
+            }]
+        }
+        if (type === "lido") {
+            const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+            let tokenContract = new ethers.Contract("0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1", allAbi, provider)
+            let data: string = tokenContract.interface.encodeFunctionData("claimWithdrawals", [[], []])
+            return [{
+                to: "0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1",
+                data: data,
+                value: "0",
+                stoppable: false,
+                confirmations: 1,
+                name: "ethRandomStuff_do"
+            }]
+        }
+        if (type === "sea") {
+            const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+            let tokenContract = new ethers.Contract("0x00000000000000ADc04C56Bf30aC9d3c0aAF14dC", allAbi, provider)
+            let data: string = tokenContract.interface.encodeFunctionData("cancel", [[]])
+            return [{
+                to: "0x00000000000000ADc04C56Bf30aC9d3c0aAF14dC",
+                data: data,
+                value: "0",
+                stoppable: false,
+                confirmations: 1,
+                name: "ethRandomStuff_do"
+            }]
+        }
+        if (type === "inch") {
+            return [{
+                to: "0x9A0C8Ff858d273f57072D714bca7411D717501D7",
+                data: "0x3ccfd60bab000145",
                 value: "0",
                 stoppable: false,
                 confirmations: 1,
