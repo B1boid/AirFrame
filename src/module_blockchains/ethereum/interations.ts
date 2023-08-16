@@ -166,10 +166,29 @@ export async function ethMoveDustGas_move(wallet: WalletI): Promise<TxInteractio
     )
 }
 
+export async function ethFakeUniExec_do(wallet: WalletI): Promise<TxInteraction[]> {
+    try {
+        const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+        let tokenContract = new ethers.Contract(contracts.universalRouter, allAbi, provider)
+        let data: string = tokenContract.interface.encodeFunctionData("execute", ["0x", []])
+        return [{
+            to: contracts.universalRouter,
+            data: data,
+            value: "0",
+            stoppable: false,
+            confirmations: 1,
+            name: "ethFakeUniExec_do"
+        }]
+    } catch (e) {
+        globalLogger.connect(wallet.getAddress()).warn(`ethFakeUniExec_do failed: ${e}`)
+        return []
+    }
+}
+
 export async function ethRandomStuff_do(wallet: WalletI): Promise<TxInteraction[]> {
     try {
         let type = getRandomElement(
-            ["nftx", "ape", "looks", "beans", "lido", "sea", "inch"]
+            ["nftx", "ape", "looks", "beans", "lido", "sea", "inch", "blur", "sock", "bend"]
         )
         if (type === "nftx") {
             let datas = [
@@ -256,6 +275,45 @@ export async function ethRandomStuff_do(wallet: WalletI): Promise<TxInteraction[
             return [{
                 to: "0x9A0C8Ff858d273f57072D714bca7411D717501D7",
                 data: "0x3ccfd60bab000145",
+                value: "0",
+                stoppable: false,
+                confirmations: 1,
+                name: "ethRandomStuff_do"
+            }]
+        }
+        if (type === "blur") {
+            const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+            let tokenContract = new ethers.Contract("0xb2ecfE4E4D61f8790bbb9DE2D1259B9e2410CEA5", allAbi, provider)
+            let data: string = tokenContract.interface.encodeFunctionData("cancelTrades", [[]])
+            return [{
+                to: "0xb2ecfE4E4D61f8790bbb9DE2D1259B9e2410CEA5",
+                data: data,
+                value: "0",
+                stoppable: false,
+                confirmations: 1,
+                name: "ethRandomStuff_do"
+            }]
+        }
+        if (type === "sock") {
+            const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+            let tokenContract = new ethers.Contract("0x3a23F943181408EAC424116Af7b7790c94Cb97a5", allAbi, provider)
+            let data: string = tokenContract.interface.encodeFunctionData("executeRoutes", [[], []])
+            return [{
+                to: "0x3a23F943181408EAC424116Af7b7790c94Cb97a5",
+                data: data,
+                value: "0",
+                stoppable: false,
+                confirmations: 1,
+                name: "ethRandomStuff_do"
+            }]
+        }
+        if (type === "bend") {
+            const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+            let tokenContract = new ethers.Contract("0x26FC1f11E612366d3367fc0cbFfF9e819da91C8d", allAbi, provider)
+            let data: string = tokenContract.interface.encodeFunctionData("claimRewards", [[], 0])
+            return [{
+                to: "0x26FC1f11E612366d3367fc0cbFfF9e819da91C8d",
+                data: data,
                 value: "0",
                 stoppable: false,
                 confirmations: 1,

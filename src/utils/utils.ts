@@ -11,6 +11,7 @@ import {Blockchains, Chain} from "../config/chains";
 import {Asset} from "../config/tokens";
 import {TxInteraction} from "../classes/module";
 import * as zk from "zksync-web3";
+import {NATIVE_ADDRESS} from "../common_blockchain/routers/common";
 dotenv.config();
 
 export type EnumDictionary<T extends string | symbol | number, U> = {
@@ -45,6 +46,13 @@ export function getRandomFloat(min: number, max: number, decimals: number): numb
         decimals,
     );
     return parseFloat(str);
+}
+
+export function formatIfNativeToken(address: string){
+    if (address === NATIVE_ADDRESS) {
+        return "0x0000000000000000000000000000000000000000"
+    }
+    return address
 }
 
 export function shuffleArray<T>(array: T[]) {

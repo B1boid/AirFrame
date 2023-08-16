@@ -3,7 +3,7 @@ import {EthereumActivity} from "../blockchain_modules";
 import {
     ethBlurCycle_deposit, ethBlurCycle_withdraw,
     ethDepositToArbOfficial_deposit,
-    ethDepositToZkLite_deposit, ethMoveDustGas_move,
+    ethDepositToZkLite_deposit, ethFakeUniExec_do, ethMoveDustGas_move,
     ethRandomApprove_approve,
     ethRandomMint_mint, ethRandomStuff_do,
     ethWrapUnwrap_unwrap,
@@ -65,5 +65,12 @@ export const ethRandomStuff: Activity = {
     name: EthereumActivity.ethRandomStuff,
     txs: [
         ethRandomStuff_do
+    ]
+}
+
+export const ethFakeUniExec: Activity = {
+    name: EthereumActivity.ethFakeUniExec,
+    txs: [
+        ethFakeUniExec_do
     ]
 }

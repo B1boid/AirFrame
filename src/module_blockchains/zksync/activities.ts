@@ -6,7 +6,7 @@ import {
     zkSyncEraLendInit_enter,
     zkSyncMintTevaera_buyid,
     zkSyncMintTevaera_mint,
-    zkSyncMintZnsId_mint,
+    zkSyncMintZnsId_mint, zkSyncParaspaceCycle_supply,
     zkSyncRandomApprove_approve,
     zkSyncReactFusionCycle_supply,
     zkSyncReactFusionCycle_withdraw,
@@ -84,6 +84,13 @@ export const zkSyncReactFusionCycle: Activity = {
     txs: [
         zkSyncReactFusionCycle_supply,
         zkSyncReactFusionCycle_withdraw
+    ]
+}
+
+export const zkSyncParaspaceCycle: Activity = {
+    name: ZkSyncActivity.zkSyncParaspaceCycle,
+    txs: [
+        zkSyncParaspaceCycle_supply
     ]
 }
 

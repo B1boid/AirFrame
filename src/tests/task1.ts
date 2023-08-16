@@ -17,7 +17,7 @@ const POLYGON_ACTIONS: ModuleActions = {
 const ZKSYNC_ACTIONS: ModuleActions = {
     chainName: Blockchains.ZkSync,
     randomOrder: Randomness.OnlyActivities,
-    activityNames: [ZkSyncActivity.zkSyncSynFuturesTest]
+    activityNames: [ZkSyncActivity.zkSyncParaspaceCycle]
 }
 
 const ETH_ACTIONS: ModuleActions = {

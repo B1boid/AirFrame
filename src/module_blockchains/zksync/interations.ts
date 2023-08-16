@@ -1,15 +1,16 @@
 import {TxInteraction} from "../../classes/module";
 import {WalletI} from "../../classes/wallet";
-import {getRandomElement, getRandomInt, getRandomizedPercent} from "../../utils/utils";
+import {getRandomElement, getRandomFloat, getRandomInt, getRandomizedPercent} from "../../utils/utils";
 import {globalLogger} from "../../utils/logger";
 import wrapped from "../../abi/wrapped.json";
 import zns_1 from "../../abi/zns_1.json";
 import zns_2 from "../../abi/zns_2.json";
 import eralend from "../../abi/eralend.json";
+import paraspace from "../../abi/paraspace.json";
 import {commonSwap, Dexes} from "../../common_blockchain/routers/common";
 import {zkSyncChain} from "../../config/chains";
 import {zkSyncContracts, zkSyncTokens} from "./constants";
-import {ethers} from "ethers-new";
+import {ethers, MaxUint256, parseEther} from "ethers-new";
 import {generateUsername} from "unique-username-generator";
 import {getRandomApprove} from "../../common_blockchain/approvals";
 
@@ -61,13 +62,13 @@ export async function zkSyncWrapUnwrap_unwrap(wallet: WalletI): Promise<TxIntera
 
 export async function zkSyncSwapCycleNativeToUsdc_swapto(wallet: WalletI): Promise<TxInteraction[]> {
     return await commonSwap(tokens.ETH, tokens.USDC, [20, 40],
-        [Dexes.OneInch, Dexes.SyncSwap, Dexes.Velocore, Dexes.Mute, Dexes.SpaceFi],
+        [Dexes.Odos, Dexes.OneInch, Dexes.SyncSwap, Dexes.Velocore, Dexes.Mute, Dexes.SpaceFi],
         wallet, chain, contracts, tokens, "zkSyncSwapCycleNativeToUsdc_swapto")
 }
 
 export async function zkSyncSwapCycleNativeToUsdc_swapback(wallet: WalletI): Promise<TxInteraction[]> {
     return await commonSwap(tokens.USDC, tokens.ETH, [],
-        [Dexes.OneInch, Dexes.SyncSwap, Dexes.Velocore, Dexes.Mute, Dexes.SpaceFi],
+        [Dexes.Odos, Dexes.OneInch, Dexes.SyncSwap, Dexes.Velocore, Dexes.Mute, Dexes.SpaceFi],
         wallet, chain, contracts, tokens,"zkSyncSwapCycleNativeToUsdc_swapback", true)
 }
 
@@ -250,6 +251,54 @@ export async function zkSyncReactFusionCycle_withdraw(wallet: WalletI): Promise<
         }]
     } catch (e) {
         globalLogger.connect(wallet.getAddress()).warn(`zkSyncReactFusionCycle_withdraw failed: ${e}`)
+        return []
+    }
+}
+
+export async function zkSyncParaspaceCycle_supply(wallet: WalletI): Promise<TxInteraction[]> {
+    try {
+        // let balancePercent = [5, 20]
+        // let tokenBalance: bigint = await provider.getBalance(wallet.getAddress())
+        // tokenBalance = getRandomizedPercent(tokenBalance, balancePercent[0], balancePercent[1])
+        const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+        let depositContract = new ethers.Contract(contracts.paraspace, paraspace, provider)
+        let data: string = depositContract.interface.encodeFunctionData(
+            "depositETH", [wallet.getAddress(), 0]
+        )
+        let balance = getRandomFloat(0.00003, 0.00010, 5) // dust ready to lose
+
+        return [{
+            to: contracts.paraspace,
+            data: data,
+            value: parseEther(balance.toString()).toString(),
+            stoppable: false,
+            confirmations: 1,
+            name: "zkSyncParaspaceCycle_supply"
+        }]
+    } catch (e) {
+        globalLogger.connect(wallet.getAddress()).warn(`zkSyncParaspaceCycle_supply failed: ${e}`)
+        return []
+    }
+}
+
+// depositing dust and skip Withdraw because of timelock
+export async function zkSyncParaspaceCycle_withdraw(wallet: WalletI): Promise<TxInteraction[]> {
+    try {
+        const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+        let cTokenContract = new ethers.Contract(contracts.paraspaceWithdraw, paraspace, provider)
+        let data: string = cTokenContract.interface.encodeFunctionData(
+            "withdraw", ["0x5bF39BdE21B95d77fb18F27bBCb07F3648720A2e", MaxUint256, wallet.getAddress()]
+        )
+        return [{
+            to: contracts.paraspaceWithdraw,
+            data: data,
+            value: "0",
+            stoppable: true,
+            confirmations: 1,
+            name: "zkSyncParaspaceCycle_withdraw"
+        }]
+    } catch (e) {
+        globalLogger.connect(wallet.getAddress()).warn(`zkSyncParaspaceCycle_withdraw failed: ${e}`)
         return []
     }
 }

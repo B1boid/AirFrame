@@ -137,13 +137,54 @@
   {
     "inputs": [
       {
+        "components": [
+          {
+            "internalType": "bytes32",
+            "name": "hash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "uint256",
+            "name": "index",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct RandomTxs.Cancel[]",
+        "name": "cancels",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "cancelTrades",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "_assets",
+        "type": "address[]"
+      },
+      {
         "internalType": "uint256",
-        "name": "vaultId",
+        "name": "_amount",
         "type": "uint256"
       }
     ],
     "name": "claimRewards",
-    "outputs": [],
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -176,6 +217,42 @@
     "name": "claimWithdrawals",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes",
+        "name": "commands",
+        "type": "bytes"
+      },
+      {
+        "internalType": "bytes[]",
+        "name": "inputs",
+        "type": "bytes[]"
+      }
+    ],
+    "name": "execute",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32[]",
+        "name": "routeIds",
+        "type": "uint32[]"
+      },
+      {
+        "internalType": "bytes[]",
+        "name": "dataItems",
+        "type": "bytes[]"
+      }
+    ],
+    "name": "executeRoutes",
+    "outputs": [],
+    "stateMutability": "payable",
     "type": "function"
   },
   {

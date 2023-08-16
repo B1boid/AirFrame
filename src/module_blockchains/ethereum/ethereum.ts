@@ -6,7 +6,7 @@ import {
     ethDepositToZkLite, ethMoveDustGas,
     ethRandomApprove, ethRandomStuff,
     ethRandomMint,
-    ethWrapUnwrap
+    ethWrapUnwrap, ethFakeUniExec
 } from "./activities";
 
 
@@ -22,6 +22,6 @@ export const moduleEthereum: EthereumModule = new EthereumModule(
     ethereumChain,
     [
         ethWrapUnwrap, ethRandomApprove, ethRandomMint, ethDepositToZkLite, ethDepositToArbOfficial, ethBlurCycle,
-        ethMoveDustGas, ethRandomStuff
+        ethMoveDustGas, ethRandomStuff, ethFakeUniExec
     ]
 )
