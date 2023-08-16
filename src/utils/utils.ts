@@ -11,6 +11,7 @@ import {Blockchains, Chain} from "../config/chains";
 import {Asset} from "../config/tokens";
 import {TxInteraction} from "../classes/module";
 import * as zk from "zksync-web3";
+import {NATIVE_ADDRESS} from "../common_blockchain/routers/common";
 dotenv.config();
 
 export type EnumDictionary<T extends string | symbol | number, U> = {
@@ -38,6 +39,20 @@ export function getRandomNearInt(value: number, percent: number = 10): number {
 export function getRandomizedPercent(value: bigint, minPercent: number, maxPercent: number): bigint {
     const randomPercent = getRandomInt(minPercent, maxPercent);
     return value * BigInt(randomPercent) / BigInt(100);
+}
+
+export function getRandomFloat(min: number, max: number, decimals: number): number {
+    const str = (Math.random() * (max - min) + min).toFixed(
+        decimals,
+    );
+    return parseFloat(str);
+}
+
+export function formatIfNativeToken(address: string){
+    if (address === NATIVE_ADDRESS) {
+        return "0x0000000000000000000000000000000000000000"
+    }
+    return address
 }
 
 export function shuffleArray<T>(array: T[]) {

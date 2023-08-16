@@ -35,12 +35,16 @@ export const zkSyncContracts: { [id: string]: string } = {
     reactFusionInit: "0x23848c28Af1C3AA7B999fA57e6b6E8599C17F3f2",
     reactFusionEth: "0xC5db68F30D21cBe0C9Eac7BE5eA83468d69297e6",
 
+    paraspace: "0x07765123EAF3cF6dd2f7b5ab717385b43B18765c",
+    paraspaceWithdraw: "0x05254db23880E93f597480A29B7A75f8434D9536",
+
     oneInchRouter: "0x6e2B76966cbD9cF4cC2Fa0D76d24d5241E0ABC2F",
     spaceRouter: "0xbE7D1FD1f6748bbDefC4fbaCafBb11C6Fc506d1d",
     syncSwapRouter: "0x2da10A1e27bF85cEdD8FFb1AbBe97e53391C0295",
     velocoreRouter: "0xd999E16e68476bC749A28FC14a0c3b6d7073F50c",
     iziRouter: "0x943ac2310D9BC703d6AB5e5e76876e212100f894",
     muteRouter: "0x8B791913eB07C32779a16750e3868aA8495F5964",
+    odosRouter: "0x4bBa932E9792A2b917D47830C93a9BC79320E4f7",
 
     syncSwapPool: "0xf2DAd89f2788a8CD54625C60b55cD3d2D0ACa7Cb",
     synFuturesMint1: "0xa6E5e7DDcd6e7C5959f4AdE9aEd97594346436aF",

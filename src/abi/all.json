@@ -1,0 +1,277 @@
+[
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "offerer",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "zone",
+            "type": "address"
+          },
+          {
+            "components": [
+              {
+                "internalType": "enum RandomTxs.ItemType",
+                "name": "itemType",
+                "type": "uint8"
+              },
+              {
+                "internalType": "address",
+                "name": "token",
+                "type": "address"
+              },
+              {
+                "internalType": "uint256",
+                "name": "identifierOrCriteria",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "startAmount",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "endAmount",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct RandomTxs.OfferItem[]",
+            "name": "offer",
+            "type": "tuple[]"
+          },
+          {
+            "components": [
+              {
+                "internalType": "enum RandomTxs.ItemType",
+                "name": "itemType",
+                "type": "uint8"
+              },
+              {
+                "internalType": "address",
+                "name": "token",
+                "type": "address"
+              },
+              {
+                "internalType": "uint256",
+                "name": "identifierOrCriteria",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "startAmount",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "endAmount",
+                "type": "uint256"
+              },
+              {
+                "internalType": "address payable",
+                "name": "recipient",
+                "type": "address"
+              }
+            ],
+            "internalType": "struct RandomTxs.ConsiderationItem[]",
+            "name": "consideration",
+            "type": "tuple[]"
+          },
+          {
+            "internalType": "enum RandomTxs.OrderType",
+            "name": "orderType",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint256",
+            "name": "startTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "endTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "zoneHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "uint256",
+            "name": "salt",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "conduitKey",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "uint256",
+            "name": "counter",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct RandomTxs.OrderComponents[]",
+        "name": "orders",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "cancel",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "cancelled",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "bytes32",
+            "name": "hash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "uint256",
+            "name": "index",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct RandomTxs.Cancel[]",
+        "name": "cancels",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "cancelTrades",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "_assets",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "claimRewards",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "_nfts",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "claimSelfBAYC",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "_requestIds",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "_hints",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "claimWithdrawals",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes",
+        "name": "commands",
+        "type": "bytes"
+      },
+      {
+        "internalType": "bytes[]",
+        "name": "inputs",
+        "type": "bytes[]"
+      }
+    ],
+    "name": "execute",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32[]",
+        "name": "routeIds",
+        "type": "uint32[]"
+      },
+      {
+        "internalType": "bytes[]",
+        "name": "dataItems",
+        "type": "bytes[]"
+      }
+    ],
+    "name": "executeRoutes",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "beanIds",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "redeemBeans",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

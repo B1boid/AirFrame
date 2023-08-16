@@ -1,7 +1,7 @@
 import {Actions, ConnectionAction, ModuleActions, Randomness} from "../classes/actions";
 import {Blockchains, Destination} from "../config/chains";
 import {Connections} from "../module_connections/connection_modules";
-import {PolygonActivity, ZkSyncActivity} from "../module_blockchains/blockchain_modules";
+import {EthereumActivity, PolygonActivity, ZkSyncActivity} from "../module_blockchains/blockchain_modules";
 import {Asset} from "../config/tokens";
 
 ////////////////////////////////////////////////////////////////////////
@@ -17,7 +17,13 @@ const POLYGON_ACTIONS: ModuleActions = {
 const ZKSYNC_ACTIONS: ModuleActions = {
     chainName: Blockchains.ZkSync,
     randomOrder: Randomness.OnlyActivities,
-    activityNames: [ZkSyncActivity.zkSyncSynFuturesTest]
+    activityNames: [ZkSyncActivity.zkSyncParaspaceCycle]
+}
+
+const ETH_ACTIONS: ModuleActions = {
+    chainName: Blockchains.Ethereum,
+    randomOrder: Randomness.Full,
+    activityNames: [EthereumActivity.ethRandomStuff]
 }
 
 const CONNECTION_OKX_TO_POLYGON: ConnectionAction = {
@@ -56,7 +62,7 @@ const CONNECTION_OKX_TO_ETHEREUM: ConnectionAction = {
     from: Destination.OKX,
     to: Destination.Ethereum,
     asset: Asset.ETH,
-    amount: 0.05,
+    amount: 0.01,
     connectionName: Connections.ExchangeOKX
 }
 
@@ -93,19 +99,13 @@ const ACTIONS_1: Actions = {
         // CONNECTION_POLYGON_TO_OKX
         // POLYGON_ACTIONS
         // ZKSYNC_ACTIONS
-
-        // CONNECTION_POLYGON_TO_OKX
-
         // CONNECTION_OKX_TO_ETHEREUM,
-        // BRIDGE_ETHEREUM_TO_ZKSYNC
-
-        // BRIDGE_ORBITER_ZKSYNC_TO_OPTIMISM,
-        CONNECTION_OPTIMISM_TO_OKX
+        ETH_ACTIONS
     ]
 }
 
 export const WALLETS_ACTIONS_1: {[id: string]: Actions} = {
-    "0x2Fd49f2da0d07102b223D89f290F61b265291952": ACTIONS_1,
+    "0x04277AC5706B24F90cD56E58D105a32906C65094": ACTIONS_1,
     // "0x..2": ACTIONS_1
 }
 
