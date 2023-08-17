@@ -5,6 +5,7 @@ import {getAddressInfo, getOkxCredentials, getOkxCredentialsForSub} from "./util
 import {WALLETS_ACTIONS_1} from "./tests/task1";
 import {Actions} from "./classes/actions";
 import {ethers} from "ethers-new";
+import {globalLogger} from "./utils/logger";
 let prompt = require('password-prompt')
 
 
@@ -18,17 +19,23 @@ async function doTask(password: string, passwordOkx: string, address: string, wa
     let actionsRes: boolean = true;
     console.log("Starting actions for account:", address)
     for (const action of walletActions.actions) {
-        if ("connectionName" in action) {
-            console.log("Connection:", action)
-            const connectionModule = connectionModules[action.connectionName]
-            actionsRes = await connectionModule.sendAsset(wallet, action.from, action.to, action.asset, action.amount)
-        } else {
-            console.log("Module:", action)
-            const blockchainModule = blockchainModules[action.chainName]
-            actionsRes = await blockchainModule.doActivities(wallet, action.activityNames, action.randomOrder)
-        }
-        if (!actionsRes) {
-            console.log("Failed to do activities")
+        try {
+            if ("connectionName" in action) {
+                console.log("Connection:", action)
+                const connectionModule = connectionModules[action.connectionName]
+                actionsRes = await connectionModule.sendAsset(wallet, action.from, action.to, action.asset, action.amount)
+            } else {
+                console.log("Module:", action)
+                const blockchainModule = blockchainModules[action.chainName]
+                actionsRes = await blockchainModule.doActivities(wallet, action.activityNames, action.randomOrder)
+            }
+            if (!actionsRes) {
+                console.log("Failed to do activities")
+                break
+            }
+        } catch (e) {
+            globalLogger.connect(wallet.getAddress()).error(`Uncaught exception. Terminating address activities. Exception: ${e}`)
+            actionsRes = false
             break
         }
     }
