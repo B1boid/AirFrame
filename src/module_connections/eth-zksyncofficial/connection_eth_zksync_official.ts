@@ -9,7 +9,6 @@ import zk_sync_bridge_official from "../../abi/zksync_bridge_official.json"
 import * as zk from "zksync-web3"
 import {getFeeData, getGasLimit} from "../../utils/gas";
 import {sleep} from "../../utils/utils";
-import {BigNumber} from "ethers";
 
 const tag = "Official ZkSync bridge"
 const BRIDGE_ADDRESS = "0x32400084C286CF3E17e7B677ea9583e60a000324"
@@ -35,10 +34,10 @@ class ZkSyncEthOfficialConectionModule implements ConnectionModule {
             return Promise.resolve(false)
         }
 
-        let balanceBefore: BigNumber;
+        let balanceBefore: bigint;
         while (true) {
             try {
-                balanceBefore = await new zk.Provider(zkSyncChain.nodeUrl).getBalance(wallet.getAddress())
+                balanceBefore = (await new zk.Provider(zkSyncChain.nodeUrl).getBalance(wallet.getAddress())).toBigInt()
                 break
             } catch (e) {
                 globalLogger.connect(wallet.getAddress()).warn(`Failed to fetch initial balance for ${tag}. Exception: ${e}`)
@@ -59,7 +58,7 @@ class ZkSyncEthOfficialConectionModule implements ConnectionModule {
         }
         globalLogger.connect(wallet.getAddress()).info(`Submitted tx ${from} -> ${to} in ${tag}. L1 Hash: ${l1Hash}.`)
 
-        return await this.waitBalanceChanged(wallet, to, balanceBefore.toBigInt())
+        return await this.waitBalanceChanged(wallet, to, balanceBefore)
     }
 
     private async buildTx(wallet: WalletI, from: Destination, amount: number): Promise<TxInteraction | null> {
