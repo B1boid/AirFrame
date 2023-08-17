@@ -55,7 +55,13 @@ class OrbiterConnectionModule implements ConnectionModule {
             return Promise.resolve(false)
         }
 
-        return await waitBalanceChanged(wallet, toProvider, balanceBefore)
+        const result = await waitBalanceChanged(wallet, toProvider, balanceBefore)
+        if (result) {
+            globalLogger.connect(wallet.getAddress()).done(`Finished bridge to ${to} using Orbiter. Balance updated.`)
+        } else {
+            globalLogger.connect(wallet.getAddress()).error(`Could not fetch changed balance for Orbiter ${from} -> ${to}. Check logs.`)
+        }
+        return result
     }
 
 }

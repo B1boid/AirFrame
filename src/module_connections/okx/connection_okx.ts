@@ -66,7 +66,7 @@ class OkxConnectionModule implements ConnectionModule {
             if (!submitStatus) {
                 globalLogger.connect(wallet.getAddress()).error("Could not fetch successful withdrawal. Check logs.")
             } else {
-                globalLogger.connect(wallet.getAddress()).success(`Successful withdrawal from OKX to ${to}.`)
+                globalLogger.connect(wallet.getAddress()).done(`Successful withdrawal from OKX to ${to}.`)
             }
 
             return Promise.resolve(submitStatus)
@@ -113,7 +113,7 @@ class OkxConnectionModule implements ConnectionModule {
             if (!submitStatus) {
                 globalLogger.connect(wallet.getAddress()).error("Could not fetch successful deposit. Check logs.")
             } else {
-                globalLogger.connect(wallet.getAddress()).success("Successful deposit. Balance updated.")
+                globalLogger.connect(wallet.getAddress()).done("Successful deposit. Balance updated.")
             }
 
             if (subAccount === null) {
@@ -158,7 +158,7 @@ class OkxConnectionModule implements ConnectionModule {
             return Promise.resolve(false)
         }
 
-        globalLogger.connect(wallet.getAddress()).success(`Final status fetch: ${JSON.stringify(changed)}.`)
+        globalLogger.connect(wallet.getAddress()).done(`Final status fetch: ${JSON.stringify(changed)}.`)
         return Promise.resolve(changed.code === "0" && changed.data[0].state.split(":")[0] === successStatus)
     }
 
@@ -233,7 +233,7 @@ class OkxConnectionModule implements ConnectionModule {
             return Promise.resolve(false)
         }
 
-        globalLogger.connect(wallet.getAddress()).success("Successfully transferred assets from sub to master.")
+        globalLogger.connect(wallet.getAddress()).done("Successfully transferred assets from sub to master.")
 
         // TODO maybe add waiting for funds transfer (but it seems fast)
 

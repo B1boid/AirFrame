@@ -9,6 +9,7 @@ import zk_sync_bridge_official from "../../abi/zksync_bridge_official.json"
 import * as zk from "zksync-web3"
 import {getFeeData, getGasLimit} from "../../utils/gas";
 import {sleep} from "../../utils/utils";
+import {logger} from "ethers";
 
 const tag = "Official ZkSync bridge"
 const BRIDGE_ADDRESS = "0x32400084C286CF3E17e7B677ea9583e60a000324"
@@ -58,7 +59,14 @@ class ZkSyncEthOfficialConectionModule implements ConnectionModule {
         }
         globalLogger.connect(wallet.getAddress()).info(`Submitted tx ${from} -> ${to} in ${tag}. L1 Hash: ${l1Hash}.`)
 
-        return await this.waitBalanceChanged(wallet, to, balanceBefore)
+        const result = await this.waitBalanceChanged(wallet, to, balanceBefore)
+
+        if (result) {
+            globalLogger.connect(wallet.getAddress()).done("Finished bridge to ZkSync. Balance updated.")
+        } else {
+            globalLogger.connect(wallet.getAddress()).error("Could not fetch changed balance for ZkSync bridge. Check logs.")
+        }
+        return result
     }
 
     private async buildTx(wallet: WalletI, from: Destination, amount: number): Promise<TxInteraction | null> {

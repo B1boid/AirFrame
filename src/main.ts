@@ -39,9 +39,9 @@ async function doTask(password: string, passwordOkx: string, address: string, wa
         }
     }
     if (actionsRes) {
-        console.log("All done for account:", address)
+        globalLogger.connect(address).done("All done for account!")
     } else {
-        console.log("Stop this thread + send emergency-alert")
+        globalLogger.connect(address).error("Stop this thread + send emergency-alert")
     }
     return actionsRes
 }

@@ -1,3 +1,4 @@
+import {bot, ERROR_CHANNEL_ID, SUPER_SUCCESS_CHANNEL_ID, WARN_CHANNEL_ID} from "../telegram/bot";
 import * as console from "console";
 
 
@@ -5,7 +6,21 @@ enum LogType {
     INFO = "INFO",
     WARN = "WARN",
     ERROR = "ERROR",
-    SUCCESS = "SUCCESS"
+    SUCCESS = "SUCCESS",
+    SUPER_SUCCESS = "SUPER_SUCCESS"
+}
+
+function getChannel(type: LogType): string | null {
+    switch (type) {
+        case LogType.ERROR:
+            return ERROR_CHANNEL_ID
+        case LogType.WARN:
+            return WARN_CHANNEL_ID
+        case LogType.SUPER_SUCCESS:
+            return SUPER_SUCCESS_CHANNEL_ID
+        default:
+            return null
+    }
 }
 
 export interface ILogger {
@@ -13,6 +28,7 @@ export interface ILogger {
     warn(msg: string): void;
     error(msg: string): void;
     success(msg: string): void;
+    done(msg: string): void;
 }
 
 class Logger implements ILogger{
@@ -36,8 +52,22 @@ class Logger implements ILogger{
         this.log(LogType.SUCCESS, msg)
     }
 
-    protected log(type: LogType, msg: string): void {
-        console.log(`${type} - GLOBAL - ${msg}`)
+    done(msg: string): void {
+        this.log(LogType.SUPER_SUCCESS, msg)
+    }
+
+    private log(type: LogType, msg: string): void {
+        const message = this.getSpecifiedText(type, msg)
+        console.log(message)
+
+        const channel = getChannel(type)
+        if (channel) {
+            bot.sendMessage(channel, message)
+        }
+    }
+
+    protected getSpecifiedText(type: LogType, msg: string) {
+        return `${type} - GLOBAL - ${msg}`
     }
 }
 
@@ -54,8 +84,8 @@ export class ConnectedLogger extends Logger {
         return this
     }
 
-    protected override log(type: LogType, msg: string) {
-        console.log(`${type} - ${this.address} - ${msg}`)
+    protected getSpecifiedText(type: LogType, msg: string): string {
+        return `${type} - ${this.address} - ${msg}`
     }
 
 }
