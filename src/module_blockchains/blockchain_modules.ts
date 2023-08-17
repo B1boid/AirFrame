@@ -5,6 +5,8 @@ import {EnumDictionary} from "../utils/utils";
 import {Blockchains} from "../config/chains";
 import {moduleEthereum} from "./ethereum/ethereum";
 import {moduleOptimism} from "./optimism/optimism";
+import {zkSyncParaspaceCycle} from "./zksync/activities";
+import {ethFakeUniExec} from "./ethereum/activities";
 
 
 export const enum PolygonActivity {
@@ -22,10 +24,20 @@ export const enum ZkSyncActivity {
     zkSyncEraLendCycle = "zkSyncEraLendCycle",
     zkSyncReactFusionInit = "zkSyncReactFusionInit",
     zkSyncReactFusionCycle = "zkSyncReactFusionCycle",
+    zkSyncParaspaceCycle = "zkSyncParaspaceCycle",
     zkSyncSynFuturesTest = "zkSyncSynFuturesTest",
 }
 
 export const enum EthereumActivity {
+    wrapUnwrap = "wrapUnwrap",
+    ethRandomApprove = "ethRandomApprove",
+    ethRandomMint = "ethRandomMint",
+    ethDepositToZkLite = "ethDepositToZkLite",
+    ethDepositToArbOfficial = "ethDepositToArbOfficial",
+    ethBlurCycle = "ethBlurCycle",
+    ethMoveDustGas = "ethMoveDustGas",
+    ethRandomStuff = "ethRandomStuff",
+    ethFakeUniExec = "ethFakeUniExec"
 
 }
 

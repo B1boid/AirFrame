@@ -47,9 +47,11 @@ export async function getFeeData(provider: UnionProvider, chain: Chain): Promise
                 )
             }
             if (chain.title === Blockchains.Ethereum) {
+                let increaseGasPrice = (curGasPriceInfo.gasPrice !== null) && (curGasPriceInfo.maxPriorityFeePerGas !== null)
+                let gasPrice: bigint | null = increaseGasPrice ? curGasPriceInfo.gasPrice! + BigInt(2) * curGasPriceInfo.maxPriorityFeePerGas! : curGasPriceInfo.gasPrice
                 curGasPriceInfo = new FeeData(
-                    curGasPriceInfo.gasPrice,
-                    curGasPriceInfo.gasPrice,
+                    gasPrice,
+                    gasPrice,
                     curGasPriceInfo.maxPriorityFeePerGas
                 )
             }

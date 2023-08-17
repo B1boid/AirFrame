@@ -44,7 +44,7 @@ export const polygonChain: Chain = {
 export const ethereumChain: Chain = {
     title: Blockchains.Ethereum,
     chainId: 1,
-    nodeUrl: "https://eth.llamarpc.com",
+    nodeUrl: "https://rpc.ankr.com/eth",
     symbol: "ETH",
     extraGasLimit: 100000,
     orbiterCode: 9001

@@ -11,7 +11,7 @@ export function GAS_PRICE_LIMITS(chain: Blockchains, randomized_percent: number 
             value = 900 * (10 ** 9) // 900 gwei
             break
         case Blockchains.Ethereum:
-            value = 35 * (10 ** 9) // 35 gwei
+            value = 27 * (10 ** 9) // 27 gwei
             break
     }
     if (randomized_percent != 0) {

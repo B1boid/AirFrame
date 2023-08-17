@@ -10,19 +10,26 @@ import {getRandomizedPercent, sleep} from "../../utils/utils";
 import {globalLogger} from "../../utils/logger";
 
 
-export async function getQuote1inch (chainId: number, fromTokenAddress: string, toTokenAddress: string, amount: string, fromAddress: string): Promise<null | string> {
+async function getQuote1inch (chainId: number, fromTokenAddress: string, toTokenAddress: string, amount: string, fromAddress: string): Promise<null | string> {
+    if (process.env.ONEINCH_API_KEY === undefined) {
+        globalLogger.warn(`1inch API key not set`)
+        return null
+    }
     let slippages = [0.1, 0.2, 0.5]  // 0.1% starting slippage
-    let logger = globalLogger.connect(fromAddress)
     let disableEstimate = true
     for (let i = 0; i < slippages.length; i++) {
         let slippage = slippages[i]
         try {
-            const result = await axios.get(`https://api.1inch.io/v5.0/${chainId}/swap`, {
+            const result = await axios.get(`https://api.1inch.dev/swap/v5.2/${chainId}/swap`, {
+                headers: {
+                    'accept': 'application/json',
+                    'Authorization': 'Bearer ' + process.env.ONEINCH_API_KEY,
+                },
                 params: {fromTokenAddress, toTokenAddress, amount, fromAddress, slippage, disableEstimate}
             });
             return result.data.tx.data
-        } catch(error) {
-            logger.warn(`1inch API failed, try: ${i}`)
+        } catch (error) {
+            globalLogger.connect(fromAddress).warn(`1inch API failed, try: ${i} with error: ${error}`)
             await sleep(5)
         }
     }
