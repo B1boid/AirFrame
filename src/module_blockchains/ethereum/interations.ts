@@ -82,7 +82,6 @@ export async function ethRandomMint_mint(wallet: WalletI): Promise<TxInteraction
     ])
     return [{
         ...nft,
-        value: "0",
         stoppable: false,
         confirmations: 1,
         name: "mintNft"
@@ -161,7 +160,7 @@ export async function ethMoveDustGas_move(wallet: WalletI): Promise<TxInteractio
     let balance = getRandomFloat(0.00003, 0.00013, 5) // dust ready to lose
     let chainIds = [optimismChain.chainId, polygonChain.chainId, 100, 56]
     return await commonRefuel(
-        [balance], [Refuels.Socket], wallet, chain, getRandomElement(chainIds), contracts,
+        {fixBalance: balance}, [Refuels.Socket], wallet, chain, getRandomElement(chainIds), contracts,
         "ethMoveDustGas_move", false
     )
 }

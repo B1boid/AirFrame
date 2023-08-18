@@ -1,4 +1,3 @@
-import {blockchainModules} from "../module_blockchains/blockchain_modules";
 
 export interface Chain {
   title: Blockchains
@@ -57,8 +56,4 @@ export const optimismChain: Chain = {
     symbol: "ETH",
     extraGasLimit: 0,
     orbiterCode: 9007
-}
-
-export const destToChain = (destination: Destination): Chain => {
-    return blockchainModules[destination as Blockchains].chain
 }

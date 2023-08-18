@@ -54,11 +54,11 @@ export async function polygonWrapUnwrap_unwrap(wallet: WalletI): Promise<TxInter
 }
 
 export async function polygonSwapCycleNativeToUsdc_swapto(wallet: WalletI): Promise<TxInteraction[]> {
-    return await commonSwap(tokens.MATIC, tokens.USDC, [20, 40], [Dexes.OneInch],
+    return await commonSwap(tokens.MATIC, tokens.USDC, {balancePercent: [20, 40]}, [Dexes.OneInch],
         wallet, chain, contracts, tokens, "polygonSwapCycleNativeToUsdc_swapto")
 }
 
 export async function polygonSwapCycleNativeToUsdc_swapback(wallet: WalletI): Promise<TxInteraction[]> {
-    return await commonSwap(tokens.USDC, tokens.MATIC, [], [Dexes.OneInch],
+    return await commonSwap(tokens.USDC, tokens.MATIC, {fullBalance: true}, [Dexes.OneInch],
         wallet, chain, contracts, tokens, "polygonSwapCycleNativeToUsdc_swapback")
 }

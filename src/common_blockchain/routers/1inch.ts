@@ -6,8 +6,9 @@ import {Chain} from "../../config/chains";
 import erc20 from "./../../abi/erc20.json";
 import {NATIVE_ADDRESS} from "./common";
 import {checkAndGetApprovalsInteraction} from "../approvals";
-import {getRandomizedPercent, sleep} from "../../utils/utils";
+import {sleep} from "../../utils/utils";
 import {globalLogger} from "../../utils/logger";
+import {ExecBalance, getExecBalance} from "../common_utils";
 
 
 async function getQuote1inch (chainId: number, fromTokenAddress: string, toTokenAddress: string, amount: string, fromAddress: string): Promise<null | string> {
@@ -42,16 +43,14 @@ export async function oneInchSwapNativeTo(
     chain: Chain,
     contracts: { [id: string]: string },
     name: string,
-    balancePercent: number[] = [],
+    execBalance: ExecBalance = {fullBalance: true},
     stoppable: boolean = false,
 ): Promise<TxInteraction[]> {
     try {
         let txs = []
         const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
         let tokenBalance: bigint = await provider.getBalance(wallet.getAddress())
-        if (balancePercent.length > 0) {
-            tokenBalance = getRandomizedPercent(tokenBalance, balancePercent[0], balancePercent[1])
-        }
+        tokenBalance = getExecBalance(execBalance, tokenBalance)!
         let data = await getQuote1inch(chain.chainId, NATIVE_ADDRESS, token, tokenBalance.toString(), wallet.getAddress())
         if (data === null) {
             let logger = globalLogger.connect(wallet.getAddress())
@@ -81,7 +80,7 @@ export async function oneInchSwap(
     chain: Chain,
     contracts: { [id: string]: string },
     name: string,
-    balancePercent: number[] = [],
+    execBalance: ExecBalance = {fullBalance: true},
     stoppable: boolean = false,
 ): Promise<TxInteraction[]> {
     try {
@@ -93,9 +92,7 @@ export async function oneInchSwap(
             logger.warn(`No balance for ${name}`)
             return []
         }
-        if (balancePercent.length > 0) {
-            tokenBalance = getRandomizedPercent(tokenBalance, balancePercent[0], balancePercent[1])
-        }
+        tokenBalance = getExecBalance(execBalance, tokenBalance)!
         let txs = await checkAndGetApprovalsInteraction(wallet.getAddress(), contracts.oneInchRouter, tokenBalance, tokenContract)
         let data = await getQuote1inch(chain.chainId, tokenFrom, tokenTo, tokenBalance.toString(), wallet.getAddress())
         if (data === null) {

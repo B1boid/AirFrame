@@ -18,7 +18,7 @@ export function okxWithdrawalConfig(asset: Asset, blockchain: Blockchains): OKXW
             }
         case Asset.ETH + Blockchains.ZkSync:
             return {
-                fee: "0.0003",
+                fee: "0.000712",
                 confirmations: -1,
                 withdrawalConfirmationsUnlock: -1
             }
