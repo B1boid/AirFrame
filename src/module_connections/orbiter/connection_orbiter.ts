@@ -3,7 +3,7 @@ import {TxResult, WalletI} from "../../classes/wallet";
 import {Chain, Destination} from "../../config/chains";
 import {Asset} from "../../config/tokens";
 import {globalLogger} from "../../utils/logger";
-import {getTxDataForAllBalanceTransfer} from "../../utils/utils";
+import {getTxDataForAllBalanceTransfer, sleep} from "../../utils/utils";
 import {TxInteraction} from "../../classes/module";
 import {ethers} from "ethers-new";
 import {getTxForTransfer, waitBalanceChanged} from "../utils";
@@ -39,7 +39,16 @@ class OrbiterConnectionModule implements ConnectionModule {
         }
 
         const toProvider = new ethers.JsonRpcProvider(chainTo.nodeUrl)
-        const balanceBefore = await toProvider.getBalance(wallet.getAddress())
+        let balanceBefore: bigint;
+        while (true) {
+            try {
+                balanceBefore = await toProvider.getBalance(wallet.getAddress())
+                break
+            } catch (e) {
+                globalLogger.connect(wallet.getAddress()).warn(`Failed to fetch initial balance for Orbiter. Exception: ${e}`)
+                await sleep(10)
+            }
+        }
         const [success, hash] = await wallet.sendTransaction(transferTx, chainFrom, 1)
 
         if (success === TxResult.Fail) {

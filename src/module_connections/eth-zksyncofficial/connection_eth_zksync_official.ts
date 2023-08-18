@@ -35,7 +35,16 @@ class ZkSyncEthOfficialConectionModule implements ConnectionModule {
             return Promise.resolve(false)
         }
 
-        const balanceBefore = await new zk.Provider(zkSyncChain.nodeUrl).getBalance(wallet.getAddress())
+        let balanceBefore: bigint;
+        while (true) {
+            try {
+                balanceBefore = (await new zk.Provider(zkSyncChain.nodeUrl).getBalance(wallet.getAddress())).toBigInt()
+                break
+            } catch (e) {
+                globalLogger.connect(wallet.getAddress()).warn(`Failed to fetch initial balance for ${tag}. Exception: ${e}`)
+                await sleep(10)
+            }
+        }
         const tx = await this.buildTx(wallet, from, amount)
 
         if (tx == null) {
@@ -50,7 +59,7 @@ class ZkSyncEthOfficialConectionModule implements ConnectionModule {
         }
         globalLogger.connect(wallet.getAddress()).info(`Submitted tx ${from} -> ${to} in ${tag}. L1 Hash: ${l1Hash}.`)
 
-        return await this.waitBalanceChanged(wallet, to, balanceBefore.toBigInt())
+        return await this.waitBalanceChanged(wallet, to, balanceBefore)
     }
 
     private async buildTx(wallet: WalletI, from: Destination, amount: number): Promise<TxInteraction | null> {
@@ -117,8 +126,15 @@ class ZkSyncEthOfficialConectionModule implements ConnectionModule {
         if (to === Destination.ZkSync) {
             const zkSynProvider: zk.Provider = new zk.Provider(zkSyncChain.nodeUrl)
             let retry = 0;
+            let newBalance: bigint
             while (retry < MAX_RETIRES_BALANCE_CHANGED) {
-                const newBalance = (await zkSynProvider.getBalance(wallet.getAddress())).toBigInt()
+                try {
+                    newBalance = (await zkSynProvider.getBalance(wallet.getAddress())).toBigInt()
+                } catch (e) {
+                    globalLogger.connect(wallet.getAddress()).warn(`Failed to fetch new balance for ${tag}. Exception: ${e}`)
+                    await sleep(10)
+                    continue
+                }
                 globalLogger.connect(wallet.getAddress()).info(`Try ${retry + 1}/${MAX_RETIRES_BALANCE_CHANGED}. Waiting for balance changing. Old balance:${ethers.formatEther(balanceBefore)}. New balance: ${ethers.formatEther(newBalance)}`)
                 if (newBalance != balanceBefore) {
                     globalLogger.connect(wallet.getAddress()).success(`Balance changed! New balance: ${ethers.formatEther(newBalance)}`)

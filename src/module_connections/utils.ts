@@ -24,8 +24,15 @@ export function getTxForTransfer(ccy: Asset, to: string, amount: number): TxInte
 const MAX_RETIRES_BALANCE_CHANGED = 90
 export async function waitBalanceChanged(wallet: WalletI, provider: ethers.JsonRpcProvider, balanceBefore: bigint, retries: number = MAX_RETIRES_BALANCE_CHANGED) {
     let retry = 0;
+    let newBalance: bigint;
     while (retry < retries) {
-        const newBalance = await provider.getBalance(wallet.getAddress())
+            try {
+                newBalance = await provider.getBalance(wallet.getAddress())
+            } catch (e) {
+                globalLogger.connect(wallet.getAddress()).warn(`Failed to fetch new balance. Exception: ${e}`)
+                await sleep(10)
+                continue
+            }
         globalLogger.connect(wallet.getAddress()).info(`Try ${retry + 1}/${retries}. Waiting for balance changing. Old balance:${ethers.formatEther(balanceBefore)}. New balance: ${ethers.formatEther(newBalance)}`)
         if (newBalance != balanceBefore) {
             globalLogger.connect(wallet.getAddress()).success(`Balance changed! New balance: ${ethers.formatEther(newBalance)}`)
