@@ -2,11 +2,9 @@ import {moduleZkSync} from "./zksync/zksync";
 import {BlockchainModule} from "../classes/module";
 import {modulePolygon} from "./polygon/polygon";
 import {EnumDictionary} from "../utils/utils";
-import {Blockchains} from "../config/chains";
+import {Blockchains, Chain, Destination} from "../config/chains";
 import {moduleEthereum} from "./ethereum/ethereum";
 import {moduleOptimism} from "./optimism/optimism";
-import {zkSyncParaspaceCycle} from "./zksync/activities";
-import {ethFakeUniExec} from "./ethereum/activities";
 
 
 export const enum PolygonActivity {
@@ -26,6 +24,7 @@ export const enum ZkSyncActivity {
     zkSyncReactFusionCycle = "zkSyncReactFusionCycle",
     zkSyncParaspaceCycle = "zkSyncParaspaceCycle",
     zkSyncSynFuturesTest = "zkSyncSynFuturesTest",
+    zkSyncDummyRandomLending = "zkSyncDummyRandomLending"
 }
 
 export const enum EthereumActivity {
@@ -48,4 +47,8 @@ export const blockchainModules: EnumDictionary<Blockchains, BlockchainModule> = 
     [Blockchains.Polygon]: modulePolygon,
     [Blockchains.Ethereum]: moduleEthereum,
     [Blockchains.Optimism]: moduleOptimism
+}
+
+export const destToChain = (destination: Destination): Chain => {
+    return blockchainModules[destination as Blockchains].chain
 }

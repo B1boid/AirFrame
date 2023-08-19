@@ -59,10 +59,10 @@ export async function getFeeData(provider: UnionProvider, chain: Chain): Promise
                 return curGasPriceInfo
             }
             globalLogger.warn(`Gas price is too high | Gas price: ${curGasPriceInfo.gasPrice}`)
-            await sleep(60)
+            await sleep(10)
         } catch (e) {
             globalLogger.error(`Error getting gas price | ${e}`)
-            await sleep(60)
+            await sleep(10)
         }
     }
 }

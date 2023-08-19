@@ -1,0 +1,2 @@
+Ethereum=24
+Polygon=900

@@ -1,4 +1,4 @@
-import {Actions, ConnectionAction, ModuleActions, Randomness} from "../classes/actions";
+import {AnyActions, ConnectionAction, ModuleActions, Randomness, WalletActions} from "../classes/actions";
 import {Blockchains, Destination} from "../config/chains";
 import {Connections} from "../module_connections/connection_modules";
 import {EthereumActivity, PolygonActivity, ZkSyncActivity} from "../module_blockchains/blockchain_modules";
@@ -91,8 +91,7 @@ const BRIDGE_ORBITER_ZKSYNC_TO_OPTIMISM: ConnectionAction = {
 }
 
 
-const ACTIONS_1: Actions = {
-    actions: [
+const ACTIONS_1: AnyActions[] =  [
         // CONNECTION_OKX_TO_ZKSYNC
         // CONNECTION_OKX_TO_POLYGON,
         // POLYGON_ACTIONS,
@@ -101,12 +100,13 @@ const ACTIONS_1: Actions = {
         // ZKSYNC_ACTIONS
         // CONNECTION_OKX_TO_ETHEREUM,
         ETH_ACTIONS
-    ]
-}
+]
 
-export const WALLETS_ACTIONS_1: {[id: string]: Actions} = {
-    "0x04277AC5706B24F90cD56E58D105a32906C65094": ACTIONS_1,
-    // "0x..2": ACTIONS_1
-}
+
+export const WALLETS_ACTIONS_1: WalletActions[] = [
+    {address: "0x04277AC5706B24F90cD56E58D105a32906C65094", actions: ACTIONS_1},
+    // {address: "0x0..0", actions: ACTIONS_1},
+]
+
 
 ////////////////////////////////////////////////////////////////////////

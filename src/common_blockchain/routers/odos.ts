@@ -8,6 +8,7 @@ import {checkAndGetApprovalsInteraction} from "../approvals";
 import {formatIfNativeToken, getRandomizedPercent, sleep} from "../../utils/utils";
 import {globalLogger} from "../../utils/logger";
 import {NATIVE_ADDRESS} from "./common";
+import {ExecBalance, getExecBalance} from "../common_utils";
 
 
 async function getQuoteOdos (chainId: number, fromTokenAddress: string, toTokenAddress: string, amount: string, fromAddress: string): Promise<null | string> {
@@ -73,16 +74,14 @@ export async function odosSwapNativeTo(
     chain: Chain,
     contracts: { [id: string]: string },
     name: string,
-    balancePercent: number[] = [],
+    execBalance: ExecBalance = {fullBalance: true},
     stoppable: boolean = false,
 ): Promise<TxInteraction[]> {
     try {
         let txs = []
         const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
         let tokenBalance: bigint = await provider.getBalance(wallet.getAddress())
-        if (balancePercent.length > 0) {
-            tokenBalance = getRandomizedPercent(tokenBalance, balancePercent[0], balancePercent[1])
-        }
+        tokenBalance = getExecBalance(execBalance, tokenBalance)!
         let pathId = await getQuoteOdos(chain.chainId, NATIVE_ADDRESS, token, tokenBalance.toString(), wallet.getAddress())
         if (pathId === null || pathId === undefined) {
             let logger = globalLogger.connect(wallet.getAddress())
@@ -120,7 +119,7 @@ export async function odosSwap(
     chain: Chain,
     contracts: { [id: string]: string },
     name: string,
-    balancePercent: number[] = [],
+    execBalance: ExecBalance = {fullBalance: true},
     stoppable: boolean = false,
 ): Promise<TxInteraction[]> {
     try {
@@ -132,9 +131,7 @@ export async function odosSwap(
             logger.warn(`No balance for ${name}`)
             return []
         }
-        if (balancePercent.length > 0) {
-            tokenBalance = getRandomizedPercent(tokenBalance, balancePercent[0], balancePercent[1])
-        }
+        tokenBalance = getExecBalance(execBalance, tokenBalance)!
         let txs = await checkAndGetApprovalsInteraction(wallet.getAddress(), contracts.odosRouter, tokenBalance, tokenContract)
         let pathId = await getQuoteOdos(chain.chainId, tokenFrom, tokenTo, tokenBalance.toString(), wallet.getAddress())
         if (pathId === null || pathId === undefined) {

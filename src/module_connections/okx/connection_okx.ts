@@ -1,6 +1,6 @@
 import {ConnectionModule} from "../../classes/connection";
 import {TxResult, WalletI} from "../../classes/wallet";
-import {Blockchains, Chain, Destination, destToChain, ethereumChain, polygonChain} from "../../config/chains";
+import {Blockchains, Chain, Destination, ethereumChain, polygonChain} from "../../config/chains";
 import {globalLogger, ILogger} from "../../utils/logger";
 import {getTxForTransfer} from "../utils";
 import Crypto from "crypto-js"
@@ -21,6 +21,7 @@ import {Asset} from "../../config/tokens";
 import {getTxDataForAllBalanceTransfer, sleep} from "../../utils/utils";
 import axios from "axios";
 import {ethers} from "ethers-new";
+import {destToChain} from "../../module_blockchains/blockchain_modules";
 
 const MAX_TRIES = 30
 const DEFAULT_GAS_PRICE = ethers.parseUnits("20", "gwei")
@@ -147,7 +148,7 @@ class OkxConnectionModule implements ConnectionModule {
         while (retry < MAX_TRIES && (!changed || changed.code !== "0" || !changed.data[0]?.state.startsWith(successStatus))) {
             globalLogger.connect(wallet.getAddress()).info(`Checking if tx/wd ${txOrWdId} is completed. Last status: ${changed?.data[0]?.state}. Try ${retry + 1}/${MAX_TRIES}.`)
             if (retry !== 0) {
-                await sleep(30)
+                await sleep(60)
                 changed = await check()
             }
             retry++

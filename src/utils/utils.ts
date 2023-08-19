@@ -12,6 +12,8 @@ import {Asset} from "../config/tokens";
 import {TxInteraction} from "../classes/module";
 import * as zk from "zksync-web3";
 import {NATIVE_ADDRESS} from "../common_blockchain/routers/common";
+import {Limits} from "../config/run_config";
+import {AnyActions, WalletActions} from "../classes/actions";
 dotenv.config();
 
 export type EnumDictionary<T extends string | symbol | number, U> = {
@@ -20,6 +22,10 @@ export type EnumDictionary<T extends string | symbol | number, U> = {
 
 export function sleep(seconds: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, 1000 * seconds));
+}
+
+export function sleepWithLimits(limit: Limits): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, 1000 * getRandomInt(limit.min, limit.max)));
 }
 
 export function getCurTimestamp(): number {
@@ -66,6 +72,44 @@ export function shuffleArray<T>(array: T[]) {
 
 export function getRandomElement<T> (list: T[]) {
     return list[Math.floor((Math.random()*list.length))];
+}
+
+export function printActions(walletActions: WalletActions){
+    let result = "";
+    if (walletActions.featuresLine){
+        result += `${walletActions.featuresLine}\n`
+    }
+    for (const action of walletActions.actions){
+        if ("connectionName" in action) {
+            result += `${action.from} -> ${action.to}  ${action.amount} ${action.asset} : ${action.connectionName}\n`
+        } else {
+            result += `${action.chainName} [${action.activityNames.join(", ")}]\n`
+        }
+    }
+    console.log(result)
+}
+
+export function getActiveAddresses(): string[] {
+    const file = readFileSync('.active_accs', 'utf-8');
+    const accs = file.split('\n');
+    let result: string[] = [];
+    for (const accLine of accs) {
+        const [label, addr, withdrawAddr, subacc, pkCipher] = accLine.trim().split(',');
+        result.push(addr)
+    }
+    return result
+}
+
+export function needToStop(): boolean {
+    const file = readFileSync('online_config/stopper.txt', 'utf-8');
+    const lines = file.split('\n');
+    for (const line of lines){
+        let [label, status] = line.trim().split('=');
+        if (label.trim() === 'stop'){
+            return status.trim() !== "0"
+        }
+    }
+    return true
 }
 
 export function getAddressInfo(password: string, address: string): AddressInfo {
