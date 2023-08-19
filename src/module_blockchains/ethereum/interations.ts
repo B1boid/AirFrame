@@ -78,7 +78,7 @@ export async function ethRandomMint_mint(wallet: WalletI): Promise<TxInteraction
         {to: contracts.nftMintParrot, value: "0", data: "0xa0712d68000000000000000000000000000000000000000000000000000000000000000172db8c0b"},
         {to: contracts.nftMintDream, value: "0", data: "0xa0712d68000000000000000000000000000000000000000000000000000000000000000172db8c0b"},
         {to: contracts.nftMintRaid, value: "0", data: "0xa0712d68000000000000000000000000000000000000000000000000000000000000000172db8c0b"},
-        {to: contracts.nftMintGlow, value: "0.00005", data: "0xa0712d68000000000000000000000000000000000000000000000000000000000000000172db8c0b"}
+        {to: contracts.nftMintGlow, value: parseEther("0.00005").toString(), data: "0xa0712d68000000000000000000000000000000000000000000000000000000000000000172db8c0b"}
     ])
     return [{
         ...nft,
