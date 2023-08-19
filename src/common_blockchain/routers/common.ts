@@ -9,6 +9,7 @@ import {syncSwap, syncSwapNativeTo} from "./syncswap";
 import {velocoreSwap, velocoreSwapNativeTo} from "./velocore";
 import {spaceFiSwap, spaceFiSwapNativeTo} from "./spacefi";
 import {odosSwap, odosSwapNativeTo} from "./odos";
+import {ExecBalance} from "../common_utils";
 
 export enum Dexes {
     OneInch = "1inch",
@@ -24,7 +25,7 @@ export const NATIVE_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
 export async function commonSwap(
     tokenFrom: string,
     tokenTo: string,
-    balancePercent: number[],
+    execBalance: ExecBalance = {fullBalance: true},
     dexes: Dexes[],
     wallet: WalletI,
     chain: Chain,
@@ -39,61 +40,61 @@ export async function commonSwap(
         if (dex === Dexes.OneInch) {
             if (tokenFrom === NATIVE_ADDRESS) {
                 res = await oneInchSwapNativeTo(
-                    tokenTo, wallet, chain, contracts, name, balancePercent, stoppable
+                    tokenTo, wallet, chain, contracts, name, execBalance, stoppable
                 )
             } else {
                 res = await oneInchSwap(
-                    tokenFrom, tokenTo, wallet, chain, contracts, name, balancePercent, stoppable
+                    tokenFrom, tokenTo, wallet, chain, contracts, name, execBalance, stoppable
                 )
             }
         } else if (dex === Dexes.Odos) {
             if (tokenFrom === NATIVE_ADDRESS) {
                 res = await odosSwapNativeTo(
-                    tokenTo, wallet, chain, contracts, name, balancePercent, stoppable
+                    tokenTo, wallet, chain, contracts, name, execBalance, stoppable
                 )
             } else if (tokenTo === NATIVE_ADDRESS) {
                 res = await odosSwap(
-                    tokenFrom, tokenTo, wallet, chain, contracts, name, balancePercent, stoppable
+                    tokenFrom, tokenTo, wallet, chain, contracts, name, execBalance, stoppable
                 )
             }
         } else if (dex === Dexes.Mute) {
             if (tokenFrom === NATIVE_ADDRESS) {
                 res = await muteSwapNativeTo(
-                    tokens.WETH, tokenTo, wallet, chain, contracts, name, balancePercent, stoppable
+                    tokens.WETH, tokenTo, wallet, chain, contracts, name, execBalance, stoppable
                 )
             } else if (tokenTo === NATIVE_ADDRESS) {
                 res = await muteSwap(
-                    tokenFrom, tokens.WETH, wallet, chain, contracts, name, balancePercent, stoppable
+                    tokenFrom, tokens.WETH, wallet, chain, contracts, name, execBalance, stoppable
                 )
             }
         } else if (dex === Dexes.SyncSwap) {
             if (tokenFrom === NATIVE_ADDRESS) {
                 res = await syncSwapNativeTo(
-                    tokens.WETH, tokenTo, wallet, chain, contracts, name, balancePercent, stoppable
+                    tokens.WETH, tokenTo, wallet, chain, contracts, name, execBalance, stoppable
                 )
             } else if (tokenTo === NATIVE_ADDRESS) {
                 res = await syncSwap(
-                    tokenFrom, tokens.WETH, wallet, chain, contracts, name, balancePercent, stoppable
+                    tokenFrom, tokens.WETH, wallet, chain, contracts, name, execBalance, stoppable
                 )
             }
         } else if (dex === Dexes.Velocore) {
             if (tokenFrom === NATIVE_ADDRESS) {
                 res = await velocoreSwapNativeTo(
-                    tokens.WETH, tokenTo, wallet, chain, contracts, name, balancePercent, stoppable
+                    tokens.WETH, tokenTo, wallet, chain, contracts, name, execBalance, stoppable
                 )
             } else if (tokenTo === NATIVE_ADDRESS) {
                 res = await velocoreSwap(
-                    tokenFrom, tokens.WETH, wallet, chain, contracts, name, balancePercent, stoppable
+                    tokenFrom, tokens.WETH, wallet, chain, contracts, name, execBalance, stoppable
                 )
             }
         } else if (dex === Dexes.SpaceFi) {
             if (tokenFrom === NATIVE_ADDRESS) {
                 res = await spaceFiSwapNativeTo(
-                    tokens.WETH, tokenTo, wallet, chain, contracts, name, balancePercent, stoppable
+                    tokens.WETH, tokenTo, wallet, chain, contracts, name, execBalance, stoppable
                 )
             } else if (tokenTo === NATIVE_ADDRESS) {
                 res = await spaceFiSwap(
-                    tokenFrom, tokens.WETH, wallet, chain, contracts, name, balancePercent, stoppable
+                    tokenFrom, tokens.WETH, wallet, chain, contracts, name, execBalance, stoppable
                 )
             }
         }

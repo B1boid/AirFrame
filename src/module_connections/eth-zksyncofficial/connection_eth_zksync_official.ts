@@ -1,6 +1,6 @@
 import {ConnectionModule} from "../../classes/connection";
 import {TxResult, WalletI} from "../../classes/wallet";
-import {Destination, destToChain, ethereumChain, zkSyncChain} from "../../config/chains";
+import {Destination, ethereumChain, zkSyncChain} from "../../config/chains";
 import {globalLogger} from "../../utils/logger";
 import {Asset} from "../../config/tokens";
 import {TxInteraction} from "../../classes/module";
@@ -9,7 +9,7 @@ import zk_sync_bridge_official from "../../abi/zksync_bridge_official.json"
 import * as zk from "zksync-web3"
 import {getFeeData, getGasLimit} from "../../utils/gas";
 import {sleep} from "../../utils/utils";
-import {logger} from "ethers";
+import {destToChain} from "../../module_blockchains/blockchain_modules";
 
 const tag = "Official ZkSync bridge"
 const BRIDGE_ADDRESS = "0x32400084C286CF3E17e7B677ea9583e60a000324"

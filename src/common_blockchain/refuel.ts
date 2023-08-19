@@ -5,6 +5,7 @@ import {TxInteraction} from "../classes/module";
 import {WalletI} from "../classes/wallet";
 import {Chain} from "../config/chains";
 import {globalLogger} from "../utils/logger";
+import {ExecBalance, getExecBalance} from "./common_utils";
 
 
 export enum Refuels {
@@ -12,7 +13,7 @@ export enum Refuels {
 }
 
 export async function commonRefuel(
-    balancePercent: number[],
+    execBalance: ExecBalance = {fullBalance: true},
     refuels: Refuels[],
     wallet: WalletI,
     fromChain: Chain,
@@ -26,7 +27,7 @@ export async function commonRefuel(
     for (let refuel of refuels) {
         if (refuel === Refuels.Socket) {
             res = await socketRefuel(
-                wallet, fromChain, destChainId, contracts, name, balancePercent, stoppable
+                wallet, fromChain, destChainId, contracts, name, execBalance, stoppable
             )
         }
         if (res.length > 0) break
@@ -40,7 +41,7 @@ async function socketRefuel(
     destChainId: number,
     contracts: { [id: string]: string },
     name: string,
-    balancePercent: number[] = [],
+    execBalance: ExecBalance = {fullBalance: true},
     stoppable: boolean = false
 ): Promise<TxInteraction[]> {
     try {
@@ -50,19 +51,12 @@ async function socketRefuel(
             "depositNativeToken", [destChainId, wallet.getAddress()])
 
         let nativeBalanceFull: bigint = await provider.getBalance(wallet.getAddress())
-        let nativeBalance: string
-        if (balancePercent.length > 1) {
-            nativeBalance = getRandomizedPercent(nativeBalanceFull, balancePercent[0], balancePercent[1]).toString()
-        } else if (balancePercent.length === 1) {
-            nativeBalance = parseEther(balancePercent[0].toString()).toString()
-        } else {
-            globalLogger.connect(wallet.getAddress()).warn("Full balance - not implemented")
-            return []
-        }
+        let nativeBalance = getExecBalance(execBalance, nativeBalanceFull)
+        if (nativeBalance === null) return []
         return [{
             to: contracts.socketGasMover,
             data: data,
-            value: nativeBalance,
+            value: nativeBalance.toString(),
             stoppable: stoppable,
             confirmations: 1,
             name: name

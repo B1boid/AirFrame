@@ -3,8 +3,13 @@ import {Connections} from "../module_connections/connection_modules";
 import {ActivityTag} from "../module_blockchains/blockchain_modules";
 import {Asset} from "../config/tokens";
 
-export interface Actions {
-    actions: (ModuleActions | ConnectionAction)[]
+
+export type AnyActions = ModuleActions | ConnectionAction
+
+export interface WalletActions {
+    actions: AnyActions[],
+    address: string,
+    featuresLine?: string
 }
 
 export enum Randomness {

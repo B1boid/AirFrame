@@ -94,6 +94,11 @@ export const zkSyncParaspaceCycle: Activity = {
     ]
 }
 
+export const zkSyncDummyRandomLending: Activity = {
+    name: ZkSyncActivity.zkSyncDummyRandomLending,
+    txs: []
+}
+
 export const zkSyncSynFuturesTest: Activity = {
     name: ZkSyncActivity.zkSyncSynFuturesTest,
     txs: [

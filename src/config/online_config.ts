@@ -1,21 +1,19 @@
-// TODO: These parameters should be changeable online(without rerunning the app) through bot/dashboard
-
 import {Blockchains} from "./chains";
 import {toBigInt} from "ethers-new";
 import {getRandomInt} from "../utils/utils";
+import {readFileSync} from "fs";
 
-export function GAS_PRICE_LIMITS(chain: Blockchains, randomized_percent: number = 10): bigint {
+export function GAS_PRICE_LIMITS(chain: Blockchains): bigint {
+    const file = readFileSync('online_config/gas_prices.txt', 'utf-8');
+    const allGases = file.split('\n');
     let value: number = 1000 * (10 ** 9); // 1000 gwei is max for all blockchains
-    switch (chain) {
-        case Blockchains.Polygon:
-            value = 900 * (10 ** 9) // 900 gwei
+    for (const gasLine of allGases) {
+        const info = gasLine.trim().split('=');
+        const maxGasPrice = Number.parseInt(info[1].trim());
+        if (info[0].trim() === chain) {
+            value = getRandomInt(maxGasPrice - 1, maxGasPrice + 1) * (10 ** 9);
             break
-        case Blockchains.Ethereum:
-            value = 27 * (10 ** 9) // 27 gwei
-            break
-    }
-    if (randomized_percent != 0) {
-        value += Math.floor(getRandomInt(-randomized_percent / 100 * value, randomized_percent / 100 * value))
+        }
     }
     return toBigInt(value)
 }

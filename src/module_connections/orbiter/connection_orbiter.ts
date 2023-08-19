@@ -1,12 +1,13 @@
 import {ConnectionModule} from "../../classes/connection";
 import {TxResult, WalletI} from "../../classes/wallet";
-import {Chain, Destination, destToChain} from "../../config/chains";
+import {Chain, Destination} from "../../config/chains";
 import {Asset} from "../../config/tokens";
 import {globalLogger} from "../../utils/logger";
 import {getTxDataForAllBalanceTransfer, sleep} from "../../utils/utils";
 import {TxInteraction} from "../../classes/module";
 import {ethers} from "ethers-new";
 import {getTxForTransfer, waitBalanceChanged} from "../utils";
+import {destToChain} from "../../module_blockchains/blockchain_modules";
 
 const EXTRA_GAS_LIMIT = 10_000
 const DEFAULT_GAS_PRICE = ethers.parseUnits("20", "gwei")

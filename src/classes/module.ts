@@ -4,6 +4,8 @@ import {Randomness} from "./actions";
 import {getActivitiesGenerator} from "../utils/activity_generators";
 import {ActivityTag} from "../module_blockchains/blockchain_modules";
 import {FeeData} from "ethers-new";
+import {Limits} from "../config/run_config";
+import {sleepWithLimits} from "../utils/utils";
 
 
 export abstract class BlockchainModule {
@@ -29,7 +31,7 @@ export abstract class BlockchainModule {
         return getActivitiesGenerator(activities, randomOrder)
     }
 
-    async doActivities(wallet: WalletI, activityNames: ActivityTag[], randomOrder: Randomness): Promise<boolean> {
+    async doActivities(wallet: WalletI, activityNames: ActivityTag[], randomOrder: Randomness, waitLimits: Limits): Promise<boolean> {
         let genActivities: ActivityTx[] = this.getActivitiesTxs(activityNames, randomOrder)
         let skippedActivities: string[] = [] // activities with interactions which failed before
         let startedActivities: string[] = [] // activities with at least one successful interaction
@@ -55,6 +57,7 @@ export abstract class BlockchainModule {
                             }
                             failed = true
                         }
+                        await sleepWithLimits(waitLimits)
                     }
                 }
                 if (!failed) break

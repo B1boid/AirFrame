@@ -9,6 +9,7 @@ import {checkAndGetApprovalsInteraction} from "../approvals";
 import {getCurTimestamp, getRandomizedPercent} from "../../utils/utils";
 import {defaultAbiCoder} from "ethers/lib/utils";
 import {globalLogger} from "../../utils/logger";
+import {ExecBalance, getExecBalance} from "../common_utils";
 
 
 let ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
@@ -20,16 +21,14 @@ export async function syncSwapNativeTo(
     chain: Chain,
     contracts: { [id: string]: string },
     name: string,
-    balancePercent: number[] = [],
+    execBalance: ExecBalance = {fullBalance: true},
     stoppable: boolean = false,
 ): Promise<TxInteraction[]> {
     try {
         let txs = []
         const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
         let tokenBalance: bigint = await provider.getBalance(wallet.getAddress())
-        if (balancePercent.length > 0) {
-            tokenBalance = getRandomizedPercent(tokenBalance, balancePercent[0], balancePercent[1])
-        }
+        tokenBalance = getExecBalance(execBalance, tokenBalance)!
 
         const classicPoolFactory: Contract = new Contract(contracts.syncSwapPool, SyncPool, provider);
         const poolAddress: string = await classicPoolFactory.getPool(wrappedToken, token);
@@ -77,7 +76,7 @@ export async function syncSwap(
     chain: Chain,
     contracts: { [id: string]: string },
     name: string,
-    balancePercent: number[] = [],
+    execBalance: ExecBalance = {fullBalance: true},
     stoppable: boolean = false,
 ): Promise<TxInteraction[]> {
     try {
@@ -89,9 +88,7 @@ export async function syncSwap(
             logger.warn(`No balance for ${name}`)
             return []
         }
-        if (balancePercent.length > 0) {
-            tokenBalance = getRandomizedPercent(tokenBalance, balancePercent[0], balancePercent[1])
-        }
+        tokenBalance = getExecBalance(execBalance, tokenBalance)!
         let txs = await checkAndGetApprovalsInteraction(wallet.getAddress(), contracts.syncSwapRouter, tokenBalance, tokenContract)
 
         const classicPoolFactory: Contract = new Contract(

@@ -7,6 +7,7 @@ import spacefi from "./../../abi/spacefi.json";
 import {checkAndGetApprovalsInteraction} from "../approvals";
 import {globalLogger} from "../../utils/logger";
 import {getCurTimestamp, getRandomizedPercent} from "../../utils/utils";
+import {ExecBalance, getExecBalance} from "../common_utils";
 
 
 
@@ -17,7 +18,7 @@ export async function spaceFiSwapNativeTo(
     chain: Chain,
     contracts: { [id: string]: string },
     name: string,
-    balancePercent: number[] = [],
+    execBalance: ExecBalance = {fullBalance: true},
     stoppable: boolean = false,
 ): Promise<TxInteraction[]> {
     try {
@@ -25,9 +26,7 @@ export async function spaceFiSwapNativeTo(
         const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
         let routerContract = new ethers.Contract(contracts.spaceRouter, spacefi, provider)
         let tokenBalance: bigint = await provider.getBalance(wallet.getAddress())
-        if (balancePercent.length > 0) {
-            tokenBalance = getRandomizedPercent(tokenBalance, balancePercent[0], balancePercent[1])
-        }
+        tokenBalance = getExecBalance(execBalance, tokenBalance)!
         let amountsOutMin: bigint[] = await routerContract.getAmountsOut(tokenBalance.toString(), [wrappedToken, token])
         let minOut: bigint = amountsOutMin[1] * BigInt(997) / BigInt(1000)
         let data = routerContract.interface.encodeFunctionData("swapExactETHForTokens",
@@ -54,7 +53,7 @@ export async function spaceFiSwap(
     chain: Chain,
     contracts: { [id: string]: string },
     name: string,
-    balancePercent: number[] = [],
+    execBalance: ExecBalance = {fullBalance: true},
     stoppable: boolean = false,
 ): Promise<TxInteraction[]> {
     try {
@@ -67,9 +66,7 @@ export async function spaceFiSwap(
             logger.warn(`No balance for ${name}`)
             return []
         }
-        if (balancePercent.length > 0) {
-            tokenBalance = getRandomizedPercent(tokenBalance, balancePercent[0], balancePercent[1])
-        }
+        tokenBalance = getExecBalance(execBalance, tokenBalance)!
         let txs = await checkAndGetApprovalsInteraction(wallet.getAddress(), contracts.spaceRouter, tokenBalance, tokenContract)
         let amountsOutMin: bigint[] = await routerContract.getAmountsOut(tokenBalance.toString(), [tokenFrom, tokenTo])
         let minOut: bigint = amountsOutMin[1] * BigInt(997) / BigInt(1000)
