@@ -9,3 +9,4 @@ package-lock.json
 .active_accs
 .subs
 src/gen.js
+src/gen_pks.ts
