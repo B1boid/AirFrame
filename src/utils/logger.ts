@@ -29,9 +29,12 @@ export interface ILogger {
     error(msg: string): void;
     success(msg: string): void;
     done(msg: string): void;
+    highGasPrice(price:  bigint | null): void;
 }
 
+const HIGH_GAS_PRICE_LOG_STEP = 100
 class Logger implements ILogger{
+    private highGasCounter = 0
     connect(address: string): ILogger {
         return new ConnectedLogger(address)
     }
@@ -54,6 +57,13 @@ class Logger implements ILogger{
 
     done(msg: string): void {
         this.log(LogType.SUPER_SUCCESS, msg)
+    }
+
+    highGasPrice(price: bigint | null) {
+        if (this.highGasCounter % HIGH_GAS_PRICE_LOG_STEP === 0) {
+            this.warn(`Gas price is too high | Gas price: ${price}`)
+        }
+        this.highGasCounter++
     }
 
     private log(type: LogType, msg: string): void {

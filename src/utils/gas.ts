@@ -58,7 +58,7 @@ export async function getFeeData(provider: UnionProvider, chain: Chain): Promise
             if (curGasPriceInfo.gasPrice !== null && curGasPriceInfo.gasPrice < GAS_PRICE_LIMITS(chain.title)) {
                 return curGasPriceInfo
             }
-            globalLogger.warn(`Gas price is too high | Gas price: ${curGasPriceInfo.gasPrice}`)
+            globalLogger.highGasPrice(curGasPriceInfo.gasPrice)
             await sleep(10)
         } catch (e) {
             globalLogger.error(`Error getting gas price | ${e}`)

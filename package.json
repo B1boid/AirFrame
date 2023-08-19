@@ -6,6 +6,7 @@
   },
   "dependencies": {
     "@eth-optimism/sdk": "^3.1.0",
+    "@supercharge/promise-pool": "^3.0.0",
     "@types/crypto-js": "^4.1.1",
     "@types/node-telegram-bot-api": "^0.61.7",
     "axios": "^1.4.0",

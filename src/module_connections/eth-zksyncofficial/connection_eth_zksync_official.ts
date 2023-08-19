@@ -23,19 +23,20 @@ const L1_DEFAULT_GAS = BigInt(120_000)
 const L2_BRIDGE_GAS_LIMIT = 733664;
 
 class ZkSyncEthOfficialConectionModule implements ConnectionModule {
-    async sendAsset(wallet: WalletI, from: Destination, to: Destination, asset: Asset, amount: number): Promise<boolean> {
+    async sendAsset(wallet: WalletI, from: Destination, to: Destination, asset: Asset, amount: number): Promise<[boolean, number]> {
         if (!(to === Destination.ZkSync && from === Destination.Ethereum)) {
             globalLogger.connect(wallet.getAddress())
                 .error(`Wrong networks for ${tag}. Expected ETH -> ZKSYNC. Found: ${from} -> ${to}.`)
-            return Promise.resolve(false)
+            return Promise.resolve([false, 0])
         }
 
         if (asset !== Asset.ETH) {
             globalLogger.connect(wallet.getAddress()).error(`Only ETH supported for ${tag}.`)
-            return Promise.resolve(false)
+            return Promise.resolve([false, 0])
         }
 
         let balanceBefore: bigint;
+        // eslint-disable-next-line no-constant-condition
         while (true) {
             try {
                 balanceBefore = (await new zk.Provider(zkSyncChain.nodeUrl).getBalance(wallet.getAddress())).toBigInt()
@@ -49,24 +50,24 @@ class ZkSyncEthOfficialConectionModule implements ConnectionModule {
 
         if (tx == null) {
             globalLogger.connect(wallet.getAddress()).error(`Failed to build bridge transaction for ${tag}.`)
-            return Promise.resolve(false)
+            return Promise.resolve([false, 0])
         }
         const [homeResponse, l1Hash] = await wallet.sendTransaction(tx, destToChain(from), 1)
 
         if (homeResponse === TxResult.Fail) {
             globalLogger.connect(wallet.getAddress()).error(`Failed tx for bridging ${from} -> ${to} using ${tag}.`)
-            return Promise.resolve(false)
+            return Promise.resolve([false, 0])
         }
         globalLogger.connect(wallet.getAddress()).info(`Submitted tx ${from} -> ${to} in ${tag}. L1 Hash: ${l1Hash}.`)
 
-        const result = await this.waitBalanceChanged(wallet, to, balanceBefore)
+        const [result, newBalance] = await this.waitBalanceChanged(wallet, to, balanceBefore)
 
         if (result) {
             globalLogger.connect(wallet.getAddress()).done("Finished bridge to ZkSync. Balance updated.")
         } else {
             globalLogger.connect(wallet.getAddress()).error("Could not fetch changed balance for ZkSync bridge. Check logs.")
         }
-        return result
+        return Promise.resolve( [result, Number(ethers.formatEther(Math.max(0, newBalance - Number(balanceBefore))))])
     }
 
     private async buildTx(wallet: WalletI, from: Destination, amount: number): Promise<TxInteraction | null> {
@@ -129,7 +130,7 @@ class ZkSyncEthOfficialConectionModule implements ConnectionModule {
 
     }
 
-    private async waitBalanceChanged(wallet: WalletI, to: Destination, balanceBefore: bigint) {
+    private async waitBalanceChanged(wallet: WalletI, to: Destination, balanceBefore: bigint): Promise<[boolean, number]> { // status, newBalance
         if (to === Destination.ZkSync) {
             const zkSynProvider: zk.Provider = new zk.Provider(zkSyncChain.nodeUrl)
             let retry = 0;
@@ -145,14 +146,14 @@ class ZkSyncEthOfficialConectionModule implements ConnectionModule {
                 globalLogger.connect(wallet.getAddress()).info(`Try ${retry + 1}/${MAX_RETIRES_BALANCE_CHANGED}. Waiting for balance changing. Old balance:${ethers.formatEther(balanceBefore)}. New balance: ${ethers.formatEther(newBalance)}`)
                 if (newBalance != balanceBefore) {
                     globalLogger.connect(wallet.getAddress()).success(`Balance changed! New balance: ${ethers.formatEther(newBalance)}`)
-                    return Promise.resolve(true)
+                    return Promise.resolve([true, Number(newBalance)])
                 }
                 retry++
                 await sleep(45)
             }
         }
         globalLogger.connect(wallet.getAddress()).error(`Balance has not changed after ${MAX_RETIRES_BALANCE_CHANGED} tries.`)
-        return Promise.resolve(false);
+        return Promise.resolve([false, 0]);
     }
 }
 

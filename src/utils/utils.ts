@@ -101,6 +101,7 @@ export function getActiveAddresses(): string[] {
 }
 
 export function needToStop(): boolean {
+    return false
     const file = readFileSync('online_config/stopper.txt', 'utf-8');
     const lines = file.split('\n');
     for (const line of lines){

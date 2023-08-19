@@ -22,7 +22,7 @@ export function getTxForTransfer(ccy: Asset, to: string, amount: number): TxInte
 }
 
 const MAX_RETIRES_BALANCE_CHANGED = 90
-export async function waitBalanceChanged(wallet: WalletI, provider: ethers.JsonRpcProvider, balanceBefore: bigint, retries: number = MAX_RETIRES_BALANCE_CHANGED) {
+export async function waitBalanceChanged(wallet: WalletI, provider: ethers.JsonRpcProvider, balanceBefore: bigint, retries: number = MAX_RETIRES_BALANCE_CHANGED): Promise<[boolean, number]> { // status, newBalance
     let retry = 0;
     let newBalance: bigint;
     while (retry < retries) {
@@ -36,11 +36,11 @@ export async function waitBalanceChanged(wallet: WalletI, provider: ethers.JsonR
         globalLogger.connect(wallet.getAddress()).info(`Try ${retry + 1}/${retries}. Waiting for balance changing. Old balance:${ethers.formatEther(balanceBefore)}. New balance: ${ethers.formatEther(newBalance)}`)
         if (newBalance != balanceBefore) {
             globalLogger.connect(wallet.getAddress()).success(`Balance changed! New balance: ${ethers.formatEther(newBalance)}`)
-            return Promise.resolve(true)
+            return Promise.resolve([true, Number(newBalance)])
         }
         retry++
         await sleep(45)
     }
     globalLogger.connect(wallet.getAddress()).error(`Balance has not changed after ${retries} tries.`)
-    return Promise.resolve(false);
+    return Promise.resolve([false, 0]);
 }

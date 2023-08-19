@@ -30,7 +30,7 @@ const CONNECTION_OKX_TO_POLYGON: ConnectionAction = {
     from: Destination.OKX,
     to: Destination.Polygon,
     asset: Asset.MATIC,
-    amount: 2,
+    amount: 3,
     connectionName: Connections.ExchangeOKX
 }
 
@@ -93,19 +93,19 @@ const BRIDGE_ORBITER_ZKSYNC_TO_OPTIMISM: ConnectionAction = {
 
 const ACTIONS_1: AnyActions[] =  [
         // CONNECTION_OKX_TO_ZKSYNC
-        // CONNECTION_OKX_TO_POLYGON,
+        CONNECTION_OKX_TO_POLYGON,
         // POLYGON_ACTIONS,
-        // CONNECTION_POLYGON_TO_OKX
+        CONNECTION_POLYGON_TO_OKX
         // POLYGON_ACTIONS
         // ZKSYNC_ACTIONS
         // CONNECTION_OKX_TO_ETHEREUM,
-        ETH_ACTIONS
+        // ETH_ACTIONS
 ]
 
 
 export const WALLETS_ACTIONS_1: WalletActions[] = [
-    {address: "0x04277AC5706B24F90cD56E58D105a32906C65094", actions: ACTIONS_1},
-    // {address: "0x0..0", actions: ACTIONS_1},
+    // {address: "0x04277AC5706B24F90cD56E58D105a32906C65094", actions: ACTIONS_1},
+    {address: "0x2Fd49f2da0d07102b223D89f290F61b265291952", actions: ACTIONS_1},
 ]
 
 

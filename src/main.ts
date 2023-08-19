@@ -11,8 +11,9 @@ import {
 import {WALLETS_ACTIONS_1} from "./tests/task1";
 import {Builder, Strategy} from "./builder/common_builder";
 import {WalletActions} from "./classes/actions";
-import {RunConfig, ZKSYNC_BASIC_CONFIG} from "./config/run_config";
+import {RunConfig, TEST_CONFIG, ZKSYNC_BASIC_CONFIG} from "./config/run_config";
 import {globalLogger} from "./utils/logger";
+import {PromisePool} from "@supercharge/promise-pool";
 let prompt = require('password-prompt')
 
 
@@ -24,7 +25,9 @@ async function doTask(password: string, passwordOkx: string, walletActions: Wall
         getOkxCredentials(passwordOkx),
         getOkxCredentialsForSub(addressInfo, passwordOkx)
     )
-    let actionsRes: boolean = true;
+    let actionsRes: boolean = true
+    let firstSentAmount : number = -1
+    let lastSentAmount: number = -1
     console.log("Starting actions for account:", address)
     printActions(walletActions)
     await sleepWithLimits(runConfig.waitInitial)
@@ -33,11 +36,17 @@ async function doTask(password: string, passwordOkx: string, walletActions: Wall
             if ("connectionName" in action) {
                 console.log("Connection:", action)
                 const connectionModule = connectionModules[action.connectionName]
-                actionsRes = await connectionModule.sendAsset(wallet, action.from, action.to, action.asset, action.amount)
+                const [status, sent] = await connectionModule.sendAsset(wallet, action.from, action.to, action.asset, action.amount)
+                actionsRes = status
+                if (firstSentAmount === -1) {
+                    firstSentAmount = sent
+                } else {
+                    lastSentAmount = sent
+                }
             } else {
                 console.log("Module:", action)
                 const blockchainModule = blockchainModules[action.chainName]
-                actionsRes = await blockchainModule.doActivities(wallet, action.activityNames, action.randomOrder)
+                actionsRes = await blockchainModule.doActivities(wallet, action.activityNames, action.randomOrder, runConfig.waitBetweenModules)
             }
             if (!actionsRes) {
                 console.log("Failed to do activities")
@@ -51,7 +60,10 @@ async function doTask(password: string, passwordOkx: string, walletActions: Wall
         await sleepWithLimits(runConfig.waitBetweenModules)
     }
     if (actionsRes) {
-        globalLogger.connect(address).done("All done for account!")
+        globalLogger.connect(address).done(`All done for account! 
+        Balance sent for activities: ${firstSentAmount}.
+        Last sent via connection module: ${lastSentAmount}.
+        Loss (first - last): ${firstSentAmount - lastSentAmount}`)
     } else {
         globalLogger.connect(address).error("Stop this thread + send emergency-alert")
     }
@@ -64,7 +76,7 @@ async function doTask(password: string, passwordOkx: string, walletActions: Wall
 async function main(){
     // TODO: online config doesn't work - we need to use tg bot for it
 
-    const runConfig: RunConfig = ZKSYNC_BASIC_CONFIG
+    const runConfig: RunConfig = TEST_CONFIG
 
     const threads: number = runConfig.threads
     const strategy: Strategy = runConfig.strategy
@@ -79,40 +91,36 @@ async function main(){
         let activeAddresses: string[] = getActiveAddresses()
         actions = await Builder.build(activeAddresses, strategy)
     }
-    let threadsStatus: boolean[] = Array(threads).fill(true) // true - thread is free, false - thread is busy
-    let stopThreads: boolean = false // waiting to finish pending threads and then stop all
-    let accountInd: number = 0
-    while (true){
 
-        for (let i = 0; i < threads; i++){
-            if (accountInd >= actions.length){
-                console.log("All accounts finished successfully")
-                return
+
+    const { results} = await PromisePool
+        .for(actions)
+        .withConcurrency(threads)
+        .process(async (action, index, pool) => {
+            const taskRes = await doTask(password, passwordOkx, action, runConfig)
+            const forceStop = needToStop()
+            if (!taskRes || forceStop) {
+                pool.stop()
             }
-            if (!stopThreads && !needToStop() && threadsStatus[i]){
-                threadsStatus[i] = false
-                doTask(password, passwordOkx, actions[accountInd], runConfig).then((taskRes) => {
-                    if (!taskRes){
-                        stopThreads = true
-                    }
-                    threadsStatus[i] = true
-                })
-                accountInd += 1
-            }
-            await sleep(2)
-        }
+            return [action.address, taskRes, forceStop]
+        })
 
-        if (!threadsStatus.includes(false) && stopThreads){
-            console.log("One of the threads failed, so finished pending threads and stopped")
-            break
-        }
-        if (!threadsStatus.includes(false) && needToStop()){
-            console.log("Force to stop, so finished pending threads and stopped")
-            break
-        }
+    const resultsCasted = results as [string, boolean, boolean][]
 
-        await sleep(10)
+
+    if (resultsCasted.filter(x => x[2]).length > 0){
+        globalLogger.done("Force to stop, so finished pending threads and stopped")
     }
+
+    if (resultsCasted.filter(x => !x[1]).length > 0){
+        globalLogger.error("One of the threads failed, so finished pending threads and stopped")
+    }
+
+    if (resultsCasted.length === actions.length &&
+        resultsCasted.filter(x => x[1]).length === actions.length) {
+        globalLogger.done("All accounts finished successfully!")
+    }
+    return
 }
 
 

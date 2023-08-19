@@ -12,20 +12,21 @@ import {destToChain} from "../../module_blockchains/blockchain_modules";
 const EXTRA_GAS_LIMIT = 10_000
 const DEFAULT_GAS_PRICE = ethers.parseUnits("20", "gwei")
 const ETH_BRIDGE_ROUTER = "0x80C67432656d59144cEFf962E8fAF8926599bCF8"
+
 class OrbiterConnectionModule implements ConnectionModule {
-    async sendAsset(wallet: WalletI, from: Destination, to: Destination, asset: Asset, amount: number): Promise<boolean> {
+    async sendAsset(wallet: WalletI, from: Destination, to: Destination, asset: Asset, amount: number): Promise<[boolean, number]> {
         const logger = globalLogger.connect(wallet.getAddress())
         const chainFrom: Chain = destToChain(from)
         const chainTo: Chain = destToChain(to)
 
         if (chainTo.orbiterCode === undefined) {
             logger.error(`Destination chain ${chainTo.title} does not have orbiter.code field. Cannot transfer via Orbiter.`)
-            return Promise.resolve(false)
+            return Promise.resolve([false, 0])
         }
 
         if (asset !== Asset.ETH) {
             logger.error(`It is possible to tranfer ETH only via Orbiter.`)
-            return Promise.resolve(false)
+            return Promise.resolve([false, 0])
         }
 
         let transferTx: TxInteraction;
@@ -40,6 +41,7 @@ class OrbiterConnectionModule implements ConnectionModule {
 
         const toProvider = new ethers.JsonRpcProvider(chainTo.nodeUrl)
         let balanceBefore: bigint;
+        // eslint-disable-next-line no-constant-condition
         while (true) {
             try {
                 balanceBefore = await toProvider.getBalance(wallet.getAddress())
@@ -49,20 +51,24 @@ class OrbiterConnectionModule implements ConnectionModule {
                 await sleep(10)
             }
         }
-        const [success, hash] = await wallet.sendTransaction(transferTx, chainFrom, 1)
+        const [success,] = await wallet.sendTransaction(transferTx, chainFrom, 1)
 
         if (success === TxResult.Fail) {
             logger.error(`Failed to send transfer tx ${chainFrom.title} -> ${chainTo.title} using Orbiter.`)
-            return Promise.resolve(false)
+            return Promise.resolve([false, 0])
         }
 
-        const result = await waitBalanceChanged(wallet, toProvider, balanceBefore)
+        const [result, newBalance] = await waitBalanceChanged(wallet, toProvider, balanceBefore)
         if (result) {
             globalLogger.connect(wallet.getAddress()).done(`Finished bridge to ${to} using Orbiter. Balance updated.`)
         } else {
             globalLogger.connect(wallet.getAddress()).error(`Could not fetch changed balance for Orbiter ${from} -> ${to}. Check logs.`)
         }
-        return result
+        return Promise.resolve([result, Number(
+            ethers.formatEther(
+                Math.max(0, newBalance - Number(balanceBefore))
+            )
+        )])
     }
 
 }
