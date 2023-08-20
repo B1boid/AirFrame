@@ -72,19 +72,19 @@ export async function getFeeData(provider: UnionProvider, chain: Chain): Promise
     }
 }
 
-export async function getL1Cost(provider: UnionProvider, chain: Chain, from: string, txInteraction: TxInteraction): Promise<number> {
+export async function getL1Cost(provider: UnionProvider, chain: Chain, from: string, txInteraction: TxInteraction): Promise<bigint> {
     try {
-        let optProvider = asL2Provider(new oldethers.providers.JsonRpcProvider(chain.nodeUrl, chain.chainId))
-        let l1GasCost: number = Number((await optProvider.estimateL1GasCost({
+        const optProvider = asL2Provider(new oldethers.providers.JsonRpcProvider(chain.nodeUrl, chain.chainId))
+        const l1GasCost: bigint = (await optProvider.estimateL1GasCost({
             from: from,
             to: txInteraction.to,
             data: txInteraction.data,
             value: txInteraction.value
-        })).toString())
-        return Math.floor(l1GasCost * 1.2) // 20% more to avoid errors if gas price will be higher
+        })).toBigInt()
+        return l1GasCost / BigInt(20) + l1GasCost // + 20%
     } catch (e) {
         globalLogger.error(`Error getting L1 cost | ${e}`)
-        return 0
+        return BigInt(0)
     }
 
 }

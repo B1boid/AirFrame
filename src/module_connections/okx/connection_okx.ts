@@ -45,7 +45,7 @@ class OkxConnectionModule implements ConnectionModule {
                     globalLogger.connect(wallet.getAddress()).error("Failed fetching OKX balance for full withdrawal.")
                     return Promise.resolve([false, 0])
                 }
-                amount = Number(okxAssetBalance) - Number(withdrawalConfig.fee)
+                amount = Number(okxAssetBalance) - Number(withdrawalConfig.fee) // TODO
             }
 
 
@@ -87,11 +87,13 @@ class OkxConnectionModule implements ConnectionModule {
                 return Promise.resolve([false, 0])
             }
             let txTransferToWithdrawAddress: TxInteraction;
+            let bigAmount: bigint
             if (amount === -1) {
-                [amount, txTransferToWithdrawAddress] = await getTxDataForAllBalanceTransfer(wallet, withdrawAddress, asset, chain, EXTRA_GAS_LIMIT, DEFAULT_GAS_PRICE)
+                [bigAmount, txTransferToWithdrawAddress] = await getTxDataForAllBalanceTransfer(wallet, withdrawAddress, asset, chain, EXTRA_GAS_LIMIT, DEFAULT_GAS_PRICE)
+                amount = Number(ethers.formatEther(bigAmount))
             } else {
-                amount = Number(ethers.parseEther(`${amount}`))
-                txTransferToWithdrawAddress = getTxForTransfer(asset, withdrawAddress, amount)
+                bigAmount = ethers.parseEther(`${amount}`)
+                txTransferToWithdrawAddress = getTxForTransfer(asset, withdrawAddress, bigAmount)
             }
 
             txTransferToWithdrawAddress.confirmations = withdrawalConfig.confirmations
@@ -118,7 +120,7 @@ class OkxConnectionModule implements ConnectionModule {
             }
 
             if (subAccount === null) {
-                return Promise.resolve([true, Number(ethers.formatEther(amount))])
+                return Promise.resolve([true, amount])
             }
 
             await sleep(10) // почему-то один раз интернал трансфер зафейлился - давай немного подождем
@@ -151,6 +153,11 @@ class OkxConnectionModule implements ConnectionModule {
             if (retry !== 0) {
                 await sleep(60)
                 changed = await check()
+            }
+            if (changed && changed.code === "0" && changed.data[0]?.state.startsWith("On Hold")) {
+                globalLogger.connect(wallet.getAddress()).warn("Deposit on hold. Same retry.")
+                await sleep(60)
+                continue
             }
             retry++
         }

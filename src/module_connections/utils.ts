@@ -8,7 +8,7 @@ import {ethers} from "ethers-new";
 import {sleep} from "../utils/utils";
 
 // TODO add Currency type
-export function getTxForTransfer(ccy: Asset, to: string, amount: number): TxInteraction {
+export function getTxForTransfer(ccy: Asset, to: string, amount: bigint): TxInteraction {
     switch (ccy) {
         case Asset.ETH:
             return {to: to, data: "", value: amount.toString(), stoppable: true, confirmations: 1, name: "eth-transfer"}

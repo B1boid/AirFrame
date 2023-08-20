@@ -14,6 +14,7 @@ import {WalletActions} from "./classes/actions";
 import {RunConfig, TEST_CONFIG, ZKSYNC_BASIC_CONFIG} from "./config/run_config";
 import {globalLogger} from "./utils/logger";
 import {PromisePool} from "@supercharge/promise-pool";
+import {bot} from "./telegram/bot";
 let prompt = require('password-prompt')
 
 
@@ -34,7 +35,7 @@ async function doTask(password: string, passwordOkx: string, walletActions: Wall
     for (const action of walletActions.actions) {
         try {
             if ("connectionName" in action) {
-                console.log("Connection:", action)
+                globalLogger.connect(wallet.getAddress()).done(`Connection: ${JSON.stringify(action)}`)
                 const connectionModule = connectionModules[action.connectionName]
                 const [status, sent] = await connectionModule.sendAsset(wallet, action.from, action.to, action.asset, action.amount)
                 actionsRes = status
@@ -44,12 +45,12 @@ async function doTask(password: string, passwordOkx: string, walletActions: Wall
                     lastSentAmount = sent
                 }
             } else {
-                console.log("Module:", action)
+                globalLogger.connect(wallet.getAddress()).done(`Module: ${JSON.stringify(action)}`)
                 const blockchainModule = blockchainModules[action.chainName]
                 actionsRes = await blockchainModule.doActivities(wallet, action.activityNames, action.randomOrder, runConfig.waitBetweenModules)
             }
             if (!actionsRes) {
-                console.log("Failed to do activities")
+                globalLogger.connect(wallet.getAddress()).error("Failed to do activities")
                 break
             }
         } catch (e) {
@@ -120,6 +121,8 @@ async function main(){
         resultsCasted.filter(x => x[1]).length === actions.length) {
         globalLogger.done("All accounts finished successfully!")
     }
+
+    await bot.stopPolling()
     return
 }
 

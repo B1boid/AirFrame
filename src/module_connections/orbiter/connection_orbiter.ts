@@ -30,12 +30,14 @@ class OrbiterConnectionModule implements ConnectionModule {
         }
 
         let transferTx: TxInteraction;
+        let bigAmount: bigint
         if (amount === -1) {
-            [amount, transferTx] = await getTxDataForAllBalanceTransfer(wallet, ETH_BRIDGE_ROUTER, asset, chainFrom, EXTRA_GAS_LIMIT, DEFAULT_GAS_PRICE)
+            [bigAmount, transferTx] = await getTxDataForAllBalanceTransfer(wallet, ETH_BRIDGE_ROUTER, asset, chainFrom, EXTRA_GAS_LIMIT, DEFAULT_GAS_PRICE)
+            amount = Number(ethers.formatEther(bigAmount))
             transferTx.value = transferTx.value.substring(0, transferTx.value.length - 4) + chainTo.orbiterCode.toString()
         } else {
-            amount = Number(ethers.parseEther(`${amount}`))
-            transferTx = getTxForTransfer(asset, ETH_BRIDGE_ROUTER, amount)
+            bigAmount = ethers.parseEther(`${amount}`)
+            transferTx = getTxForTransfer(asset, ETH_BRIDGE_ROUTER, bigAmount)
             transferTx.value = transferTx.value.substring(0, transferTx.value.length - 4) + chainTo.orbiterCode.toString()
         }
 

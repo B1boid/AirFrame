@@ -10,7 +10,7 @@ enum LogType {
     WARN = "WARN",
     ERROR = "ERROR",
     SUCCESS = "SUCCESS",
-    SUPER_SUCCESS = "SUPER_SUCCESS"
+    SUPER_SUCCESS = "SUPER SUCCESS"
 }
 
 function getChannel(type: LogType): string | null {
@@ -60,14 +60,14 @@ class Logger implements ILogger{
         this.log(LogType.SUPER_SUCCESS, msg)
     }
 
-    private log(type: LogType, msg: string): void {
+    private async log(type: LogType, msg: string): Promise<void> {
         const message = this.getSpecifiedText(type, msg)
         console.log(message)
         console.log("-----------------------------")
 
         const channel = getChannel(type)
         if (channel) {
-            bot.sendMessage(channel, message, {parse_mode: "MarkdownV2", disable_web_page_preview: true})
+            await bot.sendMessage(channel, message, {parse_mode: "MarkdownV2", disable_web_page_preview: true})
         }
     }
 
@@ -78,7 +78,7 @@ class Logger implements ILogger{
         t.cell('Address', "*GLOBAL*")
         t.cell('Message', `\`${msg}\``)
         t.newRow()
-        return t.printTransposed({separator: "|"})
+        return t.printTransposed()
     }
 }
 

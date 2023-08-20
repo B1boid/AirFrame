@@ -14,6 +14,7 @@ import * as zk from "zksync-web3";
 import {NATIVE_ADDRESS} from "../common_blockchain/routers/common";
 import {Limits} from "../config/run_config";
 import {AnyActions, WalletActions} from "../classes/actions";
+import {BigNumber} from "ethers";
 dotenv.config();
 
 export type EnumDictionary<T extends string | symbol | number, U> = {
@@ -86,7 +87,7 @@ export function printActions(walletActions: WalletActions){
             result += `${action.chainName} [${action.activityNames.join(", ")}]\n`
         }
     }
-    console.log(result)
+    globalLogger.done(`Starting actions:\n${result}`)
 }
 
 export function getActiveAddresses(): string[] {
@@ -155,31 +156,38 @@ export function getOkxCredentialsForSub(addressInfo : AddressInfo, password: str
     throw new Error(`Missing OKX credentials for ${addressInfo.subAccName}.`)
 }
 
-const ESTIMATE_GAS_LIMIT = 500_000 // берем сразу много, чтобы точно на любом чейне сработало. Нужно только для эстимейта, тк если эстимейтить с фул балансом, то падает тк не хватает средств на газ
+const ESTIMATE_GAS_LIMIT = BigInt(500_000) // берем сразу много, чтобы точно на любом чейне сработало. Нужно только для эстимейта, тк если эстимейтить с фул балансом, то падает тк не хватает средств на газ
 export async function getTxDataForAllBalanceTransfer(
     wallet: WalletI, toAddress: string, asset: Asset, fromChain: Chain, extraGasLimit: number, defaultGasPrice: bigint
-): Promise<[number, TxInteraction]> {
+): Promise<[bigint, TxInteraction]> {
     let provider: UnionProvider
     if (fromChain.title === Blockchains.ZkSync) {
         provider = new zk.Provider(fromChain.nodeUrl)
     } else {
         provider = new ethers.JsonRpcProvider(fromChain.nodeUrl, fromChain.chainId)
     }
-    const balance = Number.parseInt((await provider.getBalance(wallet.getAddress())).toString())
+    const balanceOr: bigint | BigNumber = await provider.getBalance(wallet.getAddress())
+    let balance: bigint
+    if (balanceOr instanceof BigNumber) {
+        balance = balanceOr.toBigInt()
+    } else {
+        balance = balanceOr
+    }
+
 
     globalLogger
         .connect(wallet.getAddress())
-        .info(`Amount specified is -1. Fetched balance: ${ethers.formatEther(BigInt(balance))}`)
+        .info(`Amount specified is -1. Fetched balance: ${ethers.formatEther(balance)}`)
 
     const feeData = await getFeeData(provider, fromChain)
 
-    let txTransferToWithdrawAddress = getTxForTransfer(asset, toAddress, balance - (ESTIMATE_GAS_LIMIT * Number(feeData.gasPrice ?? defaultGasPrice)))
+    let txTransferToWithdrawAddress = getTxForTransfer(asset, toAddress, balance - (ESTIMATE_GAS_LIMIT * (feeData.gasPrice ?? defaultGasPrice)))
     const gasLimit = getRandomNearInt(extraGasLimit) + (await getGasLimit(provider, fromChain, wallet.getAddress(), txTransferToWithdrawAddress))
-    let l1Cost: number = 0
+    let l1Cost: bigint = BigInt(0)
     if (fromChain.title === Blockchains.Optimism) {
         l1Cost = await getL1Cost(provider, fromChain, wallet.getAddress(), txTransferToWithdrawAddress)
     }
-    const amount = balance - l1Cost - gasLimit * Number(feeData.maxFeePerGas ?? defaultGasPrice)
+    const amount = balance - l1Cost - BigInt(gasLimit) * (feeData.maxFeePerGas ?? defaultGasPrice)
 
     txTransferToWithdrawAddress = getTxForTransfer(asset, toAddress, amount)
     txTransferToWithdrawAddress.feeData = feeData
