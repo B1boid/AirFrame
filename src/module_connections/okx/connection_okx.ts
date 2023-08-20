@@ -154,7 +154,7 @@ class OkxConnectionModule implements ConnectionModule {
                 await sleep(60)
                 changed = await check()
             }
-            if (changed && changed.code === "0" && changed.data[0]?.state.startsWith("On Hold")) {
+            if (changed && changed.code === "0" && (changed.data[0]?.state.includes("Node is upgrading") || changed.data[0]?.state.includes("On Hold"))) {
                 globalLogger.connect(wallet.getAddress()).warn("Deposit on hold. Same retry.")
                 await sleep(60)
                 continue
