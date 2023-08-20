@@ -8,7 +8,7 @@ import {Contract, ethers, FeeData} from "ethers-new";
 import zk_sync_bridge_official from "../../abi/zksync_bridge_official.json"
 import * as zk from "zksync-web3"
 import {getFeeData, getGasLimit} from "../../utils/gas";
-import {sleep} from "../../utils/utils";
+import {bigMax, sleep} from "../../utils/utils";
 import {destToChain} from "../../module_blockchains/blockchain_modules";
 
 const tag = "Official ZkSync bridge"
@@ -67,7 +67,7 @@ class ZkSyncEthOfficialConectionModule implements ConnectionModule {
         } else {
             globalLogger.connect(wallet.getAddress()).error("Could not fetch changed balance for ZkSync bridge. Check logs.")
         }
-        return Promise.resolve( [result, Number(ethers.formatEther(Math.max(0, newBalance - Number(balanceBefore))))])
+        return Promise.resolve( [result, Number(ethers.formatEther(bigMax(BigInt(0), BigInt(newBalance) - balanceBefore)))])
     }
 
     private async buildTx(wallet: WalletI, from: Destination, amount: number): Promise<TxInteraction | null> {

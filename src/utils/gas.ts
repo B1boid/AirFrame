@@ -9,6 +9,7 @@ import {GAS_PRICE_LIMITS} from "../config/online_config";
 import {globalLogger} from "./logger";
 import {asL2Provider} from "@eth-optimism/sdk"
 
+const HIGH_GAS_PRICE_LOG_STEP = 100
 export async function getGasLimit(provider: UnionProvider, chain: Chain, from: string, txInteraction: TxInteraction): Promise<number> {
     return Number((await provider.estimateGas({
         from: from,
@@ -20,6 +21,7 @@ export async function getGasLimit(provider: UnionProvider, chain: Chain, from: s
 
 export async function getFeeData(provider: UnionProvider, chain: Chain): Promise<FeeData> {
     let curGasPriceInfo: FeeData
+    let counter: number = 0
     while (true) {
         try {
             if (chain.title === Blockchains.ZkSync) {
@@ -58,7 +60,10 @@ export async function getFeeData(provider: UnionProvider, chain: Chain): Promise
             if (curGasPriceInfo.gasPrice !== null && curGasPriceInfo.gasPrice < GAS_PRICE_LIMITS(chain.title)) {
                 return curGasPriceInfo
             }
-            globalLogger.highGasPrice(curGasPriceInfo.gasPrice)
+            if (counter % HIGH_GAS_PRICE_LOG_STEP === 0) {
+                globalLogger.warn(`Gas price is too high | Gas price: ${curGasPriceInfo.gasPrice}`)
+            }
+            counter++
             await sleep(10)
         } catch (e) {
             globalLogger.error(`Error getting gas price | ${e}`)

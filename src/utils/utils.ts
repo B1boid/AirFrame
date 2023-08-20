@@ -185,3 +185,7 @@ export async function getTxDataForAllBalanceTransfer(
     txTransferToWithdrawAddress.feeData = feeData
     return [amount, txTransferToWithdrawAddress]
 }
+
+export function bigMax(a: bigint, b: bigint): bigint {
+    return a > b ? a : b
+}

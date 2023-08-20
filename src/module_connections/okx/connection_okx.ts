@@ -121,6 +121,7 @@ class OkxConnectionModule implements ConnectionModule {
                 return Promise.resolve([true, Number(ethers.formatEther(amount))])
             }
 
+            await sleep(10) // почему-то один раз интернал трансфер зафейлился - давай немного подождем
             return this.internalTransfer(wallet, asset, amount.toString(), subAccount, OKXTransferType.FROM_SUB_TO_MASTER)
         }
 
@@ -204,7 +205,7 @@ class OkxConnectionModule implements ConnectionModule {
 
         globalLogger.connect(wallet.getAddress()).info(`Response: ${JSON.stringify(response)}`)
         if (response === null || response.code !== "0") {
-            globalLogger.connect(wallet.getAddress()).warn("Withdrawal failed.")
+            globalLogger.connect(wallet.getAddress()).warn(`Withdrawal failed. Response: ${JSON.stringify(response)}`)
             return Promise.resolve([false, ""])
         }
 
@@ -228,6 +229,7 @@ class OkxConnectionModule implements ConnectionModule {
             }
         )
 
+        globalLogger.connect(wallet.getAddress()).info(ethers.formatEther(amt))
         globalLogger.connect(wallet.getAddress()).info(`Response: ${JSON.stringify(response)}`)
         if (response === null || response.code !== "0") {
             globalLogger.connect(wallet.getAddress()).warn("Failed transfer from sub to master.")

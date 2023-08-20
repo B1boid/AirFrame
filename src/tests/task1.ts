@@ -100,12 +100,14 @@ const ACTIONS_1: AnyActions[] =  [
         // ZKSYNC_ACTIONS
         // CONNECTION_OKX_TO_ETHEREUM,
         // ETH_ACTIONS
+    // CONNECTION_OPTIMISM_TO_OKX
 ]
 
 
 export const WALLETS_ACTIONS_1: WalletActions[] = [
     // {address: "0x04277AC5706B24F90cD56E58D105a32906C65094", actions: ACTIONS_1},
-    {address: "0x2Fd49f2da0d07102b223D89f290F61b265291952", actions: ACTIONS_1},
+    // {address: "0x2Fd49f2da0d07102b223D89f290F61b265291952", actions: ACTIONS_1},
+    {address: "0xAe638c4a6E5343124cF1c0FA94C6FC53c53769fE", actions: ACTIONS_1},
 ]
 
 

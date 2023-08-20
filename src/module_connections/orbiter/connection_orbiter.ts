@@ -3,7 +3,7 @@ import {TxResult, WalletI} from "../../classes/wallet";
 import {Chain, Destination} from "../../config/chains";
 import {Asset} from "../../config/tokens";
 import {globalLogger} from "../../utils/logger";
-import {getTxDataForAllBalanceTransfer, sleep} from "../../utils/utils";
+import {bigMax, getTxDataForAllBalanceTransfer, sleep} from "../../utils/utils";
 import {TxInteraction} from "../../classes/module";
 import {ethers} from "ethers-new";
 import {getTxForTransfer, waitBalanceChanged} from "../utils";
@@ -66,7 +66,7 @@ class OrbiterConnectionModule implements ConnectionModule {
         }
         return Promise.resolve([result, Number(
             ethers.formatEther(
-                Math.max(0, newBalance - Number(balanceBefore))
+                bigMax(BigInt(0), BigInt(newBalance) - balanceBefore)
             )
         )])
     }
