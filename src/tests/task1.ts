@@ -70,7 +70,7 @@ const CONNECTION_ETHEREUM_TO_OKX: ConnectionAction = {
     from: Destination.Ethereum,
     to: Destination.OKX,
     asset: Asset.ETH,
-    amount: 0.001,
+    amount: -1,
     connectionName: Connections.ExchangeOKX
 }
 
@@ -93,21 +93,23 @@ const BRIDGE_ORBITER_ZKSYNC_TO_OPTIMISM: ConnectionAction = {
 
 const ACTIONS_1: AnyActions[] =  [
         // CONNECTION_OKX_TO_ZKSYNC
-        CONNECTION_OKX_TO_POLYGON,
+        // CONNECTION_OKX_TO_POLYGON,
         // POLYGON_ACTIONS,
-        CONNECTION_POLYGON_TO_OKX
+        // CONNECTION_POLYGON_TO_OKX
         // POLYGON_ACTIONS
         // ZKSYNC_ACTIONS
         // CONNECTION_OKX_TO_ETHEREUM,
         // ETH_ACTIONS
-    // CONNECTION_OPTIMISM_TO_OKX
+       // CONNECTION_OPTIMISM_TO_OKX
+    CONNECTION_ETHEREUM_TO_OKX
 ]
 
 
 export const WALLETS_ACTIONS_1: WalletActions[] = [
     // {address: "0x04277AC5706B24F90cD56E58D105a32906C65094", actions: ACTIONS_1},
     // {address: "0x2Fd49f2da0d07102b223D89f290F61b265291952", actions: ACTIONS_1},
-    {address: "0xAe638c4a6E5343124cF1c0FA94C6FC53c53769fE", actions: ACTIONS_1},
+    // {address: "0xAe638c4a6E5343124cF1c0FA94C6FC53c53769fE", actions: ACTIONS_1},
+    {address: "0x88476513Bb91F30D7fe4d28462DF41f71fd62914", actions: ACTIONS_1},
 ]
 
 

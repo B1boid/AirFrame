@@ -123,7 +123,7 @@ export class MyWallet implements WalletI {
             }
             switch (result) {
                 case TxResult.Success:
-                        this.logger.done(`Tx:${txInteraction.name} Gas used: ${this.curGasLimit}. Gas price: ${this.lastTxGasPrice / BigInt(10 ** 9)}`)
+                        this.logger.info(`Tx:${txInteraction.name} Gas used: ${this.curGasLimit}. Gas price: ${this.lastTxGasPrice / BigInt(10 ** 9)}`)
                     return [TxResult.Success, txHash]
                 case TxResult.Fail:
                     this.logger.warn(`Tx:${txInteraction.name} Tx failed. Try №${retry} | Gas used: ${this.curGasLimit}`)

@@ -94,26 +94,33 @@ async function main(){
     }
 
 
+    const errors: Error[] = []
     const { results} = await PromisePool
         .for(actions)
         .withConcurrency(threads)
-        .process(async (action, index, pool) => {
+        .handleError(async (error, user, pool) => {
+            errors.push(error)
+            return pool.stop()
+        })
+        .process(async (action: WalletActions) => {
             const taskRes = await doTask(password, passwordOkx, action, runConfig)
             const forceStop = needToStop()
             if (!taskRes || forceStop) {
-                pool.stop()
+                const state = {taskRes, forceStop}
+                throw new Error(JSON.stringify(state))
             }
             return [action.address, taskRes, forceStop]
         })
 
     const resultsCasted = results as [string, boolean, boolean][]
+    const errorsCasted: { taskRes: boolean; forceStop: boolean }[] = errors
+        .map((x: Error) => JSON.parse(x.message) as {taskRes: boolean, forceStop: boolean})
 
-
-    if (resultsCasted.filter(x => x[2]).length > 0){
-        globalLogger.done("Force to stop, so finished pending threads and stopped")
+    if (errorsCasted.filter(x => x.forceStop).length > 0){
+        globalLogger.error("Force to stop, so finished pending threads and stopped")
     }
 
-    if (resultsCasted.filter(x => !x[1]).length > 0){
+    if (errorsCasted.filter(x => !x.taskRes).length > 0){
         globalLogger.error("One of the threads failed, so finished pending threads and stopped")
     }
 
