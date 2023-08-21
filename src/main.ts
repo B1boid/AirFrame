@@ -78,7 +78,7 @@ async function doTask(password: string, passwordOkx: string, walletActions: Wall
 async function main(){
     // TODO: online config doesn't work - we need to use tg bot for it
 
-    const runConfig: RunConfig = TEST_CONFIG
+    const runConfig: RunConfig = ZKSYNC_BASIC_CONFIG
 
     const threads: number = runConfig.threads
     const strategy: Strategy = runConfig.strategy

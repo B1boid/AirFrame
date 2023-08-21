@@ -33,7 +33,7 @@ export interface ILogger {
 
 class Logger implements ILogger{
     private highGasCounter = 0
-    connect(address: string, chain: Chain): ILogger {
+    connect(address: string, chain: Chain): ConnectedLogger {
         return new ConnectedLogger(address, chain)
     }
 
@@ -89,7 +89,7 @@ export class ConnectedLogger extends Logger {
         this.chain = chain
     }
 
-    override connect(address: string, chain: Chain): ILogger {
+    override connect(address: string, chain: Chain): ConnectedLogger {
         this.address = address
         this.chain = chain
         return this
