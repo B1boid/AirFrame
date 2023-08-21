@@ -81,7 +81,7 @@ export async function getL1Cost(provider: UnionProvider, chain: Chain, from: str
             data: txInteraction.data,
             value: txInteraction.value
         })).toBigInt()
-        return l1GasCost / BigInt(100) * BigInt(20) + l1GasCost // + 20%
+        return (l1GasCost * BigInt(20)) / BigInt(100) + l1GasCost // + 20%
     } catch (e) {
         globalLogger.error(`Error getting L1 cost | ${e}`)
         return BigInt(0)
