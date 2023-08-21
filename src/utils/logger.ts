@@ -64,7 +64,7 @@ class Logger implements ILogger{
 
         const channel = getChannel(type)
         if (channel) {
-            await bot.sendMessage(channel, message, {parse_mode: "MarkdownV2", disable_web_page_preview: true})
+            await bot.sendMessage(channel, message.substring(0, 4000), {parse_mode: "MarkdownV2", disable_web_page_preview: true})
         }
     }
 
