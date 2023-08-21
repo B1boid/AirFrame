@@ -38,7 +38,7 @@ const CONNECTION_OKX_TO_ZKSYNC: ConnectionAction = {
     from: Destination.OKX,
     to: Destination.ZkSync,
     asset: Asset.ETH,
-    amount: 0.03,
+    amount: 0.05,
     connectionName: Connections.ExchangeOKX
 }
 
@@ -90,6 +90,22 @@ const BRIDGE_ORBITER_ZKSYNC_TO_OPTIMISM: ConnectionAction = {
     connectionName: Connections.Orbiter
 }
 
+const BRIDGE_ORBITER_ZKSYNC_TO_ARBITRUM: ConnectionAction = {
+    from: Destination.ZkSync,
+    to: Destination.Arbitrum,
+    asset: Asset.ETH,
+    amount: -1,
+    connectionName: Connections.Orbiter
+}
+
+const CONNECTION_ARBITRUM_TO_OKX: ConnectionAction = {
+    from: Destination.Arbitrum,
+    to: Destination.OKX,
+    asset: Asset.ETH,
+    amount: -1,
+    connectionName: Connections.ExchangeOKX
+}
+
 
 const ACTIONS_1: AnyActions[] =  [
         // CONNECTION_OKX_TO_ZKSYNC
@@ -101,8 +117,12 @@ const ACTIONS_1: AnyActions[] =  [
         // CONNECTION_OKX_TO_ETHEREUM,
         // ETH_ACTIONS
     // BRIDGE_ORBITER_ZKSYNC_TO_OPTIMISM,
-       CONNECTION_OPTIMISM_TO_OKX
+    //    CONNECTION_OPTIMISM_TO_OKX
     // CONNECTION_ETHEREUM_TO_OKX
+    CONNECTION_OKX_TO_ZKSYNC,
+    BRIDGE_ORBITER_ZKSYNC_TO_ARBITRUM,
+    CONNECTION_ARBITRUM_TO_OKX
+
 ]
 
 

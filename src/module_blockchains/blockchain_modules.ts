@@ -5,6 +5,7 @@ import {EnumDictionary} from "../utils/utils";
 import {Blockchains, Chain, Destination} from "../config/chains";
 import {moduleEthereum} from "./ethereum/ethereum";
 import {moduleOptimism} from "./optimism/optimism";
+import {moduleArbitrum} from "./arbitrum/arbitrum";
 
 
 export const enum PolygonActivity {
@@ -46,7 +47,8 @@ export const blockchainModules: EnumDictionary<Blockchains, BlockchainModule> = 
     [Blockchains.ZkSync]: moduleZkSync,
     [Blockchains.Polygon]: modulePolygon,
     [Blockchains.Ethereum]: moduleEthereum,
-    [Blockchains.Optimism]: moduleOptimism
+    [Blockchains.Optimism]: moduleOptimism,
+    [Blockchains.Arbitrum]: moduleArbitrum
 }
 
 export const destToChain = (destination: Destination): Chain => {

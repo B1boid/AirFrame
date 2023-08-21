@@ -12,7 +12,8 @@ export enum Blockchains {
     ZkSync = "ZkSync",
     Polygon = "Polygon",
     Ethereum = "Ethereum",
-    Optimism = "Optimism"
+    Optimism = "Optimism",
+    Arbitrum = "Arbitrum"
 }
 
 enum Exchanges {
@@ -61,4 +62,14 @@ export const optimismChain: Chain = {
     extraGasLimit: 0,
     explorerUrl: "https://optimistic.etherscan.io",
     orbiterCode: 9007
+}
+
+export const arbitrumChain: Chain = {
+    title: Blockchains.Arbitrum,
+    chainId: 42161,
+    nodeUrl: "https://rpc.ankr.com/arbitrum",
+    symbol: "ETH",
+    extraGasLimit: 0,
+    explorerUrl: "https://arbiscan.io",
+    orbiterCode: 9002
 }
