@@ -1,7 +1,7 @@
 import {TxInteraction} from "../classes/module";
 import {ethers, MaxUint256} from "ethers-new";
 import {globalLogger} from "../utils/logger";
-import {Chain} from "../config/chains";
+import {Chain, ethereumChain} from "../config/chains";
 import {shuffleArray} from "../utils/utils";
 import erc20 from "../abi/erc20.json";
 
@@ -12,7 +12,7 @@ export async function checkAndGetApprovalsInteraction(
     tokenBalance: bigint,
     tokenContract: ethers.Contract
 ): Promise<TxInteraction[]> {
-    let logger = globalLogger.connect(fromAddress)
+    let logger = globalLogger.connect(fromAddress, ethereumChain)
     try {
         let tokenAddress = await tokenContract.getAddress()
         let allowance: bigint = await tokenContract.allowance(fromAddress, spender)

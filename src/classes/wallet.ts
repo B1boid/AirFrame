@@ -1,7 +1,7 @@
 import {TxInteraction} from "./module";
 import {sleep} from "../utils/utils";
 import {ethers, FeeData, toBigInt, TransactionReceipt, TransactionResponse} from "ethers-new";
-import {Blockchains, Chain} from "../config/chains";
+import {Blockchains, Chain, ethereumChain} from "../config/chains";
 import {globalLogger, ILogger} from "../utils/logger"
 import {AddressInfo, OkxCredentials} from "./info";
 import {MAX_TX_WAITING} from "../config/online_config";
@@ -64,7 +64,7 @@ export class MyWallet implements WalletI {
         this.masterCredentials = masterCredentials
         this.subAccountCredentials = subAccountCredentials
         this.subAccountName = addressInfo.subAccName
-        this.logger = globalLogger.connect(this.getAddress())
+        this.logger = globalLogger.connect(this.getAddress(), ethereumChain)
     }
 
     getSubAccountName(): string | null {

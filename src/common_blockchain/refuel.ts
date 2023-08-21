@@ -62,7 +62,7 @@ async function socketRefuel(
             name: name
         }]
     } catch (e) {
-        globalLogger.connect(wallet.getAddress()).warn(`socketRefuel failed ${e}`)
+        globalLogger.connect(wallet.getAddress(), fromChain).warn(`socketRefuel failed ${e}`)
         return []
     }
 }

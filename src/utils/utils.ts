@@ -176,7 +176,7 @@ export async function getTxDataForAllBalanceTransfer(
 
 
     globalLogger
-        .connect(wallet.getAddress())
+        .connect(wallet.getAddress(), fromChain)
         .info(`Amount specified is -1. Fetched balance: ${ethers.formatEther(balance)}`)
 
     const feeData = await getFeeData(provider, fromChain)

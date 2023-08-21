@@ -2,7 +2,7 @@ import axios from "axios";
 import {WalletI} from "../../classes/wallet";
 import {TxInteraction} from "../../classes/module";
 import {ethers, formatEther, formatUnits} from "ethers-new";
-import {Chain} from "../../config/chains";
+import {Chain, ethereumChain} from "../../config/chains";
 import erc20 from "./../../abi/erc20.json";
 import {NATIVE_ADDRESS} from "./common";
 import {checkAndGetApprovalsInteraction} from "../approvals";
@@ -30,7 +30,7 @@ async function getQuote1inch (chainId: number, fromTokenAddress: string, toToken
             });
             return result.data.tx.data
         } catch (error) {
-            globalLogger.connect(fromAddress).warn(`1inch API failed, try: ${i} with error: ${error}`)
+            globalLogger.connect(fromAddress, ethereumChain).warn(`1inch API failed, try: ${i} with error: ${error}`)
             await sleep(5)
         }
     }
@@ -53,7 +53,7 @@ export async function oneInchSwapNativeTo(
         tokenBalance = getExecBalance(execBalance, tokenBalance)!
         let data = await getQuote1inch(chain.chainId, NATIVE_ADDRESS, token, tokenBalance.toString(), wallet.getAddress())
         if (data === null) {
-            let logger = globalLogger.connect(wallet.getAddress())
+            let logger = globalLogger.connect(wallet.getAddress(), chain)
             logger.warn(`1inch quote for ${name} failed, amount: ${formatEther(tokenBalance)}`)
             return []
         }
@@ -67,7 +67,7 @@ export async function oneInchSwapNativeTo(
         })
         return txs
     } catch (e) {
-        let logger = globalLogger.connect(wallet.getAddress())
+        let logger = globalLogger.connect(wallet.getAddress(), chain)
         logger.warn(`${name} failed: ${e}`)
         return []
     }
@@ -88,7 +88,7 @@ export async function oneInchSwap(
         let tokenContract = new ethers.Contract(tokenFrom, erc20, provider)
         let tokenBalance: bigint = await tokenContract.balanceOf(wallet.getAddress())
         if (tokenBalance === BigInt(0)){
-            let logger = globalLogger.connect(wallet.getAddress())
+            let logger = globalLogger.connect(wallet.getAddress(), chain)
             logger.warn(`No balance for ${name}`)
             return []
         }
@@ -96,7 +96,7 @@ export async function oneInchSwap(
         let txs = await checkAndGetApprovalsInteraction(wallet.getAddress(), contracts.oneInchRouter, tokenBalance, tokenContract)
         let data = await getQuote1inch(chain.chainId, tokenFrom, tokenTo, tokenBalance.toString(), wallet.getAddress())
         if (data === null) {
-            let logger = globalLogger.connect(wallet.getAddress())
+            let logger = globalLogger.connect(wallet.getAddress(), chain)
             let decimals = await tokenContract.decimals()
             logger.warn(`1inch quote for ${name} failed, amount: ${formatUnits(tokenBalance.toString(), decimals)}`)
             return []
@@ -111,7 +111,7 @@ export async function oneInchSwap(
         })
         return txs
     } catch (e) {
-        let logger = globalLogger.connect(wallet.getAddress())
+        let logger = globalLogger.connect(wallet.getAddress(), chain)
         logger.warn(`${name} failed: ${e}`)
         return []
     }

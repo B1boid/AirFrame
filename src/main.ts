@@ -15,6 +15,7 @@ import {RunConfig, TEST_CONFIG, ZKSYNC_BASIC_CONFIG} from "./config/run_config";
 import {globalLogger} from "./utils/logger";
 import {PromisePool} from "@supercharge/promise-pool";
 import {bot} from "./telegram/bot";
+import {ethereumChain} from "./config/chains";
 let prompt = require('password-prompt')
 
 
@@ -35,7 +36,7 @@ async function doTask(password: string, passwordOkx: string, walletActions: Wall
     for (const action of walletActions.actions) {
         try {
             if ("connectionName" in action) {
-                globalLogger.connect(wallet.getAddress()).done(`Connection: ${JSON.stringify(action)}`)
+                globalLogger.connect(wallet.getAddress(), ethereumChain).done(`Connection: ${JSON.stringify(action)}`)
                 const connectionModule = connectionModules[action.connectionName]
                 const [status, sent] = await connectionModule.sendAsset(wallet, action.from, action.to, action.asset, action.amount)
                 actionsRes = status
@@ -45,28 +46,28 @@ async function doTask(password: string, passwordOkx: string, walletActions: Wall
                     lastSentAmount = sent
                 }
             } else {
-                globalLogger.connect(wallet.getAddress()).done(`Module: ${JSON.stringify(action)}`)
+                globalLogger.connect(wallet.getAddress(), ethereumChain).done(`Module: ${JSON.stringify(action)}`)
                 const blockchainModule = blockchainModules[action.chainName]
                 actionsRes = await blockchainModule.doActivities(wallet, action.activityNames, action.randomOrder, runConfig.waitBetweenModules)
             }
             if (!actionsRes) {
-                globalLogger.connect(wallet.getAddress()).error("Failed to do activities")
+                globalLogger.connect(wallet.getAddress(), ethereumChain).error("Failed to do activities")
                 break
             }
         } catch (e) {
-            globalLogger.connect(wallet.getAddress()).error(`Uncaught exception. Terminating address activities. Exception: ${e}`)
+            globalLogger.connect(wallet.getAddress(), ethereumChain).error(`Uncaught exception. Terminating address activities. Exception: ${e}`)
             actionsRes = false
             break
         }
         await sleepWithLimits(runConfig.waitBetweenModules)
     }
     if (actionsRes) {
-        globalLogger.connect(address).done(`All done for account! 
+        globalLogger.connect(address, ethereumChain).done(`All done for account! 
         Balance sent for activities: ${firstSentAmount}.
         Last sent via connection module: ${lastSentAmount}.
         Loss (first - last): ${firstSentAmount - lastSentAmount}`)
     } else {
-        globalLogger.connect(address).error("Stop this thread + send emergency-alert")
+        globalLogger.connect(address, ethereumChain).error("Stop this thread + send emergency-alert")
     }
      return actionsRes
 }

@@ -15,9 +15,10 @@ const ETH_BRIDGE_ROUTER = "0x80C67432656d59144cEFf962E8fAF8926599bCF8"
 
 class OrbiterConnectionModule implements ConnectionModule {
     async sendAsset(wallet: WalletI, from: Destination, to: Destination, asset: Asset, amount: number): Promise<[boolean, number]> {
-        const logger = globalLogger.connect(wallet.getAddress())
         const chainFrom: Chain = destToChain(from)
         const chainTo: Chain = destToChain(to)
+        const logger = globalLogger.connect(wallet.getAddress(), chainFrom)
+
 
         if (chainTo.orbiterCode === undefined) {
             logger.error(`Destination chain ${chainTo.title} does not have orbiter.code field. Cannot transfer via Orbiter.`)
@@ -49,7 +50,7 @@ class OrbiterConnectionModule implements ConnectionModule {
                 balanceBefore = await toProvider.getBalance(wallet.getAddress())
                 break
             } catch (e) {
-                globalLogger.connect(wallet.getAddress()).warn(`Failed to fetch initial balance for Orbiter. Exception: ${e}`)
+                globalLogger.connect(wallet.getAddress(), chainTo).warn(`Failed to fetch initial balance for Orbiter. Exception: ${e}`)
                 await sleep(10)
             }
         }
@@ -60,11 +61,11 @@ class OrbiterConnectionModule implements ConnectionModule {
             return Promise.resolve([false, 0])
         }
 
-        const [result, newBalance] = await waitBalanceChanged(wallet, toProvider, balanceBefore)
+        const [result, newBalance] = await waitBalanceChanged(wallet, chainTo, toProvider, balanceBefore)
         if (result) {
-            globalLogger.connect(wallet.getAddress()).done(`Finished bridge to ${to} using Orbiter. Balance updated.`)
+            globalLogger.connect(wallet.getAddress(), chainTo).done(`Finished bridge to ${to} using Orbiter. Balance updated.`)
         } else {
-            globalLogger.connect(wallet.getAddress()).error(`Could not fetch changed balance for Orbiter ${from} -> ${to}. Check logs.`)
+            globalLogger.connect(wallet.getAddress(), chainTo).error(`Could not fetch changed balance for Orbiter ${from} -> ${to}. Check logs.`)
         }
         return Promise.resolve([result, Number(
             ethers.formatEther(

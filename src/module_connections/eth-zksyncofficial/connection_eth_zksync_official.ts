@@ -25,13 +25,13 @@ const L2_BRIDGE_GAS_LIMIT = 733664;
 class ZkSyncEthOfficialConectionModule implements ConnectionModule {
     async sendAsset(wallet: WalletI, from: Destination, to: Destination, asset: Asset, amount: number): Promise<[boolean, number]> {
         if (!(to === Destination.ZkSync && from === Destination.Ethereum)) {
-            globalLogger.connect(wallet.getAddress())
+            globalLogger.connect(wallet.getAddress(), ethereumChain)
                 .error(`Wrong networks for ${tag}. Expected ETH -> ZKSYNC. Found: ${from} -> ${to}.`)
             return Promise.resolve([false, 0])
         }
 
         if (asset !== Asset.ETH) {
-            globalLogger.connect(wallet.getAddress()).error(`Only ETH supported for ${tag}.`)
+            globalLogger.connect(wallet.getAddress(), ethereumChain).error(`Only ETH supported for ${tag}.`)
             return Promise.resolve([false, 0])
         }
 
@@ -42,30 +42,30 @@ class ZkSyncEthOfficialConectionModule implements ConnectionModule {
                 balanceBefore = (await new zk.Provider(zkSyncChain.nodeUrl).getBalance(wallet.getAddress())).toBigInt()
                 break
             } catch (e) {
-                globalLogger.connect(wallet.getAddress()).warn(`Failed to fetch initial balance for ${tag}. Exception: ${e}`)
+                globalLogger.connect(wallet.getAddress(), zkSyncChain).warn(`Failed to fetch initial balance for ${tag}. Exception: ${e}`)
                 await sleep(10)
             }
         }
         const tx = await this.buildTx(wallet, from, amount)
 
         if (tx == null) {
-            globalLogger.connect(wallet.getAddress()).error(`Failed to build bridge transaction for ${tag}.`)
+            globalLogger.connect(wallet.getAddress(), zkSyncChain).error(`Failed to build bridge transaction for ${tag}.`)
             return Promise.resolve([false, 0])
         }
         const [homeResponse, l1Hash] = await wallet.sendTransaction(tx, destToChain(from), 1)
 
         if (homeResponse === TxResult.Fail) {
-            globalLogger.connect(wallet.getAddress()).error(`Failed tx for bridging ${from} -> ${to} using ${tag}.`)
+            globalLogger.connect(wallet.getAddress(), zkSyncChain).error(`Failed tx for bridging ${from} -> ${to} using ${tag}.`)
             return Promise.resolve([false, 0])
         }
-        globalLogger.connect(wallet.getAddress()).info(`Submitted tx ${from} -> ${to} in ${tag}. L1 Hash: ${l1Hash}.`)
+        globalLogger.connect(wallet.getAddress(), zkSyncChain).info(`Submitted tx ${from} -> ${to} in ${tag}. L1 Hash: ${l1Hash}.`)
 
         const [result, newBalance] = await this.waitBalanceChanged(wallet, to, balanceBefore)
 
         if (result) {
-            globalLogger.connect(wallet.getAddress()).done("Finished bridge to ZkSync. Balance updated.")
+            globalLogger.connect(wallet.getAddress(), zkSyncChain).done("Finished bridge to ZkSync. Balance updated.")
         } else {
-            globalLogger.connect(wallet.getAddress()).error("Could not fetch changed balance for ZkSync bridge. Check logs.")
+            globalLogger.connect(wallet.getAddress(), zkSyncChain).error("Could not fetch changed balance for ZkSync bridge. Check logs.")
         }
         return Promise.resolve( [result, Number(ethers.formatEther(bigMax(BigInt(0), BigInt(newBalance) - balanceBefore)))])
     }
@@ -122,7 +122,7 @@ class ZkSyncEthOfficialConectionModule implements ConnectionModule {
                 }
             }
         } catch (e) {
-            globalLogger.connect(wallet.getAddress()).error(`${tag} failed. Exception: ${e}`)
+            globalLogger.connect(wallet.getAddress(), zkSyncChain).error(`${tag} failed. Exception: ${e}`)
             return null
         }
 
@@ -139,20 +139,20 @@ class ZkSyncEthOfficialConectionModule implements ConnectionModule {
                 try {
                     newBalance = (await zkSynProvider.getBalance(wallet.getAddress())).toBigInt()
                 } catch (e) {
-                    globalLogger.connect(wallet.getAddress()).warn(`Failed to fetch new balance for ${tag}. Exception: ${e}`)
+                    globalLogger.connect(wallet.getAddress(), zkSyncChain).warn(`Failed to fetch new balance for ${tag}. Exception: ${e}`)
                     await sleep(10)
                     continue
                 }
-                globalLogger.connect(wallet.getAddress()).info(`Try ${retry + 1}/${MAX_RETIRES_BALANCE_CHANGED}. Waiting for balance changing. Old balance:${ethers.formatEther(balanceBefore)}. New balance: ${ethers.formatEther(newBalance)}`)
+                globalLogger.connect(wallet.getAddress(), zkSyncChain).info(`Try ${retry + 1}/${MAX_RETIRES_BALANCE_CHANGED}. Waiting for balance changing. Old balance:${ethers.formatEther(balanceBefore)}. New balance: ${ethers.formatEther(newBalance)}`)
                 if (newBalance != balanceBefore) {
-                    globalLogger.connect(wallet.getAddress()).success(`Balance changed! New balance: ${ethers.formatEther(newBalance)}`)
+                    globalLogger.connect(wallet.getAddress(), zkSyncChain).success(`Balance changed! New balance: ${ethers.formatEther(newBalance)}`)
                     return Promise.resolve([true, Number(newBalance)])
                 }
                 retry++
                 await sleep(45)
             }
         }
-        globalLogger.connect(wallet.getAddress()).error(`Balance has not changed after ${MAX_RETIRES_BALANCE_CHANGED} tries.`)
+        globalLogger.connect(wallet.getAddress(), zkSyncChain).error(`Balance has not changed after ${MAX_RETIRES_BALANCE_CHANGED} tries.`)
         return Promise.resolve([false, 0]);
     }
 }

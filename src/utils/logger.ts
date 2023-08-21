@@ -1,10 +1,7 @@
 import {bot, ERROR_CHANNEL_ID, SUPER_SUCCESS_CHANNEL_ID, WARN_CHANNEL_ID} from "../telegram/bot";
 import * as console from "console";
+import {Chain} from "../config/chains";
 let Table = require("easy-table")
-
-const ETHERSCAN_BASE_ADDRESS = "https://etherscan.io/address/"
-
-
 enum LogType {
     INFO = "INFO",
     WARN = "WARN",
@@ -36,8 +33,8 @@ export interface ILogger {
 
 class Logger implements ILogger{
     private highGasCounter = 0
-    connect(address: string): ILogger {
-        return new ConnectedLogger(address)
+    connect(address: string, chain: Chain): ILogger {
+        return new ConnectedLogger(address, chain)
     }
 
     info(msg: string): void {
@@ -84,14 +81,17 @@ class Logger implements ILogger{
 
 export class ConnectedLogger extends Logger {
     private address: string
+    private chain: Chain
 
-    constructor(address: string) {
+    constructor(address: string, chain: Chain) {
         super();
         this.address = address
+        this.chain = chain
     }
 
-    override connect(address: string): ILogger {
+    override connect(address: string, chain: Chain): ILogger {
         this.address = address
+        this.chain = chain
         return this
     }
 
@@ -99,7 +99,7 @@ export class ConnectedLogger extends Logger {
         const t = new Table
 
         t.cell('Type', `*${type}*`)
-        t.cell('Address', `[${this.address}](${ETHERSCAN_BASE_ADDRESS}/${this.address})`)
+        t.cell('Address', `[${this.address}](${this.chain.explorerUrl}/address/${this.address})`)
         t.cell('Message', `\`${msg}\``)
         t.newRow()
         return t.printTransposed()
