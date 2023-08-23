@@ -34,6 +34,13 @@ export async function getFeeData(provider: UnionProvider, chain: Chain): Promise
             } else {
                 curGasPriceInfo = await (provider as ethers.JsonRpcProvider).getFeeData()
             }
+            if (chain.title === Blockchains.Arbitrum) {
+                curGasPriceInfo = new FeeData(
+                    curGasPriceInfo.gasPrice,
+                    curGasPriceInfo.gasPrice,
+                    BigInt(0)
+                )
+            }
             if (chain.title === Blockchains.Optimism) {
                 curGasPriceInfo = new FeeData(
                     curGasPriceInfo.maxFeePerGas,
