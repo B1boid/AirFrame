@@ -41,7 +41,7 @@ export async function spaceFiSwapNativeTo(
         })
         return txs
     } catch (e) {
-        globalLogger.connect(wallet.getAddress()).warn(`${name} failed: ${e}`)
+        globalLogger.connect(wallet.getAddress(), chain).warn(`${name} failed: ${e}`)
         return []
     }
 }
@@ -62,7 +62,7 @@ export async function spaceFiSwap(
         let tokenContract = new ethers.Contract(tokenFrom, erc20, provider)
         let tokenBalance: bigint = await tokenContract.balanceOf(wallet.getAddress())
         if (tokenBalance === BigInt(0)){
-            let logger = globalLogger.connect(wallet.getAddress())
+            let logger = globalLogger.connect(wallet.getAddress(), chain)
             logger.warn(`No balance for ${name}`)
             return []
         }
@@ -82,7 +82,7 @@ export async function spaceFiSwap(
         })
         return txs
     } catch (e) {
-        globalLogger.connect(wallet.getAddress()).warn(`${name} failed: ${e}`)
+        globalLogger.connect(wallet.getAddress(), chain).warn(`${name} failed: ${e}`)
         return []
     }
 }

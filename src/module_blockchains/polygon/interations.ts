@@ -28,7 +28,7 @@ export async function polygonWrapUnwrap_wrap(wallet: WalletI): Promise<TxInterac
             name: "polygonWrapUnwrap_wrap"
         }]
     } catch (e) {
-        globalLogger.connect(wallet.getAddress()).warn(`polygonWrapUnwrap_wrap failed: ${e}`)
+        globalLogger.connect(wallet.getAddress(), polygonChain).warn(`polygonWrapUnwrap_wrap failed: ${e}`)
         return []
     }
 }
@@ -48,7 +48,7 @@ export async function polygonWrapUnwrap_unwrap(wallet: WalletI): Promise<TxInter
             name: "polygonWrapUnwrap_unwrap"
         }]
     } catch (e) {
-        globalLogger.connect(wallet.getAddress()).warn(`polygonWrapUnwrap_unwrap failed: ${e}`)
+        globalLogger.connect(wallet.getAddress(), polygonChain).warn(`polygonWrapUnwrap_unwrap failed: ${e}`)
         return []
     }
 }

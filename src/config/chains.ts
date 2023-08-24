@@ -5,13 +5,15 @@ export interface Chain {
   nodeUrl: string
   symbol: string
   extraGasLimit: number
+  explorerUrl: string
   orbiterCode?: number
 }
 export enum Blockchains {
     ZkSync = "ZkSync",
     Polygon = "Polygon",
     Ethereum = "Ethereum",
-    Optimism = "Optimism"
+    Optimism = "Optimism",
+    Arbitrum = "Arbitrum"
 }
 
 enum Exchanges {
@@ -28,6 +30,7 @@ export const zkSyncChain: Chain = {
   nodeUrl: "https://mainnet.era.zksync.io",
   symbol: "ETH",
   extraGasLimit: 100000,
+  explorerUrl: "https://explorer.zksync.io",
   orbiterCode: 9014
 }
 
@@ -37,6 +40,7 @@ export const polygonChain: Chain = {
   nodeUrl: "https://polygon.llamarpc.com",
   symbol: "MATIC",
   extraGasLimit: 100000,
+  explorerUrl: "https://polygonscan.com",
   orbiterCode: 9006
 }
 
@@ -46,6 +50,7 @@ export const ethereumChain: Chain = {
     nodeUrl: "https://rpc.ankr.com/eth",
     symbol: "ETH",
     extraGasLimit: 100000,
+    explorerUrl: "https://etherscan.io",
     orbiterCode: 9001
 }
 
@@ -55,5 +60,16 @@ export const optimismChain: Chain = {
     nodeUrl: "https://rpc.ankr.com/optimism",
     symbol: "ETH",
     extraGasLimit: 0,
+    explorerUrl: "https://optimistic.etherscan.io",
     orbiterCode: 9007
+}
+
+export const arbitrumChain: Chain = {
+    title: Blockchains.Arbitrum,
+    chainId: 42161,
+    nodeUrl: "https://rpc.ankr.com/arbitrum",
+    symbol: "ETH",
+    extraGasLimit: 0,
+    explorerUrl: "https://arbiscan.io",
+    orbiterCode: 9002
 }

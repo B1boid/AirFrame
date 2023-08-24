@@ -63,7 +63,7 @@ export async function syncSwapNativeTo(
         })
         return txs
     } catch (e) {
-        let logger = globalLogger.connect(wallet.getAddress())
+        let logger = globalLogger.connect(wallet.getAddress(), chain)
         logger.warn(`${name} failed: ${e}`)
         return []
     }
@@ -84,7 +84,7 @@ export async function syncSwap(
         let tokenContract = new ethers.Contract(tokenFrom, erc20, provider)
         let tokenBalance: bigint = await tokenContract.balanceOf(wallet.getAddress())
         if (tokenBalance === BigInt(0)){
-            let logger = globalLogger.connect(wallet.getAddress())
+            let logger = globalLogger.connect(wallet.getAddress(), chain)
             logger.warn(`No balance for ${name}`)
             return []
         }
@@ -127,7 +127,7 @@ export async function syncSwap(
         })
         return txs
     } catch (e) {
-        let logger = globalLogger.connect(wallet.getAddress())
+        let logger = globalLogger.connect(wallet.getAddress(), chain)
         logger.warn(`${name} failed: ${e}`)
         return []
     }

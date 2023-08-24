@@ -4,5 +4,5 @@ import {Asset} from "../config/tokens";
 
 
 export interface ConnectionModule {
-    sendAsset(wallet: WalletI, from: Destination, to: Destination, asset: Asset, amount: number): Promise<boolean>
+    sendAsset(wallet: WalletI, from: Destination, to: Destination, asset: Asset, amount: number): Promise<[boolean, number]>
 }

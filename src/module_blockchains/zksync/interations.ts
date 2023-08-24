@@ -35,7 +35,7 @@ export async function zkSyncWrapUnwrap_wrap(wallet: WalletI): Promise<TxInteract
             name: "zkSyncWrapUnwrap_wrap"
         }]
     } catch (e) {
-        globalLogger.connect(wallet.getAddress()).warn(`zkSyncWrapUnwrap_wrap failed: ${e}`)
+        globalLogger.connect(wallet.getAddress(), chain).warn(`zkSyncWrapUnwrap_wrap failed: ${e}`)
         return []
     }
 }
@@ -55,7 +55,7 @@ export async function zkSyncWrapUnwrap_unwrap(wallet: WalletI): Promise<TxIntera
             name: "zkSyncWrapUnwrap_unwrap"
         }]
     } catch (e) {
-        globalLogger.connect(wallet.getAddress()).warn(`zkSyncWrapUnwrap_unwrap failed: ${e}`)
+        globalLogger.connect(wallet.getAddress(), chain).warn(`zkSyncWrapUnwrap_unwrap failed: ${e}`)
         return []
     }
 }
@@ -129,7 +129,7 @@ export async function zkSyncMintZnsId_mint(wallet: WalletI): Promise<TxInteracti
 
         return txs
     } catch (e) {
-        globalLogger.connect(wallet.getAddress()).warn(`zkSyncMintZnsId_mint failed: ${e}`)
+        globalLogger.connect(wallet.getAddress(), chain).warn(`zkSyncMintZnsId_mint failed: ${e}`)
         return []
     }
 }
@@ -174,7 +174,7 @@ export async function zkSyncEraLendCycle_supply(wallet: WalletI): Promise<TxInte
             name: "zkSyncEraLendCycle_supply"
         }]
     } catch (e) {
-        globalLogger.connect(wallet.getAddress()).warn(`zkSyncEraLendCycle_supply failed: ${e}`)
+        globalLogger.connect(wallet.getAddress(), chain).warn(`zkSyncEraLendCycle_supply failed: ${e}`)
         return []
     }
 }
@@ -196,7 +196,7 @@ export async function zkSyncEraLendCycle_withdraw(wallet: WalletI): Promise<TxIn
             name: "zkSyncEraLendCycle_withdraw"
         }]
     } catch (e) {
-        globalLogger.connect(wallet.getAddress()).warn(`zkSyncEraLendCycle_withdraw failed: ${e}`)
+        globalLogger.connect(wallet.getAddress(), chain).warn(`zkSyncEraLendCycle_withdraw failed: ${e}`)
         return []
     }
 }
@@ -228,7 +228,7 @@ export async function zkSyncReactFusionCycle_supply(wallet: WalletI): Promise<Tx
             name: "zkSyncReactFusionCycle_supply"
         }]
     } catch (e) {
-        globalLogger.connect(wallet.getAddress()).warn(`zkSyncReactFusionCycle_supply failed: ${e}`)
+        globalLogger.connect(wallet.getAddress(), chain).warn(`zkSyncReactFusionCycle_supply failed: ${e}`)
         return []
     }
 }
@@ -250,7 +250,7 @@ export async function zkSyncReactFusionCycle_withdraw(wallet: WalletI): Promise<
             name: "zkSyncReactFusionCycle_withdraw"
         }]
     } catch (e) {
-        globalLogger.connect(wallet.getAddress()).warn(`zkSyncReactFusionCycle_withdraw failed: ${e}`)
+        globalLogger.connect(wallet.getAddress(), chain).warn(`zkSyncReactFusionCycle_withdraw failed: ${e}`)
         return []
     }
 }
@@ -276,7 +276,7 @@ export async function zkSyncParaspaceCycle_supply(wallet: WalletI): Promise<TxIn
             name: "zkSyncParaspaceCycle_supply"
         }]
     } catch (e) {
-        globalLogger.connect(wallet.getAddress()).warn(`zkSyncParaspaceCycle_supply failed: ${e}`)
+        globalLogger.connect(wallet.getAddress(), chain).warn(`zkSyncParaspaceCycle_supply failed: ${e}`)
         return []
     }
 }
@@ -298,7 +298,7 @@ export async function zkSyncParaspaceCycle_withdraw(wallet: WalletI): Promise<Tx
             name: "zkSyncParaspaceCycle_withdraw"
         }]
     } catch (e) {
-        globalLogger.connect(wallet.getAddress()).warn(`zkSyncParaspaceCycle_withdraw failed: ${e}`)
+        globalLogger.connect(wallet.getAddress(), chain).warn(`zkSyncParaspaceCycle_withdraw failed: ${e}`)
         return []
     }
 }
@@ -330,7 +330,7 @@ export async function zkSyncRhinoCycle_deposit(wallet: WalletI): Promise<TxInter
             name: "zkSyncRhinoCycle_deposit"
         }]
     } catch (e){
-        globalLogger.connect(wallet.getAddress()).warn(`zkSyncRhinoCycle_deposit failed: ${e}`)
+        globalLogger.connect(wallet.getAddress(), chain).warn(`zkSyncRhinoCycle_deposit failed: ${e}`)
         return []
     }
 }

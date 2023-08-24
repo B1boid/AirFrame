@@ -9,6 +9,7 @@ import {GAS_PRICE_LIMITS} from "../config/online_config";
 import {globalLogger} from "./logger";
 import {asL2Provider} from "@eth-optimism/sdk"
 
+const HIGH_GAS_PRICE_LOG_STEP = 100
 export async function getGasLimit(provider: UnionProvider, chain: Chain, from: string, txInteraction: TxInteraction): Promise<number> {
     return Number((await provider.estimateGas({
         from: from,
@@ -20,6 +21,7 @@ export async function getGasLimit(provider: UnionProvider, chain: Chain, from: s
 
 export async function getFeeData(provider: UnionProvider, chain: Chain): Promise<FeeData> {
     let curGasPriceInfo: FeeData
+    let counter: number = 0
     while (true) {
         try {
             if (chain.title === Blockchains.ZkSync) {
@@ -31,6 +33,13 @@ export async function getFeeData(provider: UnionProvider, chain: Chain): Promise
                 )
             } else {
                 curGasPriceInfo = await (provider as ethers.JsonRpcProvider).getFeeData()
+            }
+            if (chain.title === Blockchains.Arbitrum) {
+                curGasPriceInfo = new FeeData(
+                    curGasPriceInfo.gasPrice,
+                    curGasPriceInfo.gasPrice,
+                    BigInt(0)
+                )
             }
             if (chain.title === Blockchains.Optimism) {
                 curGasPriceInfo = new FeeData(
@@ -58,7 +67,10 @@ export async function getFeeData(provider: UnionProvider, chain: Chain): Promise
             if (curGasPriceInfo.gasPrice !== null && curGasPriceInfo.gasPrice < GAS_PRICE_LIMITS(chain.title)) {
                 return curGasPriceInfo
             }
-            globalLogger.warn(`Gas price is too high | Gas price: ${curGasPriceInfo.gasPrice}`)
+            if (counter % HIGH_GAS_PRICE_LOG_STEP === 0) {
+                globalLogger.warn(`Gas price is too high | Gas price: ${curGasPriceInfo.gasPrice}`)
+            }
+            counter++
             await sleep(10)
         } catch (e) {
             globalLogger.error(`Error getting gas price | ${e}`)
@@ -67,19 +79,19 @@ export async function getFeeData(provider: UnionProvider, chain: Chain): Promise
     }
 }
 
-export async function getL1Cost(provider: UnionProvider, chain: Chain, from: string, txInteraction: TxInteraction): Promise<number> {
+export async function getL1Cost(provider: UnionProvider, chain: Chain, from: string, txInteraction: TxInteraction): Promise<bigint> {
     try {
-        let optProvider = asL2Provider(new oldethers.providers.JsonRpcProvider(chain.nodeUrl, chain.chainId))
-        let l1GasCost: number = Number((await optProvider.estimateL1GasCost({
+        const optProvider = asL2Provider(new oldethers.providers.JsonRpcProvider(chain.nodeUrl, chain.chainId))
+        const l1GasCost: bigint = (await optProvider.estimateL1GasCost({
             from: from,
             to: txInteraction.to,
             data: txInteraction.data,
             value: txInteraction.value
-        })).toString())
-        return Math.floor(l1GasCost * 1.2) // 20% more to avoid errors if gas price will be higher
+        })).toBigInt()
+        return (l1GasCost * BigInt(20)) / BigInt(100) + l1GasCost // + 20%
     } catch (e) {
         globalLogger.error(`Error getting L1 cost | ${e}`)
-        return 0
+        return BigInt(0)
     }
 
 }

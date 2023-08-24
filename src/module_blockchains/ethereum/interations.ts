@@ -30,7 +30,7 @@ export async function ethWrapUnwrap_wrap(wallet: WalletI): Promise<TxInteraction
             name: "ethWrapUnwrap_wrap"
         }]
     } catch (e) {
-        globalLogger.connect(wallet.getAddress()).warn(`ethWrapUnwrap_wrap failed: ${e}`)
+        globalLogger.connect(wallet.getAddress(), chain).warn(`ethWrapUnwrap_wrap failed: ${e}`)
         return []
     }
 }
@@ -50,7 +50,7 @@ export async function ethWrapUnwrap_unwrap(wallet: WalletI): Promise<TxInteracti
             name: "ethWrapUnwrap_unwrap"
         }]
     } catch (e) {
-        globalLogger.connect(wallet.getAddress()).warn(`ethWrapUnwrap_unwrap failed: ${e}`)
+        globalLogger.connect(wallet.getAddress(), chain).warn(`ethWrapUnwrap_unwrap failed: ${e}`)
         return []
     }
 }
@@ -78,7 +78,7 @@ export async function ethRandomMint_mint(wallet: WalletI): Promise<TxInteraction
         {to: contracts.nftMintParrot, value: "0", data: "0xa0712d68000000000000000000000000000000000000000000000000000000000000000172db8c0b"},
         {to: contracts.nftMintDream, value: "0", data: "0xa0712d68000000000000000000000000000000000000000000000000000000000000000172db8c0b"},
         {to: contracts.nftMintRaid, value: "0", data: "0xa0712d68000000000000000000000000000000000000000000000000000000000000000172db8c0b"},
-        {to: contracts.nftMintGlow, value: "0.00005", data: "0xa0712d68000000000000000000000000000000000000000000000000000000000000000172db8c0b"}
+        {to: contracts.nftMintGlow, value: "0", data: "0xa0712d68000000000000000000000000000000000000000000000000000000000000000172db8c0b"}
     ])
     return [{
         ...nft,
@@ -104,7 +104,7 @@ export async function ethDepositToZkLite_deposit(wallet: WalletI): Promise<TxInt
             name: "ethDepositToZkLite_deposit"
         }]
     } catch (e) {
-        globalLogger.connect(wallet.getAddress()).warn(`ethDepositToZkLite_deposit failed: ${e}`)
+        globalLogger.connect(wallet.getAddress(), chain).warn(`ethDepositToZkLite_deposit failed: ${e}`)
         return []
     }
 }
@@ -151,7 +151,7 @@ export async function ethBlurCycle_withdraw(wallet: WalletI): Promise<TxInteract
             name: "ethBlurCycle_withdraw"
         }]
     } catch (e) {
-        globalLogger.connect(wallet.getAddress()).warn(`ethBlurCycle_withdraw failed: ${e}`)
+        globalLogger.connect(wallet.getAddress(), chain).warn(`ethBlurCycle_withdraw failed: ${e}`)
         return []
     }
 }
@@ -179,7 +179,7 @@ export async function ethFakeUniExec_do(wallet: WalletI): Promise<TxInteraction[
             name: "ethFakeUniExec_do"
         }]
     } catch (e) {
-        globalLogger.connect(wallet.getAddress()).warn(`ethFakeUniExec_do failed: ${e}`)
+        globalLogger.connect(wallet.getAddress(), chain).warn(`ethFakeUniExec_do failed: ${e}`)
         return []
     }
 }
@@ -321,7 +321,7 @@ export async function ethRandomStuff_do(wallet: WalletI): Promise<TxInteraction[
         }
         return []
     } catch (e) {
-        globalLogger.connect(wallet.getAddress()).warn(`ethRandomStuff_do failed: ${e}`)
+        globalLogger.connect(wallet.getAddress(), chain).warn(`ethRandomStuff_do failed: ${e}`)
         return []
     }
 }

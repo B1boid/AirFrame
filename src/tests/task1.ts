@@ -30,7 +30,7 @@ const CONNECTION_OKX_TO_POLYGON: ConnectionAction = {
     from: Destination.OKX,
     to: Destination.Polygon,
     asset: Asset.MATIC,
-    amount: 2,
+    amount: 3,
     connectionName: Connections.ExchangeOKX
 }
 
@@ -38,7 +38,7 @@ const CONNECTION_OKX_TO_ZKSYNC: ConnectionAction = {
     from: Destination.OKX,
     to: Destination.ZkSync,
     asset: Asset.ETH,
-    amount: 0.03,
+    amount: 0.05,
     connectionName: Connections.ExchangeOKX
 }
 
@@ -70,7 +70,7 @@ const CONNECTION_ETHEREUM_TO_OKX: ConnectionAction = {
     from: Destination.Ethereum,
     to: Destination.OKX,
     asset: Asset.ETH,
-    amount: 0.001,
+    amount: -1,
     connectionName: Connections.ExchangeOKX
 }
 
@@ -90,6 +90,22 @@ const BRIDGE_ORBITER_ZKSYNC_TO_OPTIMISM: ConnectionAction = {
     connectionName: Connections.Orbiter
 }
 
+const BRIDGE_ORBITER_ZKSYNC_TO_ARBITRUM: ConnectionAction = {
+    from: Destination.ZkSync,
+    to: Destination.Arbitrum,
+    asset: Asset.ETH,
+    amount: -1,
+    connectionName: Connections.Orbiter
+}
+
+const CONNECTION_ARBITRUM_TO_OKX: ConnectionAction = {
+    from: Destination.Arbitrum,
+    to: Destination.OKX,
+    asset: Asset.ETH,
+    amount: -1,
+    connectionName: Connections.ExchangeOKX
+}
+
 
 const ACTIONS_1: AnyActions[] =  [
         // CONNECTION_OKX_TO_ZKSYNC
@@ -99,13 +115,22 @@ const ACTIONS_1: AnyActions[] =  [
         // POLYGON_ACTIONS
         // ZKSYNC_ACTIONS
         // CONNECTION_OKX_TO_ETHEREUM,
-        ETH_ACTIONS
+        // ETH_ACTIONS
+    // BRIDGE_ORBITER_ZKSYNC_TO_OPTIMISM,
+    //    CONNECTION_OPTIMISM_TO_OKX
+    // CONNECTION_ETHEREUM_TO_OKX
+    CONNECTION_OKX_TO_ZKSYNC,
+    BRIDGE_ORBITER_ZKSYNC_TO_ARBITRUM,
+    CONNECTION_ARBITRUM_TO_OKX
+
 ]
 
 
 export const WALLETS_ACTIONS_1: WalletActions[] = [
-    {address: "0x04277AC5706B24F90cD56E58D105a32906C65094", actions: ACTIONS_1},
-    // {address: "0x0..0", actions: ACTIONS_1},
+    // {address: "0x04277AC5706B24F90cD56E58D105a32906C65094", actions: ACTIONS_1},
+    // {address: "0x2Fd49f2da0d07102b223D89f290F61b265291952", actions: ACTIONS_1},
+    // {address: "0xAe638c4a6E5343124cF1c0FA94C6FC53c53769fE", actions: ACTIONS_1},
+    {address: "0x88476513Bb91F30D7fe4d28462DF41f71fd62914", actions: ACTIONS_1},
 ]
 
 

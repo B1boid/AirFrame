@@ -33,7 +33,7 @@ enum DepositWithdrawType {
 }
 
 class OkxConnectionModule implements ConnectionModule {
-    async sendAsset(wallet: WalletI, from: Destination, to: Destination, asset: Asset, amount: number): Promise<boolean> {
+    async sendAsset(wallet: WalletI, from: Destination, to: Destination, asset: Asset, amount: number): Promise<[boolean, number]> {
         if (from === Destination.OKX) {
             const chain: Chain = destToChain(to)
             const withdrawalConfig: OKXWithdrawalConfig = okxWithdrawalConfig(asset, chain.title)
@@ -42,18 +42,18 @@ class OkxConnectionModule implements ConnectionModule {
                 const okxAssetBalance = await this.getBalance(wallet, asset, null) // get master balance for withdrawal
 
                 if (okxAssetBalance === null) {
-                    globalLogger.connect(wallet.getAddress()).error("Failed fetching OKX balance for full withdrawal.")
-                    return Promise.resolve(false)
+                    globalLogger.connect(wallet.getAddress(), chain).error("Failed fetching OKX balance for full withdrawal.")
+                    return Promise.resolve([false, 0])
                 }
-                amount = Number(okxAssetBalance) - Number(withdrawalConfig.fee)
+                amount = Number(okxAssetBalance) - Number(withdrawalConfig.fee) // TODO
             }
 
 
             const [withdrawSubmitStatus, wdId] = await this.withdraw(wallet, asset, amount.toString(), withdrawalConfig.fee, chain)
 
             if (!withdrawSubmitStatus) {
-                globalLogger.connect(wallet.getAddress()).error("Something went wrong during withdrawal creation.")
-                return Promise.resolve(false)
+                globalLogger.connect(wallet.getAddress(), chain).error("Something went wrong during withdrawal creation.")
+                return Promise.resolve([false, 0])
             }
 
             const submitStatus = await this.depositWithdrawFinished(
@@ -65,41 +65,44 @@ class OkxConnectionModule implements ConnectionModule {
             )
 
             if (!submitStatus) {
-                globalLogger.connect(wallet.getAddress()).error("Could not fetch successful withdrawal. Check logs.")
+                globalLogger.connect(wallet.getAddress(), chain).error("Could not fetch successful withdrawal. Check logs.")
             } else {
-                globalLogger.connect(wallet.getAddress()).success(`Successful withdrawal from OKX to ${to}.`)
+                globalLogger.connect(wallet.getAddress(), chain).done(`Successful withdrawal from OKX to ${to}.`)
             }
 
-            return Promise.resolve(submitStatus)
+            return Promise.resolve([submitStatus, amount])
         } else if (to == Destination.OKX) {
             const withdrawAddress = wallet.getWithdrawAddress()
+            const chain: Chain = destToChain(from)
 
             if (withdrawAddress === null) {
-                globalLogger.connect(wallet.getAddress()).error("No withdraw address.")
-                return Promise.resolve(false)
+                globalLogger.connect(wallet.getAddress(), chain).error("No withdraw address.")
+                return Promise.resolve([false, 0])
             }
             const subAccount = wallet.getSubAccountName()!
 
-            const chain: Chain = destToChain(from)
+
             const withdrawalConfig: OKXWithdrawalConfig = okxWithdrawalConfig(asset, chain.title)
             if (withdrawalConfig.confirmations === -1) {
-                globalLogger.connect(wallet.getAddress()).error("Chain is not supported for depositing to OKX ")
-                return Promise.resolve(false)
+                globalLogger.connect(wallet.getAddress(), chain).error("Chain is not supported for depositing to OKX ")
+                return Promise.resolve([false, 0])
             }
             let txTransferToWithdrawAddress: TxInteraction;
+            let bigAmount: bigint
             if (amount === -1) {
-                [amount, txTransferToWithdrawAddress] = await getTxDataForAllBalanceTransfer(wallet, withdrawAddress, asset, chain, EXTRA_GAS_LIMIT, DEFAULT_GAS_PRICE)
+                [bigAmount, txTransferToWithdrawAddress] = await getTxDataForAllBalanceTransfer(wallet, withdrawAddress, asset, chain, EXTRA_GAS_LIMIT, DEFAULT_GAS_PRICE)
+                amount = Number(ethers.formatEther(bigAmount))
             } else {
-                amount = Number(ethers.parseEther(`${amount}`))
-                txTransferToWithdrawAddress = getTxForTransfer(asset, withdrawAddress, amount)
+                bigAmount = ethers.parseEther(`${amount}`)
+                txTransferToWithdrawAddress = getTxForTransfer(asset, withdrawAddress, bigAmount)
             }
 
             txTransferToWithdrawAddress.confirmations = withdrawalConfig.confirmations
 
             const [resWithdraw, txHash]: [TxResult, string] = await wallet.sendTransaction(txTransferToWithdrawAddress, chain, 1)
             if (resWithdraw === TxResult.Fail) {
-                globalLogger.connect(wallet.getAddress()).error("Transaction failed.")
-                return Promise.resolve(false)
+                globalLogger.connect(wallet.getAddress(), chain).error("Transaction failed.")
+                return Promise.resolve([false, 0])
             }
 
 
@@ -112,15 +115,16 @@ class OkxConnectionModule implements ConnectionModule {
             )
 
             if (!submitStatus) {
-                globalLogger.connect(wallet.getAddress()).error("Could not fetch successful deposit. Check logs.")
+                globalLogger.connect(wallet.getAddress(), chain).error("Could not fetch successful deposit. Check logs.")
             } else {
-                globalLogger.connect(wallet.getAddress()).success("Successful deposit. Balance updated.")
+                globalLogger.connect(wallet.getAddress(), chain).done("Successful deposit. Balance updated.")
             }
 
             if (subAccount === null) {
-                return Promise.resolve(true)
+                return Promise.resolve([true, amount])
             }
 
+            await sleep(10) // почему-то один раз интернал трансфер зафейлился - давай немного подождем
             return this.internalTransfer(wallet, asset, amount.toString(), subAccount, OKXTransferType.FROM_SUB_TO_MASTER)
         }
 
@@ -129,7 +133,8 @@ class OkxConnectionModule implements ConnectionModule {
 
     private async depositWithdrawFinished(wallet: WalletI, txOrWdId: string, ccy: Asset, chain: Blockchains,
                                           opType: DepositWithdrawType): Promise<boolean> {
-        globalLogger.connect(wallet.getAddress()).info(`Waiting for tx/wd ${txOrWdId} to complete on OKX.`)
+        const blockchain = destToChain(chain)
+        globalLogger.connect(wallet.getAddress(), blockchain).info(`Waiting for tx/wd ${txOrWdId} to complete on OKX.`)
         const check = (() => this.fetchOKX<OKXGetDepositWithdrawalStatusResponse>(
             wallet,
             Method.GET,
@@ -146,20 +151,25 @@ class OkxConnectionModule implements ConnectionModule {
         const successStatus = opType === DepositWithdrawType.DEPOSIT ?
             "Deposit complete" : "Withdrawal complete"
         while (retry < MAX_TRIES && (!changed || changed.code !== "0" || !changed.data[0]?.state.startsWith(successStatus))) {
-            globalLogger.connect(wallet.getAddress()).info(`Checking if tx/wd ${txOrWdId} is completed. Last status: ${changed?.data[0]?.state}. Try ${retry + 1}/${MAX_TRIES}.`)
+            globalLogger.connect(wallet.getAddress(), blockchain).info(`Checking if tx/wd ${txOrWdId} is completed. Last status: ${changed?.data[0]?.state}. Try ${retry + 1}/${MAX_TRIES}.`)
             if (retry !== 0) {
                 await sleep(60)
                 changed = await check()
+            }
+            if (changed && changed.code === "0" && (changed.data[0]?.state.includes("Node is upgrading") || changed.data[0]?.state.includes("On Hold"))) {
+                globalLogger.connect(wallet.getAddress(), blockchain).warn("Deposit on hold. Same retry.")
+                await sleep(60)
+                continue
             }
             retry++
         }
 
         if (changed === null) {
-            globalLogger.connect(wallet.getAddress()).error(`Final status fetch: ${JSON.stringify(changed)}.`)
+            globalLogger.connect(wallet.getAddress(), blockchain).error(`Final status fetch: ${JSON.stringify(changed)}.`)
             return Promise.resolve(false)
         }
 
-        globalLogger.connect(wallet.getAddress()).success(`Final status fetch: ${JSON.stringify(changed)}.`)
+        globalLogger.connect(wallet.getAddress(), blockchain).done(`Final status fetch: ${JSON.stringify(changed)}.`)
         return Promise.resolve(changed.code === "0" && changed.data[0].state.split(":")[0] === successStatus)
     }
 
@@ -179,7 +189,7 @@ class OkxConnectionModule implements ConnectionModule {
         )
 
         if (!response || response.code !== "0") {
-            globalLogger.connect(wallet.getAddress()).warn(`Cannot fetch balance. Response: ${response}`)
+            globalLogger.connect(wallet.getAddress(), ethereumChain).warn(`Cannot fetch balance. Response: ${response}`)
             return null
         }
 
@@ -202,9 +212,9 @@ class OkxConnectionModule implements ConnectionModule {
             }
         )
 
-        globalLogger.connect(wallet.getAddress()).info(`Response: ${JSON.stringify(response)}`)
+        globalLogger.connect(wallet.getAddress(), chain).info(`Response: ${JSON.stringify(response)}`)
         if (response === null || response.code !== "0") {
-            globalLogger.connect(wallet.getAddress()).warn("Withdrawal failed.")
+            globalLogger.connect(wallet.getAddress(), chain).warn(`Withdrawal failed. Response: ${JSON.stringify(response)}`)
             return Promise.resolve([false, ""])
         }
 
@@ -212,7 +222,7 @@ class OkxConnectionModule implements ConnectionModule {
     }
 
     private async internalTransfer(wallet: WalletI, ccy: Asset, amt: string,
-                                   subAccountName: string, transferType: OKXTransferType): Promise<boolean> {
+                                   subAccountName: string, transferType: OKXTransferType): Promise<[boolean, number]> {
         const response = await this.fetchOKX<OKXTransferResponse>(
             wallet,
             Method.POST,
@@ -220,7 +230,7 @@ class OkxConnectionModule implements ConnectionModule {
             wallet.getMasterCredentials(),
             {
                 ccy: ccy,
-                amt: ethers.formatEther(amt).toString(),
+                amt: amt,
                 from: "6", // funding account
                 to: "6", // funding account
                 subAcct: subAccountName,
@@ -228,17 +238,18 @@ class OkxConnectionModule implements ConnectionModule {
             }
         )
 
-        globalLogger.connect(wallet.getAddress()).info(`Response: ${JSON.stringify(response)}`)
+        globalLogger.connect(wallet.getAddress(), ethereumChain).info(`From sub to master: ${amt}`)
+        globalLogger.connect(wallet.getAddress(), ethereumChain).info(`Response: ${JSON.stringify(response)}`)
         if (response === null || response.code !== "0") {
-            globalLogger.connect(wallet.getAddress()).warn("Failed transfer from sub to master.")
-            return Promise.resolve(false)
+            globalLogger.connect(wallet.getAddress(), ethereumChain).warn("Failed transfer from sub to master.")
+            return Promise.resolve([false, 0])
         }
 
-        globalLogger.connect(wallet.getAddress()).success("Successfully transferred assets from sub to master.")
+        globalLogger.connect(wallet.getAddress(), ethereumChain).done("Successfully transferred assets from sub to master.")
 
         // TODO maybe add waiting for funds transfer (but it seems fast)
 
-        return Promise.resolve(true)
+        return Promise.resolve([true, Number(amt)])
     }
 
     private async fetchOKX<T>(wallet: WalletI, method: Method, okxApiMethod: OKXApiMethod,

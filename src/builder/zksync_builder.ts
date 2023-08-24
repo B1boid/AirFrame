@@ -211,7 +211,17 @@ function generateZkSync(accInfo: Features, actions: AnyActions[]): void {
     }
     actions.push(ZKSYNC_ACTIONS)
 
-    if (getRandomInt(0, 100) <= 100){ // okx deposit doesn't work :(
+    // okx deposit doesn't work :(
+    // const CONNECTION_ZKSYNC_TO_OKX: ConnectionAction = {
+    //     from: Destination.ZkSync,
+    //     to: Destination.OKX,
+    //     asset: Asset.ETH,
+    //     amount: -1,
+    //     connectionName: Connections.ExchangeOKX
+    // }
+    // actions.push(CONNECTION_ZKSYNC_TO_OKX)
+
+    if (getRandomInt(0, 100) <= 66){ // 66% chance to use optimism
         const BRIDGE_ORBITER_ZKSYNC_TO_OPTIMISM: ConnectionAction = {
             from: Destination.ZkSync,
             to: Destination.Optimism,
@@ -229,14 +239,22 @@ function generateZkSync(accInfo: Features, actions: AnyActions[]): void {
         }
         actions.push(CONNECTION_OPTIMISM_TO_OKX)
     } else {
-        const CONNECTION_ZKSYNC_TO_OKX: ConnectionAction = {
+        const BRIDGE_ORBITER_ZKSYNC_TO_ARB: ConnectionAction = {
             from: Destination.ZkSync,
+            to: Destination.Arbitrum,
+            asset: Asset.ETH,
+            amount: -1,
+            connectionName: Connections.Orbiter
+        }
+        actions.push(BRIDGE_ORBITER_ZKSYNC_TO_ARB)
+        const CONNECTION_ARB_TO_OKX: ConnectionAction = {
+            from: Destination.Arbitrum,
             to: Destination.OKX,
             asset: Asset.ETH,
             amount: -1,
             connectionName: Connections.ExchangeOKX
         }
-        actions.push(CONNECTION_ZKSYNC_TO_OKX)
+        actions.push(CONNECTION_ARB_TO_OKX)
     }
 }
 

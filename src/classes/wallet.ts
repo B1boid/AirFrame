@@ -1,8 +1,8 @@
 import {TxInteraction} from "./module";
 import {sleep} from "../utils/utils";
 import {ethers, FeeData, toBigInt, TransactionReceipt, TransactionResponse} from "ethers-new";
-import {Blockchains, Chain} from "../config/chains";
-import {globalLogger, ILogger} from "../utils/logger"
+import {Blockchains, Chain, ethereumChain} from "../config/chains";
+import {ConnectedLogger, globalLogger, ILogger} from "../utils/logger"
 import {AddressInfo, OkxCredentials} from "./info";
 import {MAX_TX_WAITING} from "../config/online_config";
 import * as zk from "zksync-web3";
@@ -51,7 +51,7 @@ export class MyWallet implements WalletI {
     private readonly subAccountCredentials: OkxCredentials | null
     private readonly withdrawAddress: string | null
     private readonly subAccountName: string | null
-    private readonly logger: ILogger;
+    private readonly logger: ConnectedLogger;
     private curGasLimit: number = 0
     private lastTxGasPrice: bigint = BigInt(0)
     private curGasPriceInfo: FeeData = new FeeData(BigInt(0), BigInt(0), BigInt(0));
@@ -64,7 +64,7 @@ export class MyWallet implements WalletI {
         this.masterCredentials = masterCredentials
         this.subAccountCredentials = subAccountCredentials
         this.subAccountName = addressInfo.subAccName
-        this.logger = globalLogger.connect(this.getAddress())
+        this.logger = globalLogger.connect(this.getAddress(), ethereumChain)
     }
 
     getSubAccountName(): string | null {
@@ -100,6 +100,7 @@ export class MyWallet implements WalletI {
     }
 
     async sendTransaction(txInteraction: TxInteraction, chain: Chain, maxRetries: number = 1): Promise<[TxResult, string]> {
+        this.logger.connect(this.getAddress(), chain)
         let provider: UnionProvider
         let curSigner: UnionWallet
         if (chain.title === Blockchains.ZkSync) {
@@ -123,10 +124,10 @@ export class MyWallet implements WalletI {
             }
             switch (result) {
                 case TxResult.Success:
-                        this.logger.success(`Tx:${txInteraction.name} Gas used: ${this.curGasLimit}. Gas price: ${this.lastTxGasPrice / BigInt(10 ** 9)}`)
+                        this.logger.connect(this.getAddress(), chain).info(`Tx:${txInteraction.name} Gas used: ${this.curGasLimit}. Gas price: ${this.lastTxGasPrice / BigInt(10 ** 9)}`)
                     return [TxResult.Success, txHash]
                 case TxResult.Fail:
-                    this.logger.warn(`Tx:${txInteraction.name} Tx failed. Try №${retry} | Gas used: ${this.curGasLimit}`)
+                    this.logger.connect(this.getAddress(), chain).warn(`Tx:${txInteraction.name} Tx failed. Try №${retry} | Gas used: ${this.curGasLimit}`)
                     if (retry !== maxRetries) {
                         await sleep(TX_LOGIC_BY_TRY[retry + 1].wait)
                     }

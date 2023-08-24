@@ -41,7 +41,7 @@ export async function muteSwapNativeTo(
         })
         return txs
     } catch (e) {
-        globalLogger.connect(wallet.getAddress()).warn(`${name} failed: ${e}`)
+        globalLogger.connect(wallet.getAddress(), chain).warn(`${name} failed: ${e}`)
         return []
     }
 }
@@ -62,7 +62,7 @@ export async function muteSwap(
         let tokenContract = new ethers.Contract(tokenFrom, erc20, provider)
         let tokenBalance: bigint = await tokenContract.balanceOf(wallet.getAddress())
         if (tokenBalance === BigInt(0)){
-            globalLogger.connect(wallet.getAddress()).warn(`No balance for ${name}`)
+            globalLogger.connect(wallet.getAddress(), chain).warn(`No balance for ${name}`)
             return []
         }
         tokenBalance = getExecBalance(execBalance, tokenBalance)!
@@ -81,7 +81,7 @@ export async function muteSwap(
         })
         return txs
     } catch (e) {
-        globalLogger.connect(wallet.getAddress()).warn(`${name} failed: ${e}`)
+        globalLogger.connect(wallet.getAddress(), chain).warn(`${name} failed: ${e}`)
         return []
     }
 }
