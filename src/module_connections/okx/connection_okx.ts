@@ -230,7 +230,7 @@ class OkxConnectionModule implements ConnectionModule {
             wallet.getMasterCredentials(),
             {
                 ccy: ccy,
-                amt: ethers.formatEther(amt),
+                amt: amt,
                 from: "6", // funding account
                 to: "6", // funding account
                 subAcct: subAccountName,
@@ -238,7 +238,7 @@ class OkxConnectionModule implements ConnectionModule {
             }
         )
 
-        globalLogger.connect(wallet.getAddress(), ethereumChain).info(ethers.formatEther(amt))
+        globalLogger.connect(wallet.getAddress(), ethereumChain).info(`From sub to master: ${amt}`)
         globalLogger.connect(wallet.getAddress(), ethereumChain).info(`Response: ${JSON.stringify(response)}`)
         if (response === null || response.code !== "0") {
             globalLogger.connect(wallet.getAddress(), ethereumChain).warn("Failed transfer from sub to master.")
@@ -249,7 +249,7 @@ class OkxConnectionModule implements ConnectionModule {
 
         // TODO maybe add waiting for funds transfer (but it seems fast)
 
-        return Promise.resolve([true, Number(ethers.formatEther(amt))])
+        return Promise.resolve([true, Number(amt)])
     }
 
     private async fetchOKX<T>(wallet: WalletI, method: Method, okxApiMethod: OKXApiMethod,
