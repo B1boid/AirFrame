@@ -12,7 +12,7 @@ import {ExecBalance, getExecBalance} from "../common_utils";
 
 
 async function getQuoteOdos (chainId: number, fromTokenAddress: string, toTokenAddress: string, amount: string, fromAddress: string): Promise<null | string> {
-    let slippages = [0.2, 0.3, 0.5]  // 0.1% starting slippage
+    let slippages = [0.2, 0.3, 0.5]  // 0.2% starting slippage
     for (let i = 0; i < slippages.length; i++) {
         try {
             const result = await axios.post(`https://api.odos.xyz/sor/quote/v2`,{

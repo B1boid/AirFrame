@@ -16,7 +16,7 @@ async function getQuote1inch (chainId: number, fromTokenAddress: string, toToken
         globalLogger.warn(`1inch API key not set`)
         return null
     }
-    let slippages = [0.1, 0.2, 0.5]  // 0.1% starting slippage
+    let slippages = [0.2, 0.3, 0.5]  // 0.2% starting slippage
     let disableEstimate = true
     for (let i = 0; i < slippages.length; i++) {
         let slippage = slippages[i]

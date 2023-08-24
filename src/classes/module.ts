@@ -57,7 +57,6 @@ export abstract class BlockchainModule {
                             }
                             failed = true
                         }
-                        await sleepWithLimits(waitLimits)
                     }
                 }
                 if (!failed) break
@@ -67,6 +66,7 @@ export abstract class BlockchainModule {
             } else {
                 startedActivities.push(activityTx.activityName)
             }
+            await sleepWithLimits(waitLimits)
         }
 
         console.log(wallet.getAddress(), this.chain.title, "All activities done")
