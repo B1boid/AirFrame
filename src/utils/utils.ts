@@ -197,3 +197,19 @@ export async function getTxDataForAllBalanceTransfer(
 export function bigMax(a: bigint, b: bigint): bigint {
     return a > b ? a : b
 }
+
+
+export async function retry<T>(f: () => T | null, max_tries: number): Promise<T | null> {
+    let i = 0
+    while (i < max_tries) {
+        const res = await f()
+
+        if (res !== null) {
+            return res
+        }
+
+        i++
+    }
+
+    return null
+}
