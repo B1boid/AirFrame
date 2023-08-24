@@ -148,7 +148,7 @@ function generatePathToZkSync(accInfo: Features, actions: AnyActions[]): void {
 
 function generateEthRandomActivities(activitiesNum: number, chanceInPercentToMintNft: number = 0): ModuleActions {
     let availableActivities: EthereumActivity[] = [
-        EthereumActivity.ethRandomApprove, EthereumActivity.ethRandomApprove, EthereumActivity.ethRandomApprove, // x3 chance
+        EthereumActivity.ethRandomApprove, EthereumActivity.ethRandomApprove, // x2 chance
         EthereumActivity.ethRandomStuff, EthereumActivity.ethRandomStuff, // x2 chance
         EthereumActivity.ethFakeUniExec, EthereumActivity.ethFakeUniExec, // x2 chance
         EthereumActivity.wrapUnwrap,
