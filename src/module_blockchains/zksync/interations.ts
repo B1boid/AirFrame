@@ -153,7 +153,7 @@ export async function zkSyncRandomApprove_approve(wallet: WalletI): Promise<TxIn
         tokens.RETH, tokens.SPACE, tokens.VC, tokens.ZKDOGE, tokens.WBTC
     ]
     let rndSpenders: string[] = [
-        contracts.OneInchRouter, contracts.velocoreRouter, contracts.spaceRouter, contracts.syncSwapRouter,
+        contracts.oneInchRouter, contracts.velocoreRouter, contracts.spaceRouter, contracts.syncSwapRouter,
         contracts.iziRouter, contracts.muteRouter,
     ]
     return await getRandomApprove(rndTokens, rndSpenders, wallet.getAddress(), chain)
