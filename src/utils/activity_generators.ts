@@ -42,14 +42,22 @@ function onlyActivities(activities: WrappedActivity[]): ActivityTx[] {
 
 function fullShuffleActivities(activities: WrappedActivity[]): ActivityTx[]{
     let res: ActivityTx[] = []
+    let indices: {[id: string]: number} = {}
     while (true){
         let added = false
         const shuffledActivities = shuffle(activities)
         for (const activity of shuffledActivities) {
-            if (activity.activity.txs.length > 0){
-                res.push(new ActivityTx(activity.activity.name + activity.id.toString(), activity.activity.txs.shift()!))
-                added = true
-                break
+            if (activity.activity.txs.length > 0) {
+                let curName: string = activity.activity.name + activity.id.toString()
+                if (indices[curName] === undefined){
+                    indices[curName] = 0
+                }
+                if (indices[curName] < activity.activity.txs.length) {
+                    res.push(new ActivityTx(curName, activity.activity.txs[indices[curName]]))
+                    indices[curName] += 1
+                    added = true
+                    break
+                }
             }
         }
         if (!added) break

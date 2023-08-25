@@ -3,8 +3,9 @@ import {getTxCount, hasInteractionWithEthContract} from "./features";
 import {Blockchains, Destination, ethereumChain, zkSyncChain} from "../config/chains";
 import {Asset} from "../config/tokens";
 import {Connections} from "../module_connections/connection_modules";
-import {getRandomElement, getRandomFloat, getRandomInt} from "../utils/utils";
+import {getMedian, getRandomElement, getRandomFloat, getRandomInt} from "../utils/utils";
 import {EthereumActivity, ZkSyncActivity} from "../module_blockchains/blockchain_modules";
+import {globalLogger} from "../utils/logger";
 
 
 interface Features {
@@ -36,11 +37,30 @@ export async function buildZkSyncBasic(activeAddresses: string[]): Promise<Walle
     let res: WalletActions[] = []
     for (let accInfo of accountInfos) {
         res.push(generateActions(accInfo))
-        // console.log(accInfo)
-        // console.log(res[res.length - 1].actions)
-        // console.log("=====================================")
     }
+    printStats(accountInfos)
+
     return res
+}
+
+function printStats(accs: Features[]){
+    let zeroAccs = 0
+    let accsWithOffBridge = 0
+    let avgNonZeroEthTxs: number[] = []
+    let avgNonZeroZkTxs: number[] = []
+    for (let accInfo of accs) {
+        zeroAccs += accInfo.zkTxs === 0 && accInfo.ethTxs === 0 ? 1 : 0
+        accsWithOffBridge += accInfo.hasOffBridge ? 1 : 0
+        if (accInfo.zkTxs > 0) {
+            avgNonZeroZkTxs.push(accInfo.zkTxs)
+        }
+        if (accInfo.ethTxs > 0) {
+            avgNonZeroEthTxs.push(accInfo.ethTxs)
+        }
+    }
+    globalLogger.done(
+        `\nTotal accounts: ${accs.length}\nZero accounts: ${zeroAccs}\nAccs off-bridge: ${accsWithOffBridge}\nAvg non-zero ethTxs: ${getMedian(avgNonZeroEthTxs)}\nAvg non-zero zkTxs: ${getMedian(avgNonZeroZkTxs)}`
+    )
 }
 
 async function getAccountInfo(address: string, retries: number = 1): Promise<Features | null> {
@@ -148,7 +168,7 @@ function generatePathToZkSync(accInfo: Features, actions: AnyActions[]): void {
 
 function generateEthRandomActivities(activitiesNum: number, chanceInPercentToMintNft: number = 0): ModuleActions {
     let availableActivities: EthereumActivity[] = [
-        EthereumActivity.ethRandomApprove, EthereumActivity.ethRandomApprove, EthereumActivity.ethRandomApprove, // x3 chance
+        EthereumActivity.ethRandomApprove, EthereumActivity.ethRandomApprove, // x2 chance
         EthereumActivity.ethRandomStuff, EthereumActivity.ethRandomStuff, // x2 chance
         EthereumActivity.ethFakeUniExec, EthereumActivity.ethFakeUniExec, // x2 chance
         EthereumActivity.wrapUnwrap,
@@ -165,8 +185,10 @@ function generateEthRandomActivities(activitiesNum: number, chanceInPercentToMin
         let curActivity: EthereumActivity
         while (true) {
             curActivity = getRandomElement(availableActivities)
-            if (curActivity === EthereumActivity.ethRandomApprove ||
-                curActivity === EthereumActivity.ethRandomStuff) { // approve and ethRandomStuff can be repeated
+            if (curActivity === EthereumActivity.ethRandomApprove && res.filter(x => x === curActivity).length < 2){
+                break
+            }
+            if (curActivity === EthereumActivity.ethRandomStuff && res.filter(x => x === curActivity).length < 2){
                 break
             }
             if (!res.includes(curActivity)) {
@@ -271,7 +293,7 @@ function generateZkSyncRandomActivities(activitiesNum: number): ZkSyncActivity[]
         let curActivity: ZkSyncActivity
         while (true) {
             curActivity = getRandomElement(availableActivities)
-            if (curActivity === ZkSyncActivity.zkSyncRandomApprove) { // approve can be repeated
+            if (curActivity === ZkSyncActivity.zkSyncRandomApprove && res.filter(x => x === curActivity).length < 2){
                 break
             }
             if (!repeatedActivities.includes(curActivity)) {
