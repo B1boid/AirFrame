@@ -13,7 +13,7 @@ import {
     zkSyncReactFusionInit_enter,
     zkSyncSwapCycleNativeToUsdc_swapback,
     zkSyncSwapCycleNativeToUsdc_swapto,
-    zkSyncSynFuturesTest_mint,
+    zkSyncSynFuturesTest_mint, zkSyncTopSwapCycleNativeToUsdc_swapback, zkSyncTopSwapCycleNativeToUsdc_swapto,
     zkSyncWrapUnwrap_unwrap,
     zkSyncWrapUnwrap_wrap
 } from "./interations";
@@ -33,6 +33,14 @@ export const zkSyncSwapCycleNativeToUsdc: Activity = {
     txs: [
         zkSyncSwapCycleNativeToUsdc_swapto,
         zkSyncSwapCycleNativeToUsdc_swapback
+    ]
+}
+
+export const zkSyncTopSwapCycleNativeToUsdc: Activity = {
+    name: ZkSyncActivity.zkSyncTopSwapCycleNativeToUsdc,
+    txs: [
+        zkSyncTopSwapCycleNativeToUsdc_swapto,
+        zkSyncTopSwapCycleNativeToUsdc_swapback
     ]
 }
 
@@ -92,11 +100,6 @@ export const zkSyncParaspaceCycle: Activity = {
     txs: [
         zkSyncParaspaceCycle_supply
     ]
-}
-
-export const zkSyncDummyRandomLending: Activity = {
-    name: ZkSyncActivity.zkSyncDummyRandomLending,
-    txs: []
 }
 
 export const zkSyncSynFuturesTest: Activity = {

@@ -75,6 +75,17 @@ export function getRandomElement<T> (list: T[]) {
     return list[Math.floor((Math.random()*list.length))];
 }
 
+export function getMedian(arr: number[]) {
+    if (arr.length == 0) {
+        return; // 0.
+    }
+    arr.sort((a, b) => a - b); // 1.
+    const midpoint = Math.floor(arr.length / 2); // 2.
+    return arr.length % 2 === 1 ?
+        arr[midpoint] : // 3.1. If odd length, just take midpoint
+        (arr[midpoint - 1] + arr[midpoint]) / 2; // 3.2. If even length, take median of midpoints
+}
+
 export function printActions(walletActions: WalletActions){
     let result = "";
     if (walletActions.featuresLine){
@@ -196,4 +207,20 @@ export async function getTxDataForAllBalanceTransfer(
 
 export function bigMax(a: bigint, b: bigint): bigint {
     return a > b ? a : b
+}
+
+
+export async function retry<T>(f: () => T | null, max_tries: number): Promise<T | null> {
+    let i = 0
+    while (i < max_tries) {
+        const res = await f()
+
+        if (res !== null) {
+            return res
+        }
+
+        i++
+    }
+
+    return null
 }

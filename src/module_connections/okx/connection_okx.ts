@@ -18,7 +18,7 @@ import {
 } from "../../utils/okx_api";
 import {TxInteraction} from "../../classes/module";
 import {Asset} from "../../config/tokens";
-import {getTxDataForAllBalanceTransfer, sleep} from "../../utils/utils";
+import {getTxDataForAllBalanceTransfer, retry, sleep} from "../../utils/utils";
 import axios from "axios";
 import {ethers} from "ethers-new";
 import {destToChain} from "../../module_blockchains/blockchain_modules";
@@ -79,8 +79,16 @@ class OkxConnectionModule implements ConnectionModule {
                 globalLogger.connect(wallet.getAddress(), chain).error("No withdraw address.")
                 return Promise.resolve([false, 0])
             }
-            const subAccount = wallet.getSubAccountName()!
+            const subAccount = wallet.getSubAccountName()
 
+            const okxBalanceBefore = await retry( () => {
+                return this.getBalance(wallet, asset, subAccount)
+            }, MAX_TRIES)
+
+            if (!okxBalanceBefore) {
+                globalLogger.connect(wallet.getAddress(), chain).error("Could not fetch OKX old balance")
+                return Promise.resolve([false, 0])
+            }
 
             const withdrawalConfig: OKXWithdrawalConfig = okxWithdrawalConfig(asset, chain.title)
             if (withdrawalConfig.confirmations === -1) {
@@ -120,15 +128,44 @@ class OkxConnectionModule implements ConnectionModule {
                 globalLogger.connect(wallet.getAddress(), chain).done("Successful deposit. Balance updated.")
             }
 
-            if (subAccount === null) {
-                return Promise.resolve([true, amount])
+
+            const [status, newBalance] = await this.waitOkxBalanceChange(wallet, asset, okxBalanceBefore)
+
+            if (!status) {
+                return Promise.resolve([false, 0])
             }
 
-            await sleep(10) // почему-то один раз интернал трансфер зафейлился - давай немного подождем
-            return this.internalTransfer(wallet, asset, amount.toString(), subAccount, OKXTransferType.FROM_SUB_TO_MASTER)
+            if (subAccount === null) {
+                return Promise.resolve([true, newBalance])
+            }
+
+            return this.internalTransfer(wallet, asset, newBalance.toString(), subAccount, OKXTransferType.FROM_SUB_TO_MASTER)
         }
 
         throw new Error(`No OKX destination was found. From: ${from}. To: ${to}. Check configs.`)
+    }
+
+    private async waitOkxBalanceChange(wallet: WalletI, asset: Asset, okxBalanceBefore: string): Promise<[boolean, number]> { // status, balance
+        const logger =  globalLogger.connect(wallet.getAddress(), ethereumChain)
+        let i = 0;
+        while (i < MAX_TRIES) {
+            logger.info(`Try ${i}/${MAX_TRIES} fetch changed OKX balance.`)
+            const newBalance = await this.getBalance(wallet, asset, wallet.getSubAccountName())
+
+            if (!newBalance) {
+                logger.warn("Null new balance. Retrying...")
+                continue
+            }
+
+            if (Number(newBalance) > Number(okxBalanceBefore)) {
+                return Promise.resolve([true, Number(newBalance)])
+            }
+
+            i++
+        }
+
+        logger.error("Failed to fetch new OKX balance. Terminating...")
+        return Promise.resolve([false, 0])
     }
 
     private async depositWithdrawFinished(wallet: WalletI, txOrWdId: string, ccy: Asset, chain: Blockchains,
