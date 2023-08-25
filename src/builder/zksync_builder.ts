@@ -283,8 +283,8 @@ function generateZkSync(accInfo: Features, actions: AnyActions[]): void {
 function generateZkSyncRandomActivities(activitiesNum: number): ZkSyncActivity[] {
     let availableActivities: ZkSyncActivity[] = [
         ZkSyncActivity.zkSyncRandomApprove, ZkSyncActivity.zkSyncRandomApprove, // x2 chance
-        ZkSyncActivity.zkSyncSwapCycleNativeToUsdc,
         ZkSyncActivity.wrapUnwrap,
+        ZkSyncActivity.zkSyncDummyRandomSwapCycle,
         ZkSyncActivity.zkSyncDummyRandomLending
     ]
     let res: ZkSyncActivity[] = []
@@ -303,6 +303,11 @@ function generateZkSyncRandomActivities(activitiesNum: number): ZkSyncActivity[]
         if (curActivity === ZkSyncActivity.zkSyncDummyRandomLending) {
             let lendingActivities: ZkSyncActivity[] = [
                 ZkSyncActivity.zkSyncParaspaceCycle, ZkSyncActivity.zkSyncEraLendCycle, ZkSyncActivity.zkSyncReactFusionCycle
+            ]
+            res.push(getRandomElement(lendingActivities))
+        } else if (curActivity === ZkSyncActivity.zkSyncDummyRandomSwapCycle) {
+            let lendingActivities: ZkSyncActivity[] = [
+                ZkSyncActivity.zkSyncTopSwapCycleNativeToUsdc, ZkSyncActivity.zkSyncSwapCycleNativeToUsdc
             ]
             res.push(getRandomElement(lendingActivities))
         } else {

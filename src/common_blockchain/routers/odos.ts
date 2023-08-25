@@ -5,14 +5,14 @@ import {ethers, formatEther} from "ethers-new";
 import {Chain, ethereumChain} from "../../config/chains";
 import erc20 from "./../../abi/erc20.json";
 import {checkAndGetApprovalsInteraction} from "../approvals";
-import {formatIfNativeToken, getRandomizedPercent, sleep} from "../../utils/utils";
+import {formatIfNativeToken, sleep} from "../../utils/utils";
 import {globalLogger} from "../../utils/logger";
-import {NATIVE_ADDRESS} from "./common";
+import {NATIVE_ADDRESS, QuoteRes} from "./common";
 import {ExecBalance, getExecBalance} from "../common_utils";
 
 
-async function getQuoteOdos (chainId: number, fromTokenAddress: string, toTokenAddress: string, amount: string, fromAddress: string): Promise<null | string> {
-    let slippages = [0.2, 0.3, 0.5]  // 0.1% starting slippage
+async function getQuoteOdos (chainId: number, fromTokenAddress: string, toTokenAddress: string, amount: string, fromAddress: string): Promise<null | QuoteRes> {
+    let slippages = [0.2, 0.3, 0.5]  // 0.2% starting slippage
     for (let i = 0; i < slippages.length; i++) {
         try {
             const result = await axios.post(`https://api.odos.xyz/sor/quote/v2`,{
@@ -38,7 +38,10 @@ async function getQuoteOdos (chainId: number, fromTokenAddress: string, toTokenA
                     'Content-Type': 'application/json',
                 },
             })
-            return result.data.pathId
+            return {
+                tx: result.data.pathId,
+                price: BigInt(result.data.outAmounts[0])
+            }
         } catch (error) {
             globalLogger.connect(fromAddress, ethereumChain).warn(`Odos quote-API failed, try: ${i} with error: ${error}`)
             await sleep(5)
@@ -77,18 +80,51 @@ export async function odosSwapNativeTo(
     execBalance: ExecBalance = {fullBalance: true},
     stoppable: boolean = false,
 ): Promise<TxInteraction[]> {
+    return (await _odosSwapNativeTo(token, wallet, chain, contracts, name, execBalance, stoppable, false)) as TxInteraction[]
+}
+
+
+export async function odosQuoteNativeTo(
+    token: string,
+    wallet: WalletI,
+    chain: Chain,
+    contracts: { [id: string]: string },
+    name: string,
+    execBalance: ExecBalance = {fullBalance: true},
+    stoppable: boolean = false,
+): Promise<bigint> {
+    let res = await _odosSwapNativeTo(token, wallet, chain, contracts, name, {fullBalance: true}, stoppable, true)
+    if (typeof res === "bigint") {
+        return res
+    }
+    return BigInt(0)
+}
+
+async function _odosSwapNativeTo(
+    token: string,
+    wallet: WalletI,
+    chain: Chain,
+    contracts: { [id: string]: string },
+    name: string,
+    execBalance: ExecBalance = {fullBalance: true},
+    stoppable: boolean = false,
+    onlyPrice: boolean = false,
+): Promise<TxInteraction[] | bigint> {
     try {
         let txs = []
         const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
         let tokenBalance: bigint = await provider.getBalance(wallet.getAddress())
         tokenBalance = getExecBalance(execBalance, tokenBalance)!
-        let pathId = await getQuoteOdos(chain.chainId, NATIVE_ADDRESS, token, tokenBalance.toString(), wallet.getAddress())
-        if (pathId === null || pathId === undefined) {
+        let quoteRes: QuoteRes | null = await getQuoteOdos(chain.chainId, NATIVE_ADDRESS, token, tokenBalance.toString(), wallet.getAddress())
+        if (quoteRes === null || quoteRes === undefined) {
             let logger = globalLogger.connect(wallet.getAddress(), chain)
             logger.warn(`Odos quote for ${name} failed, amount: ${formatEther(tokenBalance)}`)
             return []
         }
-        let swapData = await getSwapOdos(pathId, wallet.getAddress())
+        if (onlyPrice) {
+            return quoteRes.price
+        }
+        let swapData = await getSwapOdos(quoteRes.tx, wallet.getAddress())
         if (swapData === null || swapData === undefined) {
             let logger = globalLogger.connect(wallet.getAddress(), chain)
             logger.warn(`Odos swap for ${name} failed, amount: ${formatEther(tokenBalance)}`)
@@ -122,6 +158,39 @@ export async function odosSwap(
     execBalance: ExecBalance = {fullBalance: true},
     stoppable: boolean = false,
 ): Promise<TxInteraction[]> {
+    return (await _odosSwap(tokenFrom, tokenTo, wallet, chain, contracts, name, execBalance, stoppable, false)) as TxInteraction[]
+}
+
+
+export async function odosQuote(
+    tokenFrom: string,
+    tokenTo: string,
+    wallet: WalletI,
+    chain: Chain,
+    contracts: { [id: string]: string },
+    name: string,
+    execBalance: ExecBalance = {fullBalance: true},
+    stoppable: boolean = false,
+): Promise<bigint> {
+    let res = await _odosSwap(tokenFrom, tokenTo, wallet, chain, contracts, name, {fullBalance: true}, stoppable, true)
+    if (typeof res === "bigint") {
+        return res
+    }
+    return BigInt(0)
+}
+
+
+async function _odosSwap(
+    tokenFrom: string,
+    tokenTo: string,
+    wallet: WalletI,
+    chain: Chain,
+    contracts: { [id: string]: string },
+    name: string,
+    execBalance: ExecBalance = {fullBalance: true},
+    stoppable: boolean = false,
+    onlyPrice: boolean = false,
+): Promise<TxInteraction[] | bigint> {
     try {
         const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
         let tokenContract = new ethers.Contract(tokenFrom, erc20, provider)
@@ -133,13 +202,16 @@ export async function odosSwap(
         }
         tokenBalance = getExecBalance(execBalance, tokenBalance)!
         let txs = await checkAndGetApprovalsInteraction(wallet.getAddress(), contracts.odosRouter, tokenBalance, tokenContract)
-        let pathId = await getQuoteOdos(chain.chainId, tokenFrom, tokenTo, tokenBalance.toString(), wallet.getAddress())
-        if (pathId === null || pathId === undefined) {
+        let quoteRes: QuoteRes | null = await getQuoteOdos(chain.chainId, tokenFrom, tokenTo, tokenBalance.toString(), wallet.getAddress())
+        if (quoteRes === null || quoteRes === undefined) {
             let logger = globalLogger.connect(wallet.getAddress(), chain)
             logger.warn(`Odos quote for ${name} failed, amount: ${formatEther(tokenBalance)}`)
             return []
         }
-        let swapData = await getSwapOdos(pathId, wallet.getAddress())
+        if (onlyPrice) {
+            return quoteRes.price
+        }
+        let swapData = await getSwapOdos(quoteRes.tx, wallet.getAddress())
         if (swapData === null || swapData === undefined) {
             let logger = globalLogger.connect(wallet.getAddress(), chain)
             logger.warn(`Odos swap for ${name} failed, amount: ${formatEther(tokenBalance)}`)
@@ -149,7 +221,7 @@ export async function odosSwap(
         txs.push({
             to: contracts.odosRouter,
             data: swapData,
-            value: tokenBalance.toString(),
+            value: "0",
             stoppable: stoppable,
             confirmations: 1,
             name: name

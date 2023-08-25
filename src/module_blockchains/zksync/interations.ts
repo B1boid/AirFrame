@@ -7,7 +7,7 @@ import zns_1 from "../../abi/zns_1.json";
 import zns_2 from "../../abi/zns_2.json";
 import eralend from "../../abi/eralend.json";
 import paraspace from "../../abi/paraspace.json";
-import {commonSwap, Dexes} from "../../common_blockchain/routers/common";
+import {commonSwap, commonTopSwap, Dexes} from "../../common_blockchain/routers/common";
 import {zkSyncChain} from "../../config/chains";
 import {zkSyncContracts, zkSyncTokens} from "./constants";
 import {ethers, MaxUint256, parseEther} from "ethers-new";
@@ -61,7 +61,7 @@ export async function zkSyncWrapUnwrap_unwrap(wallet: WalletI): Promise<TxIntera
 }
 
 export async function zkSyncSwapCycleNativeToUsdc_swapto(wallet: WalletI): Promise<TxInteraction[]> {
-    return await commonSwap(tokens.ETH, tokens.USDC, {balancePercent: [20, 40]},
+    return await commonSwap(tokens.ETH, tokens.USDC, {balancePercent: [5, 10]},
         [Dexes.Odos, Dexes.OneInch, Dexes.SyncSwap, Dexes.Velocore, Dexes.Mute, Dexes.SpaceFi],
         wallet, chain, contracts, tokens, "zkSyncSwapCycleNativeToUsdc_swapto")
 }
@@ -70,6 +70,18 @@ export async function zkSyncSwapCycleNativeToUsdc_swapback(wallet: WalletI): Pro
     return await commonSwap(tokens.USDC, tokens.ETH, {fullBalance: true},
         [Dexes.Odos, Dexes.OneInch, Dexes.SyncSwap, Dexes.Velocore, Dexes.Mute, Dexes.SpaceFi],
         wallet, chain, contracts, tokens,"zkSyncSwapCycleNativeToUsdc_swapback", true)
+}
+
+export async function zkSyncTopSwapCycleNativeToUsdc_swapto(wallet: WalletI): Promise<TxInteraction[]> {
+    return await commonTopSwap(tokens.ETH, tokens.USDC, {balancePercent: [20, 40]},
+        [Dexes.Odos, Dexes.OneInch],
+        wallet, chain, contracts, tokens, "zkSyncTopSwapCycleNativeToUsdc_swapto")
+}
+
+export async function zkSyncTopSwapCycleNativeToUsdc_swapback(wallet: WalletI): Promise<TxInteraction[]> {
+    return await commonTopSwap(tokens.USDC, tokens.ETH, {fullBalance: true},
+        [Dexes.Odos, Dexes.OneInch],
+        wallet, chain, contracts, tokens,"zkSyncTopSwapCycleNativeToUsdc_swapback", true)
 }
 
 export async function zkSyncMintTevaera_buyid(wallet: WalletI): Promise<TxInteraction[]> {

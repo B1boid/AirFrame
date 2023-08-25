@@ -32,7 +32,7 @@ export async function checkAndGetApprovalsInteraction(
         }
         return []
     } catch (e) {
-        logger.warn(`Getting approvals failed: ${e}`)
+        logger.warn(`Getting approvals failed: ${e} for token: ${tokenContract.address} with spender: ${spender}`)
         return []
     }
 }

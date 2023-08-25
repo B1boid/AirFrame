@@ -16,6 +16,7 @@ export const enum PolygonActivity {
 export const enum ZkSyncActivity {
     wrapUnwrap = "wrapUnwrap",
     zkSyncSwapCycleNativeToUsdc = "zkSyncSwapCycleNativeToUsdc",
+    zkSyncTopSwapCycleNativeToUsdc = "zkSyncTopSwapCycleNativeToUsdc",
     zkSyncMintTevaera = "zkSyncMintTevaera",
     zkSyncMintZnsId = "zkSyncMintZnsId",
     zkSyncRandomApprove = "zkSyncRandomApprove",
@@ -25,7 +26,9 @@ export const enum ZkSyncActivity {
     zkSyncReactFusionCycle = "zkSyncReactFusionCycle",
     zkSyncParaspaceCycle = "zkSyncParaspaceCycle",
     zkSyncSynFuturesTest = "zkSyncSynFuturesTest",
-    zkSyncDummyRandomLending = "zkSyncDummyRandomLending"
+
+    zkSyncDummyRandomLending = "zkSyncDummyRandomLending",
+    zkSyncDummyRandomSwapCycle = "zkSyncDummyRandomSwapCycle"
 }
 
 export const enum EthereumActivity {

@@ -1,6 +1,6 @@
 import {WalletI} from "../../classes/wallet";
 import {TxInteraction} from "../../classes/module";
-import {oneInchSwap, oneInchSwapNativeTo} from "./1inch";
+import {oneInchQuote, oneInchQuoteNativeTo, oneInchSwap, oneInchSwapNativeTo} from "./1inch";
 import {Chain} from "../../config/chains";
 import {EnumDictionary, shuffleArray} from "../../utils/utils";
 import {muteSwap, muteSwapNativeTo} from "./mute";
@@ -8,8 +8,9 @@ import {Asset} from "../../config/tokens";
 import {syncSwap, syncSwapNativeTo} from "./syncswap";
 import {velocoreSwap, velocoreSwapNativeTo} from "./velocore";
 import {spaceFiSwap, spaceFiSwapNativeTo} from "./spacefi";
-import {odosSwap, odosSwapNativeTo} from "./odos";
+import {odosQuote, odosQuoteNativeTo, odosSwap, odosSwapNativeTo} from "./odos";
 import {ExecBalance} from "../common_utils";
+import {globalLogger} from "../../utils/logger";
 
 export enum Dexes {
     OneInch = "1inch",
@@ -20,7 +21,80 @@ export enum Dexes {
     SpaceFi = "spacefi"
 }
 
+export interface QuoteRes {
+    tx: string,
+    price: bigint
+}
+
 export const NATIVE_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
+
+
+export async function commonTopSwap(
+    tokenFrom: string,
+    tokenTo: string,
+    execBalance: ExecBalance = {fullBalance: true},
+    dexes: Dexes[],
+    wallet: WalletI,
+    chain: Chain,
+    contracts: { [id: string]: string },
+    tokens: EnumDictionary<Asset, string>,
+    name: string,
+    stoppable: boolean = false
+): Promise<TxInteraction[]> {
+    if (tokenFrom === NATIVE_ADDRESS) {
+        let promises: (Promise<bigint>)[] = []
+        if (dexes.includes(Dexes.OneInch)) {
+            promises.push(oneInchQuoteNativeTo(
+                tokenTo, wallet, chain, contracts, name, execBalance, stoppable
+            ))
+        }
+        if (dexes.includes(Dexes.Odos)) {
+            promises.push(odosQuoteNativeTo(
+                tokenTo, wallet, chain, contracts, name, execBalance, stoppable
+            ))
+        }
+        let values: bigint[] = await Promise.all(promises)
+        globalLogger.connect(wallet.getAddress(), chain).info("Top quotes: "+ values)
+        if (values[0] > values[1]){
+            return await oneInchSwapNativeTo(
+                tokenTo, wallet, chain, contracts, name, execBalance, stoppable
+            )
+        } else {
+            if (values[1] === BigInt(0)) {
+                return []
+            }
+            return await odosSwapNativeTo(
+                tokenTo, wallet, chain, contracts, name, execBalance, stoppable
+            )
+        }
+    } else {
+        let promises: (Promise<bigint>)[] = []
+        if (dexes.includes(Dexes.OneInch)) {
+            promises.push(oneInchQuote(
+                tokenFrom, tokenTo, wallet, chain, contracts, name, execBalance, stoppable
+            ))
+        }
+        if (dexes.includes(Dexes.Odos)) {
+            promises.push(odosQuote(
+                tokenFrom, tokenTo, wallet, chain, contracts, name, execBalance, stoppable
+            ))
+        }
+        let values: bigint[] = await Promise.all(promises)
+        globalLogger.connect(wallet.getAddress(), chain).info("Top quotes: "+ values)
+        if (values[0] > values[1]){
+            return await oneInchSwap(
+                tokenFrom, tokenTo, wallet, chain, contracts, name, execBalance, stoppable
+            )
+        } else {
+            if (values[1] === BigInt(0)) {
+                return []
+            }
+            return await odosSwap(
+                tokenFrom, tokenTo, wallet, chain, contracts, name, execBalance, stoppable
+            )
+        }
+    }
+}
 
 export async function commonSwap(
     tokenFrom: string,
