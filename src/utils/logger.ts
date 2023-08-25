@@ -58,8 +58,8 @@ class Logger implements ILogger{
     }
 
     private async log(type: LogType, msg: string): Promise<void> {
-        const message = this.getSpecifiedText(type, msg)
-        console.log(message)
+        const [rawMessage, message] = this.getSpecifiedText(type, msg)
+        console.log(rawMessage)
         console.log("-----------------------------")
 
         const channel = getChannel(type)
@@ -68,14 +68,14 @@ class Logger implements ILogger{
         }
     }
 
-    protected getSpecifiedText(type: LogType, msg: string) {
+    protected getSpecifiedText(type: LogType, msg: string): [string, string] {
         const t = new Table
 
         t.cell('Type', `*${type}*`)
         t.cell('Address', "*GLOBAL*")
         t.cell('Message', `\`${msg}\``)
         t.newRow()
-        return t.printTransposed()
+        return [`${type} - GLOBAL - ${msg}`, t.printTransposed()]
     }
 }
 
@@ -95,14 +95,14 @@ export class ConnectedLogger extends Logger {
         return this
     }
 
-    protected getSpecifiedText(type: LogType, msg: string): string {
+    protected getSpecifiedText(type: LogType, msg: string): [string, string] {
         const t = new Table
 
         t.cell('Type', `*${type}*`)
         t.cell('Address', `[${this.address}](${this.chain.explorerUrl}/address/${this.address})`)
         t.cell('Message', `\`${msg}\``)
         t.newRow()
-        return t.printTransposed()
+        return [`${type} - ${this.address} - ${msg}`, t.printTransposed()]
     }
 
 }
