@@ -63,7 +63,7 @@ function printStats(accs: Features[]){
     )
 }
 
-async function getAccountInfo(address: string, retries: number = 1): Promise<Features | null> {
+export async function getAccountInfo(address: string, retries: number = 1): Promise<Features | null> {
     if (retries < 0) return null
     try {
         let ethTxs = await getTxCount(address, ethereumChain)
