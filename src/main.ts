@@ -75,7 +75,7 @@ async function doTask(password: string, passwordOkx: string, walletActions: Wall
 
 
 
-export async function main(accsPassword : string | null, okxPassword: string | null){
+export async function main(accsPassword : string | undefined = undefined, okxPassword: string | undefined = undefined){
     // TODO: online config doesn't work - we need to use tg bot for it
 
     const runConfig: RunConfig = TEST_CONFIG

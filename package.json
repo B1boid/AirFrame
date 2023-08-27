@@ -2,7 +2,8 @@
   "name": "airframe",
   "version": "1.0.0",
   "scripts": {
-    "dev": "ts-node --esm src/main.ts"
+    "dev": "ts-node --esm src/local_runner.ts",
+    "prod": "ts-node --esm src/telegram/bot.ts"
   },
   "dependencies": {
     "@eth-optimism/sdk": "^3.1.0",
