@@ -122,16 +122,13 @@ bot.onText(/\/set_gas_price_limit/, (msg) => {
         return
     }
 
-
-    let chain: Blockchains;
     let limit: number;
 
-    try {
-        chain  = args[0] as Blockchains
-    } catch (e) {
+    if (Object.values(Blockchains).indexOf(args[0] as unknown as Blockchains) === -1) {
         bot.sendMessage(msg.chat.id, `Unknown chain: ${args[0]}.`)
         return
     }
+    const chain: Blockchains  = args[0] as Blockchains
 
     try {
         limit = Number(args[1])
