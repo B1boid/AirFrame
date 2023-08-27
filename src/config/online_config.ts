@@ -1,21 +1,24 @@
 import {Blockchains} from "./chains";
 import {toBigInt} from "ethers-new";
-import {getRandomInt} from "../utils/utils";
-import {readFileSync} from "fs";
+import {EnumDictionary, getRandomInt} from "../utils/utils";
+import {globalLogger} from "../utils/logger";
+
+
+export const allGases : EnumDictionary<Blockchains, number> = {
+    [Blockchains.Ethereum]: 24,
+    [Blockchains.Polygon]: 900,
+    [Blockchains.ZkSync]: 1000,
+    [Blockchains.Arbitrum]: 1000,
+    [Blockchains.Optimism]: 1000
+}
+
+export function setGasPriceLimit(chain: Blockchains, limit: number) {
+    globalLogger.info(`Changed global gas price limit for ${chain}. New value: ${allGases[chain]}`)
+    allGases[chain] = limit
+}
 
 export function GAS_PRICE_LIMITS(chain: Blockchains): bigint {
-    const file = readFileSync('online_config/gas_prices.txt', 'utf-8');
-    const allGases = file.split('\n');
-    let value: number = 1000 * (10 ** 9); // 1000 gwei is max for all blockchains
-    for (const gasLine of allGases) {
-        const info = gasLine.trim().split('=');
-        const maxGasPrice = Number.parseInt(info[1].trim());
-        if (info[0].trim() === chain) {
-            value = getRandomInt(maxGasPrice - 1, maxGasPrice + 1) * (10 ** 9);
-            break
-        }
-    }
-    return toBigInt(value)
+    return toBigInt(getRandomInt(allGases[chain] - 1, allGases[chain] + 1) * (10 ** 9))
 }
 
 export function MAX_TX_WAITING(confirmations: number): number {

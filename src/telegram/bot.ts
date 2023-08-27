@@ -2,8 +2,9 @@ import TelegramBot from "node-telegram-bot-api";
 import dotenv from "dotenv";
 import {main} from "../main";
 import {getAccountInfo} from "../builder/zksync_builder";
-import {ethereumChain, zkSyncChain} from "../config/chains";
+import {Blockchains, ethereumChain, zkSyncChain} from "../config/chains";
 import {needToStop, setStop} from "../utils/utils";
+import {allGases, setGasPriceLimit} from "../config/online_config";
 let Table = require("easy-table")
 
 dotenv.config()
@@ -107,4 +108,47 @@ bot.onText(/\/set_force_stop/, (msg) => {
 
 bot.onText(/\/get_force_stop/, (msg) => {
     bot.sendMessage(msg.chat.id, `${needToStop()}`)
+})
+
+bot.onText(/\/set_gas_price_limit/, (msg) => {
+    if (msg.text === undefined) {
+        bot.sendMessage(msg.chat.id, "Usage: /set_gas_price_limit <chain> <limit>")
+        return
+    }
+
+    const args = msg.text.split(/\s+/).slice(1)
+    if (args.length < 2) {
+        bot.sendMessage(msg.chat.id, "Usage: /set_gas_price_limit <chain> <limit>")
+        return
+    }
+
+
+    let chain: Blockchains;
+    let limit: number;
+
+    try {
+        chain  = args[0] as Blockchains
+    } catch (e) {
+        bot.sendMessage(msg.chat.id, `Unknown chain: ${args[0]}.`)
+        return
+    }
+
+    try {
+        limit = Number(args[1])
+
+        if (limit < 0) {
+            throw new Error("Wrong limit.")
+        }
+    } catch {
+        bot.sendMessage(msg.chat.id, "Fail parsing gas price limit.")
+        return
+    }
+
+    setGasPriceLimit(chain, limit)
+
+    bot.sendMessage(msg.chat.id, `Successfully set ${limit} for ${chain}.`)
+})
+
+bot.onText(/\/get_gas_price_limits/, (msg) => {
+    bot.sendMessage(msg.chat.id, JSON.stringify(allGases))
 })
