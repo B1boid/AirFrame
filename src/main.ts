@@ -75,7 +75,7 @@ async function doTask(password: string, passwordOkx: string, walletActions: Wall
 
 
 
-async function main(){
+export async function main(accsPassword : string | null, okxPassword: string | null){
     // TODO: online config doesn't work - we need to use tg bot for it
 
     const runConfig: RunConfig = TEST_CONFIG
@@ -83,8 +83,8 @@ async function main(){
     const threads: number = runConfig.threads
     const strategy: Strategy = runConfig.strategy
 
-    const password: string = await prompt('Accs password: ')
-    const passwordOkx: string = await prompt('Okx password: ')
+    const password: string = accsPassword ? accsPassword : await prompt('Accs password: ')
+    const passwordOkx: string = okxPassword ? okxPassword : await prompt('Okx password: ')
 
     let actions: WalletActions[]
     if (runConfig.strategy === Strategy.TestMode){
@@ -133,6 +133,3 @@ async function main(){
     await bot.stopPolling()
     return
 }
-
-
-main()

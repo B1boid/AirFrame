@@ -17,6 +17,8 @@ import {AnyActions, WalletActions} from "../classes/actions";
 import {BigNumber} from "ethers";
 dotenv.config();
 
+let stopAll = false;
+
 export type EnumDictionary<T extends string | symbol | number, U> = {
     [K in T]: U;
 };
@@ -112,18 +114,11 @@ export function getActiveAddresses(): string[] {
     return result
 }
 
-export function needToStop(): boolean {
-    return false
-    const file = readFileSync('online_config/stopper.txt', 'utf-8');
-    const lines = file.split('\n');
-    for (const line of lines){
-        let [label, status] = line.trim().split('=');
-        if (label.trim() === 'stop'){
-            return status.trim() !== "0"
-        }
-    }
-    return true
+export function setStop(status: boolean): void {
+    stopAll = status
 }
+
+export const needToStop = (): boolean => stopAll;
 
 export function getAddressInfo(password: string, address: string): AddressInfo {
     const file = readFileSync('.accs', 'utf-8');
