@@ -26,6 +26,6 @@ export const ZKSYNC_BASIC_CONFIG: RunConfig = {
     strategy: Strategy.ZkSyncBasic,
     threads: 1,
     waitInitial: {min: 0, max: 0},
-    waitBetweenTxs: {min: 30, max: 60},
+    waitBetweenTxs: {min: 30, max: 15 * 60},
     waitBetweenModules: {min: 30, max: 60}
 }

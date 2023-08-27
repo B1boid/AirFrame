@@ -48,7 +48,7 @@ async function doTask(password: string, passwordOkx: string, walletActions: Wall
             } else {
                 globalLogger.connect(wallet.getAddress(), ethereumChain).done(`Module: ${JSON.stringify(action)}`)
                 const blockchainModule = blockchainModules[action.chainName]
-                actionsRes = await blockchainModule.doActivities(wallet, action.activityNames, action.randomOrder, runConfig.waitBetweenModules)
+                actionsRes = await blockchainModule.doActivities(wallet, action.activityNames, action.randomOrder, runConfig.waitBetweenTxs)
             }
             if (!actionsRes) {
                 globalLogger.connect(wallet.getAddress(), ethereumChain).error("Failed to do activities")
