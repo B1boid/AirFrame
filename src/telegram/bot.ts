@@ -97,13 +97,16 @@ bot.onText(/\/set_force_stop/, (msg) => {
     switch (args[0]) {
         case "true":
             setStop(true)
-            return
+            break
         case "false":
             setStop(false)
-            return
+            break
         default:
             bot.sendMessage(msg.chat.id, `Wrong status. Expected: <true|false>. Found: ${args[0]}`)
+            return
     }
+
+    bot.sendMessage(msg.chat.id, `Successfully set status \`${args[0]}\` for force stop.`)
 })
 
 bot.onText(/\/get_force_stop/, (msg) => {
