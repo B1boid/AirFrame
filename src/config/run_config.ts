@@ -18,14 +18,14 @@ export const TEST_CONFIG: RunConfig = {
     strategy: Strategy.TestMode,
     threads: 1,
     waitInitial: {min: 0, max: 0},
-    waitBetweenTxs: {min: 0, max: 0},
+    waitBetweenTxs: {min: 30, max: 5 * 60},
     waitBetweenModules: {min: 0, max: 0}
 }
 
 export const ZKSYNC_BASIC_CONFIG: RunConfig = {
     strategy: Strategy.ZkSyncBasic,
-    threads: 1,
-    waitInitial: {min: 0, max: 0},
-    waitBetweenTxs: {min: 30, max: 15 * 60},
+    threads: 2,
+    waitInitial: {min: 0, max: 20 * 60},
+    waitBetweenTxs: {min: 30, max: 10 * 60},
     waitBetweenModules: {min: 30, max: 60}
 }

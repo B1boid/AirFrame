@@ -73,7 +73,7 @@ export async function getFeeData(provider: UnionProvider, chain: Chain): Promise
             counter++
             await sleep(10)
         } catch (e) {
-            globalLogger.error(`Error getting gas price | ${e}`)
+            globalLogger.warn(`Error getting gas price | ${e}`)
             await sleep(10)
         }
     }
