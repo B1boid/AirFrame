@@ -66,25 +66,7 @@ class Logger implements ILogger{
         if (channel) {
             try {
                 await bot.sendMessage(channel,
-                    message.substring(0, 4000)
-                        .replace(/_/g, '\\_')
-                        .replace(/\*/g, '\\*')
-                        .replace(/\[/g, '\\[')
-                        .replace(/]/g, '\\]')
-                        .replace(/\(/g, '\\(')
-                        .replace(/\)/g, '\\)')
-                        .replace(/~/g, '\\~')
-                        .replace(/`/g, '\\`')
-                        .replace(/>/g, '\\>')
-                        .replace(/#/g, '\\#')
-                        .replace(/\+/g, '\\+')
-                        .replace(/-/g, '\\-')
-                        .replace(/=/g, '\\=')
-                        .replace(/\|/g, '\\|')
-                        .replace(/\{/g, '\\{')
-                        .replace(/}/g, '\\}')
-                        .replace(/\./g, '\\.')
-                        .replace(/!/g, '\\!'),
+                    message.substring(0, 4000),
                     {parse_mode: "MarkdownV2", disable_web_page_preview: true})
             } catch (e) {
                 await bot.sendMessage(channel, "Failed sending message to bot. Check logs.")
@@ -97,7 +79,25 @@ class Logger implements ILogger{
 
         t.cell('Type', `*${type}*`)
         t.cell('Address', "*GLOBAL*")
-        t.cell('Message', `\`${msg}\``)
+        t.cell('Message', `\`${msg
+            .replace(/_/g, '\\_')
+            .replace(/\*/g, '\\*')
+            .replace(/\[/g, '\\[')
+            .replace(/]/g, '\\]')
+            .replace(/\(/g, '\\(')
+            .replace(/\)/g, '\\)')
+            .replace(/~/g, '\\~')
+            .replace(/`/g, '\\`')
+            .replace(/>/g, '\\>')
+            .replace(/#/g, '\\#')
+            .replace(/\+/g, '\\+')
+            .replace(/-/g, '\\-')
+            .replace(/=/g, '\\=')
+            .replace(/\|/g, '\\|')
+            .replace(/\{/g, '\\{')
+            .replace(/}/g, '\\}')
+            .replace(/\./g, '\\.')
+            .replace(/!/g, '\\!')}\``)
         t.newRow()
         return [`${type} - GLOBAL - ${msg}`, t.printTransposed()]
     }
