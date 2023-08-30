@@ -107,8 +107,14 @@ export function getActiveAddresses(): string[] {
     const file = readFileSync('.active_accs', 'utf-8');
     const accs = file.split('\n');
     let result: string[] = [];
-    for (const accLine of accs) {
+    for (const [ind, accLine] of accs.entries()) {
         const [label, addr, withdrawAddr, subacc, pkCipher] = accLine.trim().split(',');
+        if (addr === undefined){
+            if (ind === accs.length - 1){
+                break
+            }
+            throw Error(`Invalid address in .active_accs file: ${accLine}`)
+        }
         result.push(addr)
     }
     return result
