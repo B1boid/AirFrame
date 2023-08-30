@@ -1,7 +1,7 @@
 import {ConnectionModule} from "../../classes/connection";
 import {TxResult, WalletI} from "../../classes/wallet";
-import {Blockchains, Chain, Destination, ethereumChain, polygonChain} from "../../config/chains";
-import {globalLogger, ILogger} from "../../utils/logger";
+import {Blockchains, Chain, Destination, ethereumChain} from "../../config/chains";
+import {globalLogger} from "../../utils/logger";
 import {getTxForTransfer} from "../utils";
 import Crypto from "crypto-js"
 import {OkxCredentials} from "../../classes/info";
@@ -22,6 +22,7 @@ import {getTxDataForAllBalanceTransfer, retry, sleep} from "../../utils/utils";
 import axios from "axios";
 import {ethers} from "ethers-new";
 import {destToChain} from "../../module_blockchains/blockchain_modules";
+import {allGases} from "../../config/online_config";
 
 const MAX_TRIES = 30
 const DEFAULT_GAS_PRICE = ethers.parseUnits("20", "gwei")
@@ -95,24 +96,24 @@ class OkxConnectionModule implements ConnectionModule {
                 globalLogger.connect(wallet.getAddress(), chain).error("Chain is not supported for depositing to OKX ")
                 return Promise.resolve([false, 0])
             }
-            let txTransferToWithdrawAddress: TxInteraction;
-            let bigAmount: bigint
-            if (amount === -1) {
-                [bigAmount, txTransferToWithdrawAddress] = await getTxDataForAllBalanceTransfer(wallet, withdrawAddress, asset, chain, EXTRA_GAS_LIMIT, DEFAULT_GAS_PRICE)
-                amount = Number(ethers.formatEther(bigAmount))
-            } else {
-                bigAmount = ethers.parseEther(`${amount}`)
-                txTransferToWithdrawAddress = getTxForTransfer(asset, withdrawAddress, bigAmount)
-            }
 
-            txTransferToWithdrawAddress.confirmations = withdrawalConfig.confirmations
 
-            const [resWithdraw, txHash]: [TxResult, string] = await wallet.sendTransaction(txTransferToWithdrawAddress, chain, 1)
-            if (resWithdraw === TxResult.Fail) {
+            const response: [TxResult, string] | null = (await retry(async (i) => {
+                const [bigAmount, txTransferToWithdrawAddress] = await this.buildTransferToOkx(wallet, amount, withdrawAddress,
+                    asset, chain, i * EXTRA_GAS_LIMIT, ethers.parseUnits(`${allGases[chain.title]}`, "gwei"))
+
+                txTransferToWithdrawAddress.confirmations = withdrawalConfig.confirmations
+
+                const [res, txHash] = await wallet.sendTransaction(txTransferToWithdrawAddress, chain, 1)
+                return res === TxResult.Fail ? null : [res, txHash]
+            }, MAX_TRIES))
+
+            if (response === null) {
                 globalLogger.connect(wallet.getAddress(), chain).error("Transaction failed.")
                 return Promise.resolve([false, 0])
             }
 
+            const [resWithdraw, txHash] = response
 
             const submitStatus = await this.depositWithdrawFinished(
                 wallet,
@@ -143,6 +144,16 @@ class OkxConnectionModule implements ConnectionModule {
         }
 
         throw new Error(`No OKX destination was found. From: ${from}. To: ${to}. Check configs.`)
+    }
+
+    private async buildTransferToOkx(wallet: WalletI, amount: number, withdrawAddress: string, asset: Asset, chain: Chain, extraGasLimit: number, defaultGasPrice: bigint): Promise<[bigint, TxInteraction]> {
+        if (amount === -1) {
+            return await getTxDataForAllBalanceTransfer(wallet, withdrawAddress, asset, chain, extraGasLimit, defaultGasPrice)
+        } else {
+            const bigAmount = ethers.parseEther(`${amount}`)
+            const txTransferToWithdrawAddress = getTxForTransfer(asset, withdrawAddress, bigAmount)
+            return Promise.resolve([bigAmount, txTransferToWithdrawAddress])
+        }
     }
 
     private async waitOkxBalanceChange(wallet: WalletI, asset: Asset, okxBalanceBefore: string): Promise<[boolean, number]> { // status, balance

@@ -211,10 +211,10 @@ export function bigMax(a: bigint, b: bigint): bigint {
 }
 
 
-export async function retry<T>(f: () => T | null, max_tries: number): Promise<T | null> {
+export async function retry<T>(f: (i: number) => T | null, max_tries: number): Promise<T | null> {
     let i = 0
     while (i < max_tries) {
-        const res = await f()
+        const res = await f(i + 1)
 
         if (res !== null) {
             return res

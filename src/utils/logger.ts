@@ -64,7 +64,31 @@ class Logger implements ILogger{
 
         const channel = getChannel(type)
         if (channel) {
-            await bot.sendMessage(channel, message.substring(0, 4000), {parse_mode: "MarkdownV2", disable_web_page_preview: true})
+            try {
+                await bot.sendMessage(channel,
+                    message.substring(0, 4000)
+                        .replace(/_/g, '\\_')
+                        .replace(/\*/g, '\\*')
+                        .replace(/\[/g, '\\[')
+                        .replace(/]/g, '\\]')
+                        .replace(/\(/g, '\\(')
+                        .replace(/\)/g, '\\)')
+                        .replace(/~/g, '\\~')
+                        .replace(/`/g, '\\`')
+                        .replace(/>/g, '\\>')
+                        .replace(/#/g, '\\#')
+                        .replace(/\+/g, '\\+')
+                        .replace(/-/g, '\\-')
+                        .replace(/=/g, '\\=')
+                        .replace(/\|/g, '\\|')
+                        .replace(/\{/g, '\\{')
+                        .replace(/}/g, '\\}')
+                        .replace(/\./g, '\\.')
+                        .replace(/!/g, '\\!'),
+                    {parse_mode: "MarkdownV2", disable_web_page_preview: true})
+            } catch (e) {
+                await bot.sendMessage(channel, "Failed sending message to bot. Check logs.")
+            }
         }
     }
 
