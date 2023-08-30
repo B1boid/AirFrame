@@ -8,6 +8,7 @@ import {MAX_TX_WAITING} from "../config/online_config";
 import * as zk from "zksync-web3";
 import * as oldethers from "ethers";
 import {getFeeData, getGasLimit} from "../utils/gas";
+import {ZKSYNC_BRIDGE_NAME} from "../module_connections/eth-zksyncofficial/connection_eth_zksync_official";
 
 
 export enum TxResult {
@@ -118,6 +119,9 @@ export class MyWallet implements WalletI {
                 if (!txInteraction.name.toLowerCase().includes("bridge") && !txInteraction.name.toLowerCase().endsWith("-transfer")) {
                     this.curGasLimit += TX_LOGIC_BY_TRY[retry].addGasLimit + chain.extraGasLimit
                 }
+                 if (retry === 1 && ZKSYNC_BRIDGE_NAME === txInteraction.name) {
+                    this.curGasLimit = Math.floor(1.02 * this.curGasLimit)
+                 }
                 const [sendResponse, txInfo] = await this._sendTransaction(curSigner, txInteraction)
                 result = sendResponse
                 txHash = txInfo
