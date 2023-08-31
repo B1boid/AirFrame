@@ -36,6 +36,9 @@ export enum Asset {
     ILV = "ILV",
     CVX = "CVX",
     ENJ = "ENJ",
+    OP = "OP",
+    RPL = "RPL",
+    CBETH = "CBETH",
 
     // === Only zkSync tokens ==
     MUTE = "MUTE",

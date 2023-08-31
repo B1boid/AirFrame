@@ -65,6 +65,7 @@ export const ethContracts: { [id: string]: string } = {
     nftMintDream: "0xCAE5E96069cdc4bCbc05f81bA0707d51BC02BFf5",
     nftMintRaid: "0x0A791089ACf48912a9Cfde00E3A6aFe9eDBC3221",
     nftMintGlow: "0x7BB824EceD0a777C17ac0000B0E7f8e036F1538f",
+    nftMintHolo: "0x2c4BD4e25D83285f417E26a44069F41d1a8aD0e7",
 
     claimNFTx: "0x688c3E4658B5367da06fd629E41879beaB538E37",
     claimApe: "0x5954aB967Bc958940b7EB73ee84797Dc8a2AFbb9"
