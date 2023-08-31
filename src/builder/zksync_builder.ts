@@ -4,7 +4,7 @@ import {Blockchains, Destination, ethereumChain, zkSyncChain} from "../config/ch
 import {Asset} from "../config/tokens";
 import {Connections} from "../module_connections/connection_modules";
 import {getMedian, getRandomElement, getRandomFloat, getRandomInt} from "../utils/utils";
-import {EthereumActivity, ZkSyncActivity} from "../module_blockchains/blockchain_modules";
+import {EthereumActivity, OptimismActivity, ZkSyncActivity} from "../module_blockchains/blockchain_modules";
 import {globalLogger} from "../utils/logger";
 
 
@@ -243,7 +243,7 @@ function generateZkSync(accInfo: Features, actions: AnyActions[]): void {
     // }
     // actions.push(CONNECTION_ZKSYNC_TO_OKX)
 
-    if (getRandomInt(0, 100) <= 66){ // 66% chance to use optimism
+    if (getRandomInt(0, 100) <= 75){ // 75% chance to use optimism
         const BRIDGE_ORBITER_ZKSYNC_TO_OPTIMISM: ConnectionAction = {
             from: Destination.ZkSync,
             to: Destination.Optimism,
@@ -252,6 +252,9 @@ function generateZkSync(accInfo: Features, actions: AnyActions[]): void {
             connectionName: Connections.Orbiter
         }
         actions.push(BRIDGE_ORBITER_ZKSYNC_TO_OPTIMISM)
+        actions.push(
+            generateOptimismActivities(getRandomInt(0, 2))
+        )
         const CONNECTION_OPTIMISM_TO_OKX: ConnectionAction = {
             from: Destination.Optimism,
             to: Destination.OKX,
@@ -316,4 +319,31 @@ function generateZkSyncRandomActivities(activitiesNum: number): ZkSyncActivity[]
         repeatedActivities.push(curActivity)
     }
     return res
+}
+
+function generateOptimismActivities(activitiesNum: number): ModuleActions {
+    let availableActivities: OptimismActivity[] = [
+        OptimismActivity.optRandomMint, OptimismActivity.optRandomMint, OptimismActivity.optRandomMint, // x3 chance
+        OptimismActivity.optAaveCycle,
+        OptimismActivity.optSwapCycleNativeToUsdc,
+        OptimismActivity.optFakeUniExec,
+        OptimismActivity.optMoveDustGas
+    ]
+
+    let res: OptimismActivity[] = []
+    for (let i = 0; i < activitiesNum; i++) {
+        let curActivity: OptimismActivity
+        while (true) {
+            curActivity = getRandomElement(availableActivities)
+            if (!res.includes(curActivity)) {
+                break
+            }
+        }
+        res.push(curActivity)
+    }
+    return {
+        chainName: Blockchains.Optimism,
+        randomOrder: Randomness.Full,
+        activityNames: res
+    }
 }
