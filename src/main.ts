@@ -11,7 +11,7 @@ import {
 import {WALLETS_ACTIONS_1} from "./tests/task1";
 import {Builder, Strategy} from "./builder/common_builder";
 import {WalletActions} from "./classes/actions";
-import {RunConfig, TEST_CONFIG, ZKSYNC_BASIC_CONFIG} from "./config/run_config";
+import {MAINS_ZKSYNC_CONFIG, RunConfig, TEST_CONFIG, ZKSYNC_BASIC_CONFIG} from "./config/run_config";
 import {globalLogger} from "./utils/logger";
 import {PromisePool} from "@supercharge/promise-pool";
 import {bot} from "./telegram/bot";
@@ -78,7 +78,7 @@ async function doTask(password: string, passwordOkx: string, walletActions: Wall
 export async function main(accsPassword : string | undefined = undefined, okxPassword: string | undefined = undefined){
     // TODO: online config doesn't work - we need to use tg bot for it
 
-    const runConfig: RunConfig = ZKSYNC_BASIC_CONFIG
+    const runConfig: RunConfig = MAINS_ZKSYNC_CONFIG
 
     const threads: number = runConfig.threads
     const strategy: Strategy = runConfig.strategy
