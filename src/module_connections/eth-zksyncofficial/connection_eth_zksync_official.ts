@@ -8,7 +8,7 @@ import {Contract, ethers, FeeData} from "ethers-new";
 import zk_sync_bridge_official from "../../abi/zksync_bridge_official.json"
 import * as zk from "zksync-web3"
 import {getFeeData, getGasLimit} from "../../utils/gas";
-import {bigMax, sleep} from "../../utils/utils";
+import {bigMax, retry, sleep} from "../../utils/utils";
 import {destToChain} from "../../module_blockchains/blockchain_modules";
 
 const tag = "Official ZkSync bridge"
@@ -18,6 +18,8 @@ export const ZKSYNC_BRIDGE_NAME = `${tag}: Bridge ETH from Ethereum to ZkSync.`
 const SEND_ALL = -1;
 
 const MAX_RETIRES_BALANCE_CHANGED = 90;
+const MAX_RETIRES_ZKSYNC_BRIDGE = 30
+const SLEEP_MINUTES = 10
 
 const L1_DEFAULT_GAS = BigInt(120_000)
 const L2_BRIDGE_GAS_LIMIT = 733664;
@@ -52,12 +54,22 @@ class ZkSyncEthOfficialConectionModule implements ConnectionModule {
             globalLogger.connect(wallet.getAddress(), zkSyncChain).error(`Failed to build bridge transaction for ${tag}.`)
             return Promise.resolve([false, 0])
         }
-        const [homeResponse, l1Hash] = await wallet.sendTransaction(tx, destToChain(from), 1)
+        const response: [TxResult, string] | null = await retry(async () => {
+            const [homeResponse, l1Hash] = await wallet.sendTransaction(tx, destToChain(from), 1)
 
-        if (homeResponse === TxResult.Fail) {
+            if (homeResponse === TxResult.Success) {
+                return Promise.resolve([homeResponse, l1Hash])
+            }
+            await sleep(SLEEP_MINUTES * 60)
+            return null
+        }, MAX_RETIRES_ZKSYNC_BRIDGE)
+
+        if (response === null) {
             globalLogger.connect(wallet.getAddress(), zkSyncChain).error(`Failed tx for bridging ${from} -> ${to} using ${tag}.`)
             return Promise.resolve([false, 0])
         }
+        const [homeResponse, l1Hash] = response
+
         globalLogger.connect(wallet.getAddress(), zkSyncChain).info(`Submitted tx ${from} -> ${to} in ${tag}. L1 Hash: ${l1Hash}.`)
 
         const [result, newBalance] = await this.waitBalanceChanged(wallet, to, balanceBefore)
