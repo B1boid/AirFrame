@@ -103,7 +103,7 @@ class ZkSyncEthOfficialConectionModule implements ConnectionModule {
                         stoppable: false
                     }
                     let estimatedGas: number = await getGasLimit(provider, ethereumChain, wallet.getAddress(), estimateData)
-                    estimatedGas = Math.floor(1.04 * estimatedGas) // 4% shift
+                    estimatedGas = Math.floor(1.12 * estimatedGas) // 12% shift
                     const l1FeesToPay = BigInt(estimatedGas) * (feeData.maxFeePerGas ?? DEFAULT_GAS_PRICE_ZKSYNC_OFFICIAL_BRIDGE)
 
                     amountToSendWithFees = (balance - l1FeesToPay).toString()

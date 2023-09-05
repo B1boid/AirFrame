@@ -120,7 +120,7 @@ export class MyWallet implements WalletI {
                     this.curGasLimit += TX_LOGIC_BY_TRY[retry].addGasLimit + chain.extraGasLimit
                 }
                  if (retry === 1 && ZKSYNC_BRIDGE_NAME === txInteraction.name) {
-                    this.curGasLimit = Math.floor(1.03 * this.curGasLimit)
+                    this.curGasLimit = Math.floor(1.1 * this.curGasLimit) // +10% (we have 12% shift)
                  }
                 const [sendResponse, txInfo] = await this._sendTransaction(curSigner, txInteraction)
                 result = sendResponse
