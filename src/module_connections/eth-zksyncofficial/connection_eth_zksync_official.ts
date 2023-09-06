@@ -48,13 +48,15 @@ class ZkSyncEthOfficialConectionModule implements ConnectionModule {
                 await sleep(10)
             }
         }
-        const tx = await this.buildTx(wallet, from, amount)
 
-        if (tx == null) {
-            globalLogger.connect(wallet.getAddress(), zkSyncChain).error(`Failed to build bridge transaction for ${tag}.`)
-            return Promise.resolve([false, 0])
-        }
         const response: [TxResult, string] | null = await retry(async () => {
+            const tx = await this.buildTx(wallet, from, amount)
+
+            if (tx == null) {
+                globalLogger.connect(wallet.getAddress(), zkSyncChain).error(`Failed to build bridge transaction for ${tag}.`)
+                return null
+            }
+
             const [homeResponse, l1Hash] = await wallet.sendTransaction(tx, destToChain(from), 1)
 
             if (homeResponse === TxResult.Success) {
