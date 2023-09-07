@@ -21,6 +21,6 @@ class OptimismModule extends BlockchainModule {
 export const moduleOptimism: OptimismModule = new OptimismModule(
     optimismChain,
     [
-        optSwapCycleNativeToUsdc, optRandomApprove, optAaveCycle, optMoveDustGas, optFakeUniExec, optRandomMint
+        optSwapCycleNativeToUsdc, optRandomApprove, optAaveCycle, optMoveDustGas, optFakeUniExec
     ]
 )
