@@ -6,7 +6,7 @@ import {
     getAddressInfo,
     getOkxCredentials,
     getOkxCredentialsForSub,
-    needToStop, printActions, sleep, sleepWithLimits
+    needToStop, printActions, sleepWithLimits
 } from "./utils/utils";
 import {WALLETS_ACTIONS_1} from "./tests/task1";
 import {Builder, Strategy} from "./builder/common_builder";
@@ -130,6 +130,5 @@ export async function main(accsPassword : string | undefined = undefined, okxPas
         globalLogger.done("All accounts finished successfully!")
     }
 
-    await bot.stopPolling()
     return
 }
