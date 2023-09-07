@@ -71,16 +71,16 @@ export async function ethRandomApprove_approve(wallet: WalletI): Promise<TxInter
 
 export async function ethRandomMint_mint(wallet: WalletI): Promise<TxInteraction[]> {
     let nft = getRandomElement([
-        {to: contracts.nftMintHolo, value: "63646133376673", data: "0xefef39a10000000000000000000000000000000000000000000000000000000000000001"},
-        {to: contracts.nftMintHolo, value: "63646133376673", data: "0xefef39a10000000000000000000000000000000000000000000000000000000000000001"},
-        {to: contracts.nftMintHolo, value: "63646133376673", data: "0xefef39a10000000000000000000000000000000000000000000000000000000000000001"},
-        {to: contracts.nftMintHolo, value: "63646133376673", data: "0xefef39a10000000000000000000000000000000000000000000000000000000000000001"},
-        {to: contracts.nftMintHolo, value: "63646133376673", data: "0xefef39a10000000000000000000000000000000000000000000000000000000000000001"},
+        // {to: contracts.nftMintHolo, value: "63646133376673", data: "0xefef39a10000000000000000000000000000000000000000000000000000000000000001"},
+        // {to: contracts.nftMintHolo, value: "63646133376673", data: "0xefef39a10000000000000000000000000000000000000000000000000000000000000001"},
+        // {to: contracts.nftMintHolo, value: "63646133376673", data: "0xefef39a10000000000000000000000000000000000000000000000000000000000000001"},
+        // {to: contracts.nftMintHolo, value: "63646133376673", data: "0xefef39a10000000000000000000000000000000000000000000000000000000000000001"},
+        // {to: contracts.nftMintHolo, value: "63646133376673", data: "0xefef39a10000000000000000000000000000000000000000000000000000000000000001"},
 
         {to: contracts.nftMintZerion, value: "0", data: "0x1249c58b72db8c0b"},
-        // {to: contracts.nftMintZerion, value: "0", data: "0x1249c58b72db8c0b"},
-        // {to: contracts.nftMintZerion, value: "0", data: "0x1249c58b72db8c0b"},
-        // {to: contracts.nftMintParrot, value: "0", data: "0xa0712d68000000000000000000000000000000000000000000000000000000000000000172db8c0b"},
+        {to: contracts.nftMintZerion, value: "0", data: "0x1249c58b72db8c0b"},
+        {to: contracts.nftMintZerion, value: "0", data: "0x1249c58b72db8c0b"},
+        {to: contracts.nftMintParrot, value: "0", data: "0xa0712d68000000000000000000000000000000000000000000000000000000000000000172db8c0b"},
         {to: contracts.nftMintParrot, value: "0", data: "0xa0712d68000000000000000000000000000000000000000000000000000000000000000172db8c0b"},
         {to: contracts.nftMintDream, value: "0", data: "0xa0712d68000000000000000000000000000000000000000000000000000000000000000172db8c0b"},
         {to: contracts.nftMintRaid, value: "0", data: "0xa0712d68000000000000000000000000000000000000000000000000000000000000000172db8c0b"},
