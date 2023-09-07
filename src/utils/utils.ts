@@ -18,6 +18,7 @@ import {BigNumber} from "ethers";
 dotenv.config();
 
 let stopAll = false;
+const MAX_TRIES = 10;
 
 export type EnumDictionary<T extends string | symbol | number, U> = {
     [K in T]: U;
@@ -178,7 +179,20 @@ export async function getTxDataForAllBalanceTransfer(
     } else {
         provider = new ethers.JsonRpcProvider(fromChain.nodeUrl, fromChain.chainId)
     }
-    const balanceOr: bigint | BigNumber = await provider.getBalance(wallet.getAddress())
+
+    const balanceOr: bigint | BigNumber | null = await retry(async () => {
+        try {
+            return await provider.getBalance(wallet.getAddress())
+        } catch {
+            await sleep(5 * 60)
+            return null
+        }
+    }, MAX_TRIES)
+
+    if (balanceOr === null) {
+        throw new Error("Failed to fetch balance for all transfer.")
+    }
+
     let balance: bigint
     if (balanceOr instanceof BigNumber) {
         balance = balanceOr.toBigInt()
