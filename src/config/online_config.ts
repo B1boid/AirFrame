@@ -9,7 +9,8 @@ export const allGases : EnumDictionary<Blockchains, number> = {
     [Blockchains.Polygon]: 900,
     [Blockchains.ZkSync]: 1000,
     [Blockchains.Arbitrum]: 1000,
-    [Blockchains.Optimism]: 1000
+    [Blockchains.Optimism]: 1000,
+    [Blockchains.Bsc]: 1000
 }
 
 export function setGasPriceLimit(chain: Blockchains, limit: number) {

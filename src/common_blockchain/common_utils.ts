@@ -12,7 +12,7 @@ export function getExecBalance (balance: ExecBalance, fullBalance: bigint): bigi
         return fullBalance
     }
     if (balance.fixBalance !== undefined && balance.fixBalance){
-        return  parseEther(balance.fixBalance.toString())
+        return parseEther(balance.fixBalance.toString())
     }
     if (balance.balancePercent !== undefined && balance.balancePercent) {
         return getRandomizedPercent(fullBalance, balance.balancePercent[0], balance.balancePercent[1])

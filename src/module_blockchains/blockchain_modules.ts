@@ -7,6 +7,7 @@ import {moduleEthereum} from "./ethereum/ethereum";
 import {moduleOptimism} from "./optimism/optimism";
 import {moduleArbitrum} from "./arbitrum/arbitrum";
 import {optFakeUniExec, optRandomMint} from "./optimism/activities";
+import {moduleBsc} from "./bsc/bsc";
 
 
 export const enum PolygonActivity {
@@ -53,14 +54,20 @@ export const enum OptimismActivity {
     optRandomMint = "optRandomMint"
 }
 
-export type ActivityTag = PolygonActivity | ZkSyncActivity | EthereumActivity | OptimismActivity
+export const enum BscActivity {
+    bscRandomApprove = "bscRandomApprove",
+    bscKinzaCycle = "bscKinzaCycle"
+}
+
+export type ActivityTag = PolygonActivity | ZkSyncActivity | EthereumActivity | OptimismActivity | BscActivity
 
 export const blockchainModules: EnumDictionary<Blockchains, BlockchainModule> = {
     [Blockchains.ZkSync]: moduleZkSync,
     [Blockchains.Polygon]: modulePolygon,
     [Blockchains.Ethereum]: moduleEthereum,
     [Blockchains.Optimism]: moduleOptimism,
-    [Blockchains.Arbitrum]: moduleArbitrum
+    [Blockchains.Arbitrum]: moduleArbitrum,
+    [Blockchains.Bsc]: moduleBsc
 }
 
 export const destToChain = (destination: Destination): Chain => {

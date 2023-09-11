@@ -40,6 +40,12 @@ export function okxWithdrawalConfig(asset: Asset, blockchain: Blockchains): OKXW
                 confirmations: 12,
                 withdrawalConfirmationsUnlock: 12
             }
+        case Asset.BNB + Blockchains.Bsc:
+            return {
+                fee: "0.002",
+                confirmations: 12,
+                withdrawalConfirmationsUnlock: 30
+            }
         default:
             return {
                 fee: "0",
@@ -61,6 +67,8 @@ export function destToOkxChain(blockchain: Blockchains) {
             return "ERC20"
         case Blockchains.Arbitrum:
             return "Arbitrum One"
+        case Blockchains.Bsc:
+            return "BSC"
         default:
             return ""
     }

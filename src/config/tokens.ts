@@ -1,5 +1,7 @@
 export enum Asset {
     ETH = "ETH",
+    BNB = "BNB",
+    WBNB = "WBNB",
     WETH = "WETH",
     USDT = "USDT",
     USDC = "USDC",
@@ -39,6 +41,10 @@ export enum Asset {
     OP = "OP",
     RPL = "RPL",
     CBETH = "CBETH",
+    XRP = "XRP",
+    ADA = "ADA",
+    DOGE = "DOGE",
+    TONCOIN = "TONCOIN",
 
     // === Only zkSync tokens ==
     MUTE = "MUTE",

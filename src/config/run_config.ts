@@ -18,7 +18,7 @@ export const TEST_CONFIG: RunConfig = {
     strategy: Strategy.TestMode,
     threads: 1,
     waitInitial: {min: 0, max: 0},
-    waitBetweenTxs: {min: 30, max: 5 * 60},
+    waitBetweenTxs: {min: 0, max: 1},
     waitBetweenModules: {min: 0, max: 0}
 }
 
