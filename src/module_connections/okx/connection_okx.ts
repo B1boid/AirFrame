@@ -302,49 +302,55 @@ class OkxConnectionModule implements ConnectionModule {
 
     private async fetchOKX<T>(wallet: WalletI, method: Method, okxApiMethod: OKXApiMethod,
                               credentials: OkxCredentials | null, body: object | URLSearchParams): Promise<T | null> {
-        if (credentials === null) {
-            return Promise.resolve(null)
-        }
-        const nowISO: string = new Date().toISOString()
-        const message = (() => {
-            switch (method) {
-                case Method.GET:
-                    return `${nowISO}${method}${okxApiMethod}?${body}`
-                case Method.POST:
-                    return `${nowISO}${method}${okxApiMethod}${JSON.stringify(body)}`
+        try {
+            if (credentials === null) {
+                return Promise.resolve(null)
             }
-        })()
-        const sign: string = Crypto.enc.Base64.stringify(
-            Crypto.HmacSHA256(
-                message,
-                credentials.secretKey
+            const nowISO: string = new Date().toISOString()
+            const message = (() => {
+                switch (method) {
+                    case Method.GET:
+                        return `${nowISO}${method}${okxApiMethod}?${body}`
+                    case Method.POST:
+                        return `${nowISO}${method}${okxApiMethod}${JSON.stringify(body)}`
+                }
+            })()
+            const sign: string = Crypto.enc.Base64.stringify(
+                Crypto.HmacSHA256(
+                    message,
+                    credentials.secretKey
+                )
             )
-        )
 
-        return (await (async () => {
-            switch (method) {
-                case Method.GET:
-                    return axios.get<T>(`${OKX_BASE_URL}${okxApiMethod}?${body}`, {
-                        headers: {
-                            "OK-ACCESS-KEY": credentials.apiKey,
-                            "OK-ACCESS-SIGN": sign,
-                            "OK-ACCESS-TIMESTAMP": nowISO,
-                            "OK-ACCESS-PASSPHRASE": credentials.passphrase
-                        }
-                    })
-                case Method.POST:
-                    return axios.post(`${OKX_BASE_URL}${okxApiMethod}`, body, {
-                        headers: {
-                            "OK-ACCESS-KEY": credentials.apiKey,
-                            "OK-ACCESS-SIGN": sign,
-                            "OK-ACCESS-TIMESTAMP": nowISO,
-                            "OK-ACCESS-PASSPHRASE": credentials.passphrase
-                        }
-                    })
-                default:
-                    throw Error(`Unexpected method: ${method}.`)
-            }
-        })()).data;
+            return (await (async () => {
+                switch (method) {
+                    case Method.GET:
+                        return axios.get<T>(`${OKX_BASE_URL}${okxApiMethod}?${body}`, {
+                            headers: {
+                                "OK-ACCESS-KEY": credentials.apiKey,
+                                "OK-ACCESS-SIGN": sign,
+                                "OK-ACCESS-TIMESTAMP": nowISO,
+                                "OK-ACCESS-PASSPHRASE": credentials.passphrase
+                            }
+                        })
+                    case Method.POST:
+                        return axios.post(`${OKX_BASE_URL}${okxApiMethod}`, body, {
+                            headers: {
+                                "OK-ACCESS-KEY": credentials.apiKey,
+                                "OK-ACCESS-SIGN": sign,
+                                "OK-ACCESS-TIMESTAMP": nowISO,
+                                "OK-ACCESS-PASSPHRASE": credentials.passphrase
+                            }
+                        })
+                    default:
+                        throw Error(`Unexpected method: ${method}.`)
+                }
+            })()).data;
+        } catch (e) {
+            globalLogger.warn(`Failed fetch OKX: ${e}`)
+            await sleep(10)
+            return null
+        }
     }
 }
 
