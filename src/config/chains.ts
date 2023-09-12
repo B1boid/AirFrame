@@ -13,7 +13,8 @@ export enum Blockchains {
     Polygon = "Polygon",
     Ethereum = "Ethereum",
     Optimism = "Optimism",
-    Arbitrum = "Arbitrum"
+    Arbitrum = "Arbitrum",
+    Bsc = "Bsc"
 }
 
 enum Exchanges {
@@ -72,4 +73,14 @@ export const arbitrumChain: Chain = {
     extraGasLimit: 0,
     explorerUrl: "https://arbiscan.io",
     orbiterCode: 9002
+}
+
+export const bscChain: Chain = {
+    title: Blockchains.Bsc,
+    chainId: 56,
+    nodeUrl: "https://rpc.ankr.com/bsc",
+    symbol: "BNB",
+    extraGasLimit: 0,
+    explorerUrl: "https://bscscan.com",
+    orbiterCode: -1 // TODO: oleg pls
 }
