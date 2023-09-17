@@ -137,7 +137,7 @@ class OkxConnectionModule implements ConnectionModule {
             }
 
             if (subAccount === null) {
-                return Promise.resolve([true, newBalance])
+                return Promise.resolve([true, newBalance - Number(okxBalanceBefore)])
             }
 
             return this.internalTransfer(wallet, asset, newBalance.toString(), subAccount, OKXTransferType.FROM_SUB_TO_MASTER)
