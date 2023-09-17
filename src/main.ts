@@ -1,22 +1,26 @@
 import {blockchainModules} from "./module_blockchains/blockchain_modules";
 import {MyWallet, WalletI} from "./classes/wallet";
-import {connectionModules} from "./module_connections/connection_modules";
+import {connectionModules, Connections} from "./module_connections/connection_modules";
 import {
     getActiveAddresses,
     getAddressInfo,
     getOkxCredentials,
     getOkxCredentialsForSub,
-    needToStop, printActions, sleepWithLimits
+    needToStop,
+    printActions,
+    sleepWithLimits
 } from "./utils/utils";
 import {WALLETS_ACTIONS_1} from "./tests/task1";
 import {Builder, Strategy} from "./builder/common_builder";
 import {WalletActions} from "./classes/actions";
-import {MAINS_ZKSYNC_CONFIG, RunConfig, TEST_CONFIG, ZKSYNC_BASIC_CONFIG} from "./config/run_config";
+import {RunConfig, TEST_CONFIG, ZKSYNC_BASIC_CONFIG} from "./config/run_config";
 import {globalLogger} from "./utils/logger";
 import {PromisePool} from "@supercharge/promise-pool";
-import {bot} from "./telegram/bot";
 import {ethereumChain} from "./config/chains";
+import AsyncLock from "async-lock";
+
 let prompt = require('password-prompt')
+const okxLock = new AsyncLock()
 
 
 
@@ -38,7 +42,14 @@ async function doTask(password: string, passwordOkx: string, walletActions: Wall
             if ("connectionName" in action) {
                 globalLogger.connect(wallet.getAddress(), ethereumChain).done(`Connection: ${JSON.stringify(action)}`)
                 const connectionModule = connectionModules[action.connectionName]
-                const [status, sent] = await connectionModule.sendAsset(wallet, action.from, action.to, action.asset, action.amount)
+                const [status, sent] = action.connectionName === Connections.ExchangeOKX ?
+                    await okxLock.acquire<[boolean, number]>("okxOp", async () => {
+                        globalLogger.connect(wallet.getAddress(), ethereumChain).info("Enter OKX lock.")
+                        const res = await connectionModule.sendAsset(wallet, action.from, action.to, action.asset, action.amount)
+                        globalLogger.connect(wallet.getAddress(), ethereumChain).info("Exit OKX lock.")
+                        return res
+                    }) :
+                    await connectionModule.sendAsset(wallet, action.from, action.to, action.asset, action.amount)
                 actionsRes = status
                 if (firstSentAmount === -1) {
                     firstSentAmount = sent

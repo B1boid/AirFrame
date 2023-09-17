@@ -8,8 +8,10 @@
   "dependencies": {
     "@eth-optimism/sdk": "^3.1.0",
     "@supercharge/promise-pool": "^3.0.0",
+    "@types/async-lock": "^1.4.0",
     "@types/crypto-js": "^4.1.1",
     "@types/node-telegram-bot-api": "^0.61.7",
+    "async-lock": "^1.4.0",
     "axios": "^1.4.0",
     "bip39": "^3.1.0",
     "crypto-js": "^4.1.1",
