@@ -160,8 +160,8 @@ class OkxConnectionModule implements ConnectionModule {
         const logger =  globalLogger.connect(wallet.getAddress(), ethereumChain)
         let i = 0;
         while (i < MAX_TRIES) {
-            logger.info(`Try ${i}/${MAX_TRIES} fetch changed OKX balance.`)
             const newBalance = await this.getBalance(wallet, asset, wallet.getSubAccountName())
+            logger.info(`Try ${i}/${MAX_TRIES} fetch changed OKX balance. Old balance: ${okxBalanceBefore}. New fetched balance: ${newBalance === null ? -1 : newBalance}`)
 
             if (!newBalance) {
                 logger.warn("Null new balance. Retrying...")
