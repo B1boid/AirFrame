@@ -263,8 +263,8 @@ class OkxConnectionModule implements ConnectionModule {
         globalLogger.connect(wallet.getAddress(), chain).info(`Response: ${JSON.stringify(response)}`)
         if (response === null || response.code !== "0") {
             globalLogger.connect(wallet.getAddress(), chain).warn(`Withdrawal failed. Response: ${JSON.stringify(response)}`)
-            if (!needToStop() && response !== null && response.msg.startsWith("Withdrawals suspended")) {
-                globalLogger.connect(wallet.getAddress(), chain).warn("Withdrawals suspended. Waiting and trying again later.")
+            if (!needToStop() && (response !== null && response.msg.startsWith("Withdrawals suspended") || response === null)) {
+                globalLogger.connect(wallet.getAddress(), chain).warn("Withdrawals suspended or response is null. Waiting and trying again later.")
                 await sleep(60 * 60) // 1 hour
                 return this.withdraw(wallet, ccy, amt, fee, chain)
             }
