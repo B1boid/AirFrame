@@ -1,3 +1,5 @@
+import dotenv from "dotenv";
+dotenv.config()
 
 export interface Chain {
   title: Blockchains
@@ -38,7 +40,7 @@ export const zkSyncChain: Chain = {
 export const polygonChain: Chain = {
   title: Blockchains.Polygon,
   chainId: 137,
-  nodeUrl: "https://polygon.llamarpc.com",
+  nodeUrl: `https://polygon-mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
   symbol: "MATIC",
   extraGasLimit: 100000,
   explorerUrl: "https://polygonscan.com",
@@ -48,7 +50,7 @@ export const polygonChain: Chain = {
 export const ethereumChain: Chain = {
     title: Blockchains.Ethereum,
     chainId: 1,
-    nodeUrl: "https://rpc.ankr.com/eth",
+    nodeUrl: `https://mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
     symbol: "ETH",
     extraGasLimit: 100000,
     explorerUrl: "https://etherscan.io",
@@ -58,7 +60,7 @@ export const ethereumChain: Chain = {
 export const optimismChain: Chain = {
     title: Blockchains.Optimism,
     chainId: 10,
-    nodeUrl: "https://rpc.ankr.com/optimism",
+    nodeUrl: `https://optimism-mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
     symbol: "ETH",
     extraGasLimit: 0,
     explorerUrl: "https://optimistic.etherscan.io",
@@ -68,7 +70,7 @@ export const optimismChain: Chain = {
 export const arbitrumChain: Chain = {
     title: Blockchains.Arbitrum,
     chainId: 42161,
-    nodeUrl: "https://rpc.ankr.com/arbitrum",
+    nodeUrl: `https://arbitrum-mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
     symbol: "ETH",
     extraGasLimit: 0,
     explorerUrl: "https://arbiscan.io",
