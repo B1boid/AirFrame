@@ -6,7 +6,6 @@ import {Blockchains, Chain, Destination} from "../config/chains";
 import {moduleEthereum} from "./ethereum/ethereum";
 import {moduleOptimism} from "./optimism/optimism";
 import {moduleArbitrum} from "./arbitrum/arbitrum";
-import {optFakeUniExec, optRandomMint} from "./optimism/activities";
 import {moduleBsc} from "./bsc/bsc";
 
 
@@ -51,7 +50,10 @@ export const enum OptimismActivity {
     optAaveCycle = "optAaveCycle",
     optMoveDustGas = "optMoveDustGas",
     optFakeUniExec = "optFakeUniExec",
-    optRandomMint = "optRandomMint"
+    optRandomStuff = "optRandomStuff",
+    optOptimismDelegate = "optOptimismDelegate",
+    optGranaryCycle = "optGranaryCycle",
+    optDummyLendingCycle = "optDummyLendingCycle"
 }
 
 export const enum BscActivity {

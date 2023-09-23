@@ -2,10 +2,10 @@ import {Chain, optimismChain} from "../../config/chains";
 import {Activity, BlockchainModule} from "../../classes/module";
 import {
     optAaveCycle,
-    optFakeUniExec,
-    optMoveDustGas,
+    optFakeUniExec, optGranaryCycle,
+    optMoveDustGas, optOptimismDelegate,
     optRandomApprove,
-    optRandomMint,
+    optRandomStuff,
     optSwapCycleNativeToUsdc
 } from "./activities";
 
@@ -21,6 +21,7 @@ class OptimismModule extends BlockchainModule {
 export const moduleOptimism: OptimismModule = new OptimismModule(
     optimismChain,
     [
-        optSwapCycleNativeToUsdc, optRandomApprove, optAaveCycle, optMoveDustGas, optFakeUniExec
+        optSwapCycleNativeToUsdc, optRandomApprove, optAaveCycle, optMoveDustGas, optFakeUniExec, optOptimismDelegate,
+        optGranaryCycle, optRandomStuff
     ]
 )

@@ -1,11 +1,13 @@
 import {buildZkSyncBasic} from "./zksync_builder";
 import {WalletActions} from "../classes/actions";
 import {buildZkSyncMains} from "./zksync_mains_builder";
+import {buildZkSyncAnother} from "./zksync_another_builder";
 
 export enum Strategy {
     TestMode = "TestMode",
     ZkSyncBasic = "ZkSyncBasic",
-    ZkSyncMains = "ZkSyncMains"
+    ZkSyncMains = "ZkSyncMains",
+    ZkSyncAnother = "ZkSyncAnother",
 }
 
 export class Builder {
@@ -16,6 +18,8 @@ export class Builder {
                 return await buildZkSyncBasic(activeAddresses)
             case Strategy.ZkSyncMains:
                 return await buildZkSyncMains(activeAddresses)
+            case Strategy.ZkSyncAnother:
+                return await buildZkSyncAnother(activeAddresses)
             default:
                 return []
         }

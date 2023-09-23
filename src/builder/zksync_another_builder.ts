@@ -1,6 +1,6 @@
 import {AnyActions, ConnectionAction, ModuleActions, Randomness, WalletActions} from "../classes/actions";
 import {getTxCount, hasInteractionWithEthContract} from "./features";
-import {Blockchains, Destination, ethereumChain, zkSyncChain} from "../config/chains";
+import {arbitrumChain, Blockchains, Destination, ethereumChain, optimismChain, zkSyncChain} from "../config/chains";
 import {Asset} from "../config/tokens";
 import {Connections} from "../module_connections/connection_modules";
 import {getMedian, getRandomElement, getRandomFloat, getRandomInt} from "../utils/utils";
@@ -8,16 +8,18 @@ import {EthereumActivity, OptimismActivity, ZkSyncActivity} from "../module_bloc
 import {globalLogger} from "../utils/logger";
 
 
-interface Features {
+interface ExtendedFeatures {
     walletAddress: string,
     ethTxs: number,
     zkTxs: number,
+    optTxs: number,
+    arbTxs: number,
     hasOffBridge: boolean
 }
 
 
-export async function buildZkSyncBasic(activeAddresses: string[]): Promise<WalletActions[]> {
-    let accountInfos: Features[] = []
+export async function buildZkSyncAnother(activeAddresses: string[]): Promise<WalletActions[]> {
+    let accountInfos: ExtendedFeatures[] = []
     for (let address of activeAddresses){
         let features = await getAccountInfo(address)
         if (features === null) {
@@ -26,7 +28,7 @@ export async function buildZkSyncBasic(activeAddresses: string[]): Promise<Walle
         accountInfos.push(features)
     }
     accountInfos.sort(
-        function(a: Features, b: Features){
+        function(a: ExtendedFeatures, b: ExtendedFeatures){
             if(a.hasOffBridge === b.hasOffBridge){
                 return a.zkTxs > b.zkTxs ? 1 : -1;
             }else{
@@ -43,7 +45,7 @@ export async function buildZkSyncBasic(activeAddresses: string[]): Promise<Walle
     return res
 }
 
-function printStats(accs: Features[]){
+function printStats(accs: ExtendedFeatures[]){
     let zeroAccs = 0
     let accsWithOffBridge = 0
     let avgNonZeroEthTxs: number[] = []
@@ -63,19 +65,23 @@ function printStats(accs: Features[]){
     )
 }
 
-export async function getAccountInfo(address: string, retries: number = 1): Promise<Features | null> {
+export async function getAccountInfo(address: string, retries: number = 1): Promise<ExtendedFeatures | null> {
     if (retries < 0) return null
     try {
         let ethTxs = await getTxCount(address, ethereumChain)
         let zkTxs = await getTxCount(address, zkSyncChain)
+        let optTxs = await getTxCount(address, optimismChain)
+        let arbTxs = await getTxCount(address, arbitrumChain)
         let hasOffBridge = await hasInteractionWithEthContract(address, "0x32400084C286CF3E17e7B677ea9583e60a000324")
-        if (ethTxs === null || zkTxs === null || hasOffBridge === null) {
+        if (ethTxs === null || zkTxs === null || hasOffBridge === null || optTxs === null || arbTxs === null) {
             return null
         }
         return {
             walletAddress: address,
             ethTxs: ethTxs,
             zkTxs: zkTxs,
+            optTxs: optTxs,
+            arbTxs: arbTxs,
             hasOffBridge: hasOffBridge
         }
     } catch (e) {
@@ -91,7 +97,7 @@ const BRIDGE_ALL_ETHEREUM_TO_ZKSYNC: ConnectionAction = {
     connectionName: Connections.OfficialZkSyncBridge
 }
 
-function generateActions(accInfo: Features): WalletActions {
+function generateActions(accInfo: ExtendedFeatures): WalletActions {
     let actions: AnyActions[] = []
     generatePathToZkSync(accInfo, actions)
     generateZkSync(accInfo, actions)
@@ -102,7 +108,7 @@ function generateActions(accInfo: Features): WalletActions {
     }
 }
 
-function generatePathToZkSync(accInfo: Features, actions: AnyActions[]): void {
+function generatePathToZkSync(accInfo: ExtendedFeatures, actions: AnyActions[]): void {
     if (!accInfo.hasOffBridge){
         const CONNECTION_OKX_TO_ETHEREUM: ConnectionAction = {
             from: Destination.OKX,
@@ -204,7 +210,7 @@ function generateEthRandomActivities(activitiesNum: number, chanceInPercentToMin
     }
 }
 
-function generateZkSync(accInfo: Features, actions: AnyActions[]): void {
+function generateZkSync(accInfo: ExtendedFeatures, actions: AnyActions[]): void {
     let activities: ZkSyncActivity[]
     if (accInfo.zkTxs === 0){
         activities = generateZkSyncRandomActivities(getRandomInt(2, 3))
@@ -243,7 +249,7 @@ function generateZkSync(accInfo: Features, actions: AnyActions[]): void {
     // }
     // actions.push(CONNECTION_ZKSYNC_TO_OKX)
 
-    if (getRandomInt(0, 100) <= 75){ // 75% chance to use optimism
+    if (accInfo.optTxs > 0){ // 75% chance to use optimism
         const BRIDGE_ORBITER_ZKSYNC_TO_OPTIMISM: ConnectionAction = {
             from: Destination.ZkSync,
             to: Destination.Optimism,
@@ -323,22 +329,30 @@ function generateZkSyncRandomActivities(activitiesNum: number): ZkSyncActivity[]
 
 function generateOptimismActivities(activitiesNum: number): ModuleActions {
     let availableActivities: OptimismActivity[] = [
-        OptimismActivity.optAaveCycle,
+        OptimismActivity.optRandomStuff,
+        OptimismActivity.optDummyLendingCycle,
         OptimismActivity.optSwapCycleNativeToUsdc,
         OptimismActivity.optFakeUniExec,
         OptimismActivity.optMoveDustGas
     ]
 
     let res: OptimismActivity[] = []
+    let repeatedActivities: OptimismActivity[] = []
     for (let i = 0; i < activitiesNum; i++) {
         let curActivity: OptimismActivity
         while (true) {
             curActivity = getRandomElement(availableActivities)
-            if (!res.includes(curActivity)) {
+            if (!repeatedActivities.includes(curActivity)) {
                 break
             }
         }
-        res.push(curActivity)
+        if (curActivity === OptimismActivity.optDummyLendingCycle) {
+            let lendingActivities: OptimismActivity[] = [
+                OptimismActivity.optAaveCycle, OptimismActivity.optAaveCycle, OptimismActivity.optGranaryCycle
+            ]
+            res.push(getRandomElement(lendingActivities))
+        }
+        repeatedActivities.push(curActivity)
     }
     return {
         chainName: Blockchains.Optimism,

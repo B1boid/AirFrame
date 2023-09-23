@@ -65,7 +65,7 @@ export async function optAaveCycle_withdraw(wallet: WalletI): Promise<TxInteract
         let tokenContract = new ethers.Contract(contracts.aaveWrapped, erc20, provider)
         let tokenBalance: bigint = await tokenContract.balanceOf(wallet.getAddress())
 
-        let txs: TxInteraction[] = await checkAndGetApprovalsInteraction(contracts.aaveWrapped, contracts.aaveDepo, tokenBalance, tokenContract)
+        let txs: TxInteraction[] = await checkAndGetApprovalsInteraction(wallet.getAddress(), contracts.aaveDepo, tokenBalance, tokenContract)
 
         let depoContract = new ethers.Contract(contracts.aaveDepo, aave, provider)
         let data: string = depoContract.interface.encodeFunctionData("withdrawETH", [contracts.aavePool, MaxUint256, wallet.getAddress()])
@@ -112,14 +112,117 @@ export async function optFakeUniExec_do(wallet: WalletI): Promise<TxInteraction[
     }
 }
 
-export async function optRandomMint_mint(wallet: WalletI): Promise<TxInteraction[]> {
-    let nft = getRandomElement([
-        {to: contracts.nftMintHolo, value: "63646133376673", data: "0xefef39a10000000000000000000000000000000000000000000000000000000000000001"},
-    ])
-    return [{
-        ...nft,
-        stoppable: false,
-        confirmations: 1,
-        name: "mintNft"
-    }]
+export async function optOptimismDelegate_do(wallet: WalletI): Promise<TxInteraction[]> {
+    try {
+        const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+        let tokenContract = new ethers.Contract(tokens.OP, allAbi, provider)
+        let data: string = tokenContract.interface.encodeFunctionData("delegate", [wallet.getAddress()])
+        return [{
+            to: tokens.OP,
+            data: data,
+            value: "0",
+            stoppable: false,
+            confirmations: 1,
+            name: "optOptimismDelegate_do"
+        }]
+    } catch (e) {
+        globalLogger.connect(wallet.getAddress(), chain).warn(`optOptimismDelegate_do failed: ${e}`)
+        return []
+    }
+}
+
+export async function optRandomStuff_do(wallet: WalletI): Promise<TxInteraction[]> {
+    const choice = getRandomElement(
+         ["mint1", "claim1", "sea"]
+    )
+    try {
+        if (choice === "mint1") {
+            const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+            let tokenContract = new ethers.Contract("0xda2dc5277c6b2237983f928d9242febbbe402232", allAbi, provider)
+            let data: string = tokenContract.interface.encodeFunctionData("mint", [wallet.getAddress()])
+            return [{
+                to: "0xda2dc5277c6b2237983f928d9242febbbe402232",
+                data: data,
+                value: "0",
+                stoppable: false,
+                confirmations: 1,
+                name: "optRandomStuff_do"
+            }]
+        }
+        if (choice === "claim1"){
+            return [{
+                to: "0x41C914ee0c7E1A5edCD0295623e6dC557B5aBf3C",
+                data: "0xf9f031df00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000",
+                value: "0",
+                stoppable: false,
+                confirmations: 1,
+                name: "optRandomStuff_do"
+            }]
+        }
+        if (choice === "sea") {
+            const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+            let tokenContract = new ethers.Contract("0x00000000000000ADc04C56Bf30aC9d3c0aAF14dC", allAbi, provider)
+            let data: string = tokenContract.interface.encodeFunctionData("cancel", [[]])
+            return [{
+                to: "0x00000000000000ADc04C56Bf30aC9d3c0aAF14dC",
+                data: data,
+                value: "0",
+                stoppable: false,
+                confirmations: 1,
+                name: "optRandomStuff_do"
+            }]
+        }
+        return []
+    } catch (e) {
+        globalLogger.connect(wallet.getAddress(), chain).warn(`optRandomStuff_do failed: ${e}`)
+        return []
+    }
+}
+
+export async function optGranaryCycle_deposit(wallet: WalletI): Promise<TxInteraction[]> {
+    try {
+        let balancePercent = [10, 25]
+        const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+        let depoContract = new ethers.Contract("0x6e20E155819f0ee08d1291b0b9889b0e011b8224", aave, provider)
+        let data: string = depoContract.interface.encodeFunctionData(
+            "depositETH", ["0x8FD4aF47E4E63d1D2D45582c3286b4BD9Bb95DfE", wallet.getAddress(), 0])
+        let tokenBalance: bigint = await provider.getBalance(wallet.getAddress())
+        tokenBalance = getRandomizedPercent(tokenBalance, balancePercent[0], balancePercent[1])
+        return [{
+            to: "0x6e20E155819f0ee08d1291b0b9889b0e011b8224",
+            data: data,
+            value: tokenBalance.toString(),
+            stoppable: false,
+            confirmations: 1,
+            name: "optGranaryCycle_deposit"
+        }]
+    } catch (e) {
+        globalLogger.connect(wallet.getAddress(), chain).warn(`optGranaryCycle_deposit failed: ${e}`)
+        return []
+    }
+}
+
+export async function optGranaryCycle_withdraw(wallet: WalletI): Promise<TxInteraction[]> {
+    try {
+        const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+        let tokenContract = new ethers.Contract("0xfF94cc8E2c4B17e3CC65d7B83c7e8c643030D936", erc20, provider)
+        let tokenBalance: bigint = await tokenContract.balanceOf(wallet.getAddress())
+
+        let txs: TxInteraction[] = await checkAndGetApprovalsInteraction(wallet.getAddress(), "0x6e20E155819f0ee08d1291b0b9889b0e011b8224", tokenBalance, tokenContract)
+
+        let depoContract = new ethers.Contract("0x6e20E155819f0ee08d1291b0b9889b0e011b8224", aave, provider)
+        let data: string = depoContract.interface.encodeFunctionData("withdrawETH", ["0x8FD4aF47E4E63d1D2D45582c3286b4BD9Bb95DfE", MaxUint256, wallet.getAddress()])
+        txs.push({
+            to: "0x6e20E155819f0ee08d1291b0b9889b0e011b8224",
+            data: data,
+            value: "0",
+            stoppable: true,
+            confirmations: 1,
+            name: "optGranaryCycle_withdraw"
+        })
+        return txs
+    } catch (e) {
+        globalLogger.connect(wallet.getAddress(), chain).warn(`optGranaryCycle_withdraw failed: ${e}`)
+        return []
+    }
 }
