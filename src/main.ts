@@ -18,6 +18,7 @@ import {globalLogger} from "./utils/logger";
 import {PromisePool} from "@supercharge/promise-pool";
 import {ethereumChain} from "./config/chains";
 import AsyncLock from "async-lock";
+import {pingSubs} from "./utils/okx_pinger";
 
 let prompt = require('password-prompt')
 const okxLock = new AsyncLock()
@@ -96,6 +97,10 @@ export async function main(accsPassword : string | undefined = undefined, okxPas
 
     const password: string = accsPassword ? accsPassword : await prompt('Accs password: ')
     const passwordOkx: string = okxPassword ? okxPassword : await prompt('Okx password: ')
+    pingSubs(passwordOkx).catch(e => {
+        globalLogger.warn("Failed to ping subaccs")
+        console.log(e)
+    })
 
     let actions: WalletActions[]
     if (runConfig.strategy === Strategy.TestMode){

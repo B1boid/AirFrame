@@ -10,7 +10,8 @@ export enum OKXApiMethod {
     OKX_WITHDRAWAL = "/api/v5/asset/withdrawal",
     OKX_MAIN_BALANCE = "/api/v5/asset/balances",
     OKX_SUB_BALANCE = "/api/v5/asset/subaccount/balances",
-    OKX_DEPOSIT_WITHDRAW_STATUS = "/api/v5/asset/deposit-withdraw-status"
+    OKX_DEPOSIT_WITHDRAW_STATUS = "/api/v5/asset/deposit-withdraw-status",
+    OKX_TEST = "/api/v5/system/status"
 }
 
 export enum OKXTransferType {

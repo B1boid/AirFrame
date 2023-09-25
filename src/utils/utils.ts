@@ -169,6 +169,20 @@ export function getOkxCredentialsForSub(addressInfo : AddressInfo, password: str
     throw new Error(`Missing OKX credentials for ${addressInfo.subAccName}.`)
 }
 
+export function getOkxCredentialsSubs( password: string): OkxCredentials[]{
+    const file = readFileSync('.subs', 'utf-8');
+    const credentials = file.split('\n');
+    let subs: OkxCredentials[] = []
+    for (const subAccCredentials of credentials) {
+        const [subName, apikey, secretCipher, passphraseCipher] = subAccCredentials.trim().split(',');
+        const passphrase: string = CryptoJS.AES.decrypt(passphraseCipher, password).toString(CryptoJS.enc.Utf8)
+        const secret: string = CryptoJS.AES.decrypt(secretCipher, password).toString(CryptoJS.enc.Utf8)
+        subs.push(new OkxCredentials(apikey, passphrase, secret))
+
+    }
+    return subs
+}
+
 const ESTIMATE_GAS_LIMIT = BigInt(500_000) // берем сразу много, чтобы точно на любом чейне сработало. Нужно только для эстимейта, тк если эстимейтить с фул балансом, то падает тк не хватает средств на газ
 export async function getTxDataForAllBalanceTransfer(
     wallet: WalletI, toAddress: string, asset: Asset, fromChain: Chain, extraGasLimit: number, defaultGasPrice: bigint
