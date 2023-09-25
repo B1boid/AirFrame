@@ -171,9 +171,12 @@ export function getOkxCredentialsForSub(addressInfo : AddressInfo, password: str
 
 export function getOkxCredentialsSubs( password: string): OkxCredentials[]{
     const file = readFileSync('.subs', 'utf-8');
-    const credentials = file.split('\n');
+    const credentials = file.trim().split('\n');
     let subs: OkxCredentials[] = []
     for (const subAccCredentials of credentials) {
+        if (subAccCredentials.trim().length === 0){
+            continue
+        }
         const [subName, apikey, secretCipher, passphraseCipher] = subAccCredentials.trim().split(',');
         const passphrase: string = CryptoJS.AES.decrypt(passphraseCipher, password).toString(CryptoJS.enc.Utf8)
         const secret: string = CryptoJS.AES.decrypt(secretCipher, password).toString(CryptoJS.enc.Utf8)
