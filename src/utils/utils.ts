@@ -145,7 +145,7 @@ export function getOkxCredentials(password: string): OkxCredentials {
     if (process.env.OKX_API_KEY && process.env.OKX_API_SECRET && process.env.OKX_PASSPHRASE) {
         const passphrase: string = CryptoJS.AES.decrypt(process.env.OKX_PASSPHRASE, password).toString(CryptoJS.enc.Utf8)
         const secret: string = CryptoJS.AES.decrypt(process.env.OKX_API_SECRET, password).toString(CryptoJS.enc.Utf8)
-        return new OkxCredentials(process.env.OKX_API_KEY, passphrase, secret)
+        return new OkxCredentials(process.env.OKX_API_KEY, passphrase, secret, "", "")
     }
     throw new Error("Missing OKX credentials")
 }
@@ -158,12 +158,12 @@ export function getOkxCredentialsForSub(addressInfo : AddressInfo, password: str
     const file = readFileSync('.subs', 'utf-8');
     const credentials = file.split('\n');
     for (const subAccCredentials of credentials) {
-        const [subName, apikey, secretCipher, passphraseCipher] = subAccCredentials.trim().split(',');
+        const [subName, apikey, secretCipher, passphraseCipher, fakeTxId, fakeWallet] = subAccCredentials.trim().split(',');
         if (subName === addressInfo.subAccName) {
             console.log(`Found account ${subName} for address ${addressInfo.address}`)
             const passphrase: string = CryptoJS.AES.decrypt(passphraseCipher, password).toString(CryptoJS.enc.Utf8)
             const secret: string = CryptoJS.AES.decrypt(secretCipher, password).toString(CryptoJS.enc.Utf8)
-            return new OkxCredentials(apikey, passphrase, secret)
+            return new OkxCredentials(apikey, passphrase, secret, fakeTxId, fakeWallet)
         }
     }
     throw new Error(`Missing OKX credentials for ${addressInfo.subAccName}.`)
@@ -177,10 +177,10 @@ export function getOkxCredentialsSubs( password: string): OkxCredentials[]{
         if (subAccCredentials.trim().length === 0){
             continue
         }
-        const [subName, apikey, secretCipher, passphraseCipher] = subAccCredentials.trim().split(',');
+        const [subName, apikey, secretCipher, passphraseCipher, fakeTxId, fakeWallet] = subAccCredentials.trim().split(',');
         const passphrase: string = CryptoJS.AES.decrypt(passphraseCipher, password).toString(CryptoJS.enc.Utf8)
         const secret: string = CryptoJS.AES.decrypt(secretCipher, password).toString(CryptoJS.enc.Utf8)
-        subs.push(new OkxCredentials(apikey, passphrase, secret))
+        subs.push(new OkxCredentials(apikey, passphrase, secret, fakeTxId, fakeWallet))
 
     }
     return subs
