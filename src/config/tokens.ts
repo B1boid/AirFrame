@@ -45,6 +45,10 @@ export enum Asset {
     ADA = "ADA",
     DOGE = "DOGE",
     TONCOIN = "TONCOIN",
+    ARB = "ARB",
+    GMX = "GMX",
+    RDNT = "RDNT",
+    AGEUR = "AGEUR",
 
     // === Only zkSync tokens ==
     MUTE = "MUTE",

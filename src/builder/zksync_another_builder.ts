@@ -4,7 +4,12 @@ import {arbitrumChain, Blockchains, Destination, ethereumChain, optimismChain, z
 import {Asset} from "../config/tokens";
 import {Connections} from "../module_connections/connection_modules";
 import {getMedian, getRandomElement, getRandomFloat, getRandomInt} from "../utils/utils";
-import {EthereumActivity, OptimismActivity, ZkSyncActivity} from "../module_blockchains/blockchain_modules";
+import {
+    ArbActivity,
+    EthereumActivity,
+    OptimismActivity,
+    ZkSyncActivity
+} from "../module_blockchains/blockchain_modules";
 import {globalLogger} from "../utils/logger";
 
 
@@ -126,7 +131,7 @@ function generatePathToZkSync(accInfo: ExtendedFeatures, actions: AnyActions[]):
         actions.push(BRIDGE_ALL_ETHEREUM_TO_ZKSYNC)
     } else {
         const PERCENT_TO_REPEAT_ETH_ACTIVITIES = 80
-        if (accInfo.ethTxs > 7 || getRandomInt(0, 100) > PERCENT_TO_REPEAT_ETH_ACTIVITIES) {
+        if (accInfo.ethTxs > 9 && getRandomInt(0, 100) > PERCENT_TO_REPEAT_ETH_ACTIVITIES) {
             const CONNECTION_OKX_TO_ZKSYNC: ConnectionAction = {
                 from: Destination.OKX,
                 to: Destination.ZkSync,
@@ -144,7 +149,7 @@ function generatePathToZkSync(accInfo: ExtendedFeatures, actions: AnyActions[]):
                 connectionName: Connections.ExchangeOKX
             }
             actions.push(CONNECTION_OKX_TO_ETHEREUM)
-            const remainEthTxs = Math.min(8, 10 - accInfo.ethTxs) // target at least ~10 eth txs
+            const remainEthTxs = Math.min(5, 11 - accInfo.ethTxs) // target at least ~10 eth txs
             actions.push(generateEthRandomActivities(getRandomInt(remainEthTxs - 1, remainEthTxs + 2), 0))
 
             const PERCENT_TO_USE_OFFICIAL_BRIDGE_AGAIN = 15
@@ -249,7 +254,7 @@ function generateZkSync(accInfo: ExtendedFeatures, actions: AnyActions[]): void 
     // }
     // actions.push(CONNECTION_ZKSYNC_TO_OKX)
 
-    if (accInfo.optTxs > 0){ // 75% chance to use optimism
+    if ((accInfo.optTxs > 0 && accInfo.arbTxs === 0) || getRandomInt(0, 100) < 66){ // 66% chance to use optimism
         const BRIDGE_ORBITER_ZKSYNC_TO_OPTIMISM: ConnectionAction = {
             from: Destination.ZkSync,
             to: Destination.Optimism,
@@ -259,7 +264,7 @@ function generateZkSync(accInfo: ExtendedFeatures, actions: AnyActions[]): void 
         }
         actions.push(BRIDGE_ORBITER_ZKSYNC_TO_OPTIMISM)
         actions.push(
-            generateOptimismActivities(getRandomInt(0, 2))
+            generateOptimismActivities(getRandomInt(0, 3))
         )
         const CONNECTION_OPTIMISM_TO_OKX: ConnectionAction = {
             from: Destination.Optimism,
@@ -278,6 +283,9 @@ function generateZkSync(accInfo: ExtendedFeatures, actions: AnyActions[]): void 
             connectionName: Connections.Orbiter
         }
         actions.push(BRIDGE_ORBITER_ZKSYNC_TO_ARB)
+        actions.push(
+            generateArbitrumActivities(getRandomInt(0, 3))
+        )
         const CONNECTION_ARB_TO_OKX: ConnectionAction = {
             from: Destination.Arbitrum,
             to: Destination.OKX,
@@ -291,10 +299,11 @@ function generateZkSync(accInfo: ExtendedFeatures, actions: AnyActions[]): void 
 
 function generateZkSyncRandomActivities(activitiesNum: number): ZkSyncActivity[] {
     let availableActivities: ZkSyncActivity[] = [
-        ZkSyncActivity.zkSyncRandomApprove, ZkSyncActivity.zkSyncRandomApprove, // x2 chance
+        ZkSyncActivity.zkSyncRandomApprove,
         ZkSyncActivity.wrapUnwrap,
         ZkSyncActivity.zkSyncDummyRandomSwapCycle,
-        ZkSyncActivity.zkSyncDummyRandomLending
+        ZkSyncActivity.zkSyncDummyRandomLending,
+        ZkSyncActivity.zkSyncDmail
     ]
     let res: ZkSyncActivity[] = []
     let repeatedActivities: ZkSyncActivity[] = []
@@ -302,9 +311,6 @@ function generateZkSyncRandomActivities(activitiesNum: number): ZkSyncActivity[]
         let curActivity: ZkSyncActivity
         while (true) {
             curActivity = getRandomElement(availableActivities)
-            if (curActivity === ZkSyncActivity.zkSyncRandomApprove && res.filter(x => x === curActivity).length < 2){
-                break
-            }
             if (!repeatedActivities.includes(curActivity)) {
                 break
             }
@@ -333,7 +339,9 @@ function generateOptimismActivities(activitiesNum: number): ModuleActions {
         OptimismActivity.optDummyLendingCycle,
         OptimismActivity.optSwapCycleNativeToUsdc,
         OptimismActivity.optFakeUniExec,
-        OptimismActivity.optMoveDustGas
+        OptimismActivity.optMoveDustGas,
+        OptimismActivity.optRandomApprove,
+        OptimismActivity.optOptimismDelegate
     ]
 
     let res: OptimismActivity[] = []
@@ -351,11 +359,45 @@ function generateOptimismActivities(activitiesNum: number): ModuleActions {
                 OptimismActivity.optAaveCycle, OptimismActivity.optAaveCycle, OptimismActivity.optGranaryCycle
             ]
             res.push(getRandomElement(lendingActivities))
+        } else {
+            res.push(curActivity)
         }
         repeatedActivities.push(curActivity)
     }
     return {
         chainName: Blockchains.Optimism,
+        randomOrder: Randomness.Full,
+        activityNames: res
+    }
+}
+
+function generateArbitrumActivities(activitiesNum: number): ModuleActions {
+    let availableActivities: ArbActivity[] = [
+        ArbActivity.arbRandomStuff,
+        ArbActivity.arbAaveCycle,
+        ArbActivity.arbSwapCycleNativeToUsdc,
+        ArbActivity.arbRandomApprove,
+        ArbActivity.arbArbitrumDelegate,
+        ArbActivity.arbFakeUniExec,
+        ArbActivity.arbMoveDustGas,
+        ArbActivity.arbFriendsTech, ArbActivity.arbFriendsTech // x2 chance
+    ]
+
+    let res: ArbActivity[] = []
+    let repeatedActivities: ArbActivity[] = []
+    for (let i = 0; i < activitiesNum; i++) {
+        let curActivity: ArbActivity
+        while (true) {
+            curActivity = getRandomElement(availableActivities)
+            if (!repeatedActivities.includes(curActivity)) {
+                break
+            }
+        }
+        res.push(curActivity)
+        repeatedActivities.push(curActivity)
+    }
+    return {
+        chainName: Blockchains.Arbitrum,
         randomOrder: Randomness.Full,
         activityNames: res
     }

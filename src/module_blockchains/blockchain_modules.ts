@@ -29,7 +29,8 @@ export const enum ZkSyncActivity {
     zkSyncSynFuturesTest = "zkSyncSynFuturesTest",
 
     zkSyncDummyRandomLending = "zkSyncDummyRandomLending",
-    zkSyncDummyRandomSwapCycle = "zkSyncDummyRandomSwapCycle"
+    zkSyncDummyRandomSwapCycle = "zkSyncDummyRandomSwapCycle",
+    zkSyncDmail = "zkSyncDmail"
 }
 
 export const enum EthereumActivity {
@@ -61,7 +62,18 @@ export const enum BscActivity {
     bscKinzaCycle = "bscKinzaCycle"
 }
 
-export type ActivityTag = PolygonActivity | ZkSyncActivity | EthereumActivity | OptimismActivity | BscActivity
+export const enum ArbActivity {
+    arbSwapCycleNativeToUsdc = "arbSwapCycleNativeToUsdc",
+    arbRandomApprove = "arbRandomApprove",
+    arbAaveCycle = "arbAaveCycle",
+    arbMoveDustGas = "arbMoveDustGas",
+    arbFakeUniExec = "arbFakeUniExec",
+    arbRandomStuff = "arbRandomStuff",
+    arbArbitrumDelegate = "arbArbitrumDelegate",
+    arbFriendsTech = "arbFriendsTech"
+}
+
+export type ActivityTag = PolygonActivity | ZkSyncActivity | EthereumActivity | OptimismActivity | BscActivity | ArbActivity
 
 export const blockchainModules: EnumDictionary<Blockchains, BlockchainModule> = {
     [Blockchains.ZkSync]: moduleZkSync,

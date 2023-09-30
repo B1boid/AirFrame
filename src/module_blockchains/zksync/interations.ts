@@ -7,6 +7,7 @@ import zns_1 from "../../abi/zns_1.json";
 import zns_2 from "../../abi/zns_2.json";
 import eralend from "../../abi/eralend.json";
 import paraspace from "../../abi/paraspace.json";
+import allAbi from "../../abi/all.json";
 import {commonSwap, commonTopSwap, Dexes} from "../../common_blockchain/routers/common";
 import {zkSyncChain} from "../../config/chains";
 import {zkSyncContracts, zkSyncTokens} from "./constants";
@@ -343,6 +344,30 @@ export async function zkSyncRhinoCycle_deposit(wallet: WalletI): Promise<TxInter
         }]
     } catch (e){
         globalLogger.connect(wallet.getAddress(), chain).warn(`zkSyncRhinoCycle_deposit failed: ${e}`)
+        return []
+    }
+}
+
+export async function zkSyncDmail_send(wallet: WalletI): Promise<TxInteraction[]> {
+    try {
+        const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+        let dmailContract = new ethers.Contract(contracts.dmail, allAbi, provider)
+        const genRanHex = (size: number) => [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
+        const to: string = genRanHex(64)
+        const path: string = genRanHex(64)
+        let data: string = dmailContract.interface.encodeFunctionData(
+            "send_mail", [to, path]
+        )
+        return [{
+            to: contracts.dmail,
+            data: data,
+            value: "0",
+            stoppable: false,
+            confirmations: 1,
+            name: "zkSyncDmail_send"
+        }]
+    } catch (e){
+        globalLogger.connect(wallet.getAddress(), chain).warn(`zkSyncDmail_send failed: ${e}`)
         return []
     }
 }

@@ -10,5 +10,6 @@ export const polygonTokens: EnumDictionary<Asset, string> = {
 
 
 export const polygonContracts: { [id: string]: string } = {
-    oneInchRouter: "0x1111111254eeb25477b68fb85ed929f73a960582"
+    oneInchRouter: "0x1111111254eeb25477b68fb85ed929f73a960582",
+    lifiRouter: "0x1231DEB6f5749EF6cE6943a275A1D3E7486F4EaE",
 }

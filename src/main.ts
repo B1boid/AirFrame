@@ -19,6 +19,7 @@ import {PromisePool} from "@supercharge/promise-pool";
 import {ethereumChain} from "./config/chains";
 import AsyncLock from "async-lock";
 import {pingSubs} from "./utils/okx_pinger";
+import {AddressInfo} from "./classes/info";
 
 let prompt = require('password-prompt')
 const okxLock = new AsyncLock()
@@ -27,9 +28,9 @@ const okxLock = new AsyncLock()
 
 async function doTask(password: string, passwordOkx: string, walletActions: WalletActions, runConfig: RunConfig): Promise<boolean> {
     const address = walletActions.address
-    const addressInfo = getAddressInfo(password, address)
+    const addressInfo: AddressInfo = getAddressInfo(password, address)
     const wallet: WalletI = new MyWallet(addressInfo,
-        getOkxCredentials(passwordOkx),
+        getOkxCredentials(addressInfo, passwordOkx),
         getOkxCredentialsForSub(addressInfo, passwordOkx)
     )
     let actionsRes: boolean = true

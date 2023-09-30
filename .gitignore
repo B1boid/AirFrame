@@ -8,5 +8,6 @@ package-lock.json
 .accs
 .active_accs
 .subs
+.okx
 src/gen.js
 src/gen_pks.ts

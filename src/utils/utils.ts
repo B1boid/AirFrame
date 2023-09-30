@@ -131,21 +131,30 @@ export function getAddressInfo(password: string, address: string): AddressInfo {
     const file = readFileSync('.accs', 'utf-8');
     const accs = file.split('\n');
     for (const accLine of accs) {
-        const [label, addr, withdrawAddr, subacc, pkCipher] = accLine.trim().split(',');
+        const [label, addr, withdrawAddr, okxacc, subacc, pkCipher] = accLine.trim().split(',');
+        if (okxacc === ""){
+            throw new Error("Missing okx acc info")
+        }
         if (addr.toLowerCase() === address.toLowerCase()) {
             console.log(`Found account ${label} for address ${addr}`)
             const pk: string = CryptoJS.AES.decrypt(pkCipher, password).toString(CryptoJS.enc.Utf8)
-            return new AddressInfo(addr, pk, withdrawAddr === "" ? null : withdrawAddr, subacc === "" ? null : subacc);
+            return new AddressInfo(addr, pk, withdrawAddr === "" ? null : withdrawAddr, okxacc, subacc === "" ? null : subacc);
         }
     }
     throw new Error("Missing account info")
 }
 
-export function getOkxCredentials(password: string): OkxCredentials {
-    if (process.env.OKX_API_KEY && process.env.OKX_API_SECRET && process.env.OKX_PASSPHRASE) {
-        const passphrase: string = CryptoJS.AES.decrypt(process.env.OKX_PASSPHRASE, password).toString(CryptoJS.enc.Utf8)
-        const secret: string = CryptoJS.AES.decrypt(process.env.OKX_API_SECRET, password).toString(CryptoJS.enc.Utf8)
-        return new OkxCredentials(process.env.OKX_API_KEY, passphrase, secret, "", "")
+export function getOkxCredentials(addressInfo: AddressInfo, password: string): OkxCredentials {
+    const file = readFileSync('.okx', 'utf-8');
+    const credentials = file.split('\n');
+    for (const subAccCredentials of credentials) {
+        const [okxName, apikey, secretCipher, passphraseCipher] = subAccCredentials.trim().split(',');
+        if (okxName === addressInfo.okxAcc) {
+            console.log(`Found okx-account ${okxName} for address ${addressInfo.address}`)
+            const passphrase: string = CryptoJS.AES.decrypt(passphraseCipher, password).toString(CryptoJS.enc.Utf8)
+            const secret: string = CryptoJS.AES.decrypt(secretCipher, password).toString(CryptoJS.enc.Utf8)
+            return new OkxCredentials(apikey, passphrase, secret, "", "")
+        }
     }
     throw new Error("Missing OKX credentials")
 }

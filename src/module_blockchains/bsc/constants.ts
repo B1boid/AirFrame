@@ -23,6 +23,7 @@ export const bscContracts: { [id: string]: string } = {
     odosRouter: "0x89b8AA89FDd0507a99d334CBe3C808fAFC7d850E",
     paraswapRouter: "0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57",
     pancakeRouter: "0x05fF2B0DB69458A0750badebc4f9e13aDd608C7F",
+    lifiRouter: "0x1231DEB6f5749EF6cE6943a275A1D3E7486F4EaE",
 
     kinzaDepo: "0xCC650b486f723C924370656b509a82bD69526739",
     bnbKinzaWrapped: "0xf5e0ADda6Fb191A332A787DEeDFD2cFFC72Dba0c"

@@ -28,6 +28,7 @@ export const zkSyncContracts: { [id: string]: string } = {
     tevaeraNft: "0x50B2b7092bCC15fbB8ac74fE9796Cf24602897Ad",
     znsIdReg: "0x8b5193BCaE3032766bEc9d07ecDB9E56aefBff0F",
     znsIdName: "0xF2372788b23DF335A260d88f349615B9d7d6918D",
+    dmail: "0x981F198286E40F9979274E0876636E9144B8FB8E",
 
     zkEraLendInit: "0xC955d5fa053d88E7338317cc6589635cD5B2cf09",
     zkEraLendEth: "0x22D8b71599e14F20a49a397b88c1C878c86F5579",
@@ -45,6 +46,7 @@ export const zkSyncContracts: { [id: string]: string } = {
     iziRouter: "0x943ac2310D9BC703d6AB5e5e76876e212100f894",
     muteRouter: "0x8B791913eB07C32779a16750e3868aA8495F5964",
     odosRouter: "0x4bBa932E9792A2b917D47830C93a9BC79320E4f7",
+    lifiRouter: "0x1231DEB6f5749EF6cE6943a275A1D3E7486F4EaE",
 
     syncSwapPool: "0xf2DAd89f2788a8CD54625C60b55cD3d2D0ACa7Cb",
     synFuturesMint1: "0xa6E5e7DDcd6e7C5959f4AdE9aEd97594346436aF",

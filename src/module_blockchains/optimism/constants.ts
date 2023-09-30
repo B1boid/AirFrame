@@ -22,6 +22,7 @@ export const optContracts: { [id: string]: string } = {
     oneInchRouter: "0x1111111254eeb25477b68fb85ed929f73a960582",
     odosRouter: "0xCa423977156BB05b13A2BA3b76Bc5419E2fE9680",
     paraswapRouter: "0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57",
+    lifiRouter: "0x1231DEB6f5749EF6cE6943a275A1D3E7486F4EaE",
 
     aaveDepo: "0x76D3030728e52DEB8848d5613aBaDE88441cbc59",
     aavePool: "0x794a61358D6845594F94dc1DB02A252b5b4814aD",

@@ -1,6 +1,7 @@
 import {Activity} from "../../classes/module";
 import {ZkSyncActivity} from "../blockchain_modules";
 import {
+    zkSyncDmail_send,
     zkSyncEraLendCycle_supply,
     zkSyncEraLendCycle_withdraw,
     zkSyncEraLendInit_enter,
@@ -106,5 +107,12 @@ export const zkSyncSynFuturesTest: Activity = {
     name: ZkSyncActivity.zkSyncSynFuturesTest,
     txs: [
         zkSyncSynFuturesTest_mint
+    ]
+}
+
+export const zkSyncDmail: Activity = {
+    name: ZkSyncActivity.zkSyncDmail,
+    txs: [
+        zkSyncDmail_send
     ]
 }

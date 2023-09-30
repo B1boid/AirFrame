@@ -19,11 +19,13 @@ export class AddressInfo {
     public readonly privateKey: string
     public readonly subAccName: string | null
     public readonly withdrawAddress: string | null
+    public readonly okxAcc: string
 
-    constructor(address: string, privateKey: string, withdrawAddress: string | null, subAccName: string | null) {
+    constructor(address: string, privateKey: string, withdrawAddress: string | null, okxAcc: string, subAccName: string | null) {
         this.address = address
         this.privateKey = privateKey
         this.withdrawAddress = withdrawAddress
+        this.okxAcc = okxAcc
         this.subAccName = subAccName
     }
 }

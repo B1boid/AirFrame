@@ -1,6 +1,7 @@
 import {Chain, zkSyncChain} from "../../config/chains";
 import {Activity, BlockchainModule} from "../../classes/module";
 import {
+    zkSyncDmail,
     zkSyncEraLendCycle,
     zkSyncEraLendInit,
     zkSyncMintTevaera,
@@ -23,6 +24,6 @@ export const moduleZkSync: ZkSyncModule = new ZkSyncModule(
     [
         zkSyncWrapUnwrap, zkSyncSwapCycleNativeToUsdc, zkSyncMintTevaera, zkSyncMintZnsId, zkSyncRandomApprove,
         zkSyncEraLendInit, zkSyncEraLendCycle, zkSyncReactFusionCycle, zkSyncReactFusionInit, zkSyncParaspaceCycle,
-        zkSyncSynFuturesTest, zkSyncTopSwapCycleNativeToUsdc
+        zkSyncSynFuturesTest, zkSyncTopSwapCycleNativeToUsdc, zkSyncDmail
     ]
 )
