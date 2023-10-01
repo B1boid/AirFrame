@@ -132,9 +132,6 @@ export function getAddressInfo(password: string, address: string): AddressInfo {
     const accs = file.split('\n');
     for (const accLine of accs) {
         const [label, addr, withdrawAddr, okxacc, subacc, pkCipher] = accLine.trim().split(',');
-        if (okxacc === ""){
-            throw new Error("Missing okx acc info")
-        }
         if (addr.toLowerCase() === address.toLowerCase()) {
             console.log(`Found account ${label} for address ${addr}`)
             const pk: string = CryptoJS.AES.decrypt(pkCipher, password).toString(CryptoJS.enc.Utf8)
@@ -144,7 +141,11 @@ export function getAddressInfo(password: string, address: string): AddressInfo {
     throw new Error("Missing account info")
 }
 
-export function getOkxCredentials(addressInfo: AddressInfo, password: string): OkxCredentials {
+export function getOkxCredentials(addressInfo: AddressInfo, password: string): OkxCredentials | null {
+    if (!addressInfo.okxAcc) {
+        console.log(`No okx for ${addressInfo.address}. Is it ok?`)
+        return null
+    }
     const file = readFileSync('.okx', 'utf-8');
     const credentials = file.split('\n');
     for (const subAccCredentials of credentials) {
