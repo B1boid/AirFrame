@@ -163,7 +163,7 @@ export async function arbFriendsTech_buy(wallet: WalletI): Promise<TxInteraction
     try {
         const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
         let tokenContract = new ethers.Contract(contracts.friendsTech, friends, provider)
-        let sharesBalances: bigint = await tokenContract.balanceOf(wallet.getAddress())
+        let sharesBalances: bigint = await tokenContract.sharesBalance(wallet.getAddress(), wallet.getAddress())
         if (sharesBalances === BigInt(0)){
             globalLogger.connect(wallet.getAddress(), chain).info(`ArbitrumFriendsTech has balance: ${sharesBalances}`)
             return []
