@@ -131,8 +131,7 @@ function generatePathToZkSync(accInfo: ExtendedFeatures, actions: AnyActions[]):
         }
         actions.push(BRIDGE_ALL_ETHEREUM_TO_ZKSYNC)
     } else {
-        const PERCENT_TO_REPEAT_ETH_ACTIVITIES = 80
-        if (accInfo.ethTxs > 9 && getRandomInt(0, 100) > PERCENT_TO_REPEAT_ETH_ACTIVITIES) {
+        if (accInfo.ethTxs > 9) {
             const CONNECTION_OKX_TO_ZKSYNC: ConnectionAction = {
                 from: Destination.OKX,
                 to: Destination.ZkSync,
