@@ -3,7 +3,7 @@ import {getTxCount, hasInteractionWithEthContract} from "./features";
 import {arbitrumChain, Blockchains, Destination, ethereumChain, optimismChain, zkSyncChain} from "../config/chains";
 import {Asset} from "../config/tokens";
 import {Connections} from "../module_connections/connection_modules";
-import {getMedian, getRandomElement, getRandomFloat, getRandomInt} from "../utils/utils";
+import {getMedian, getRandomElement, getRandomFloat, getRandomInt, shuffleArray} from "../utils/utils";
 import {
     ArbActivity,
     EthereumActivity,
@@ -32,6 +32,7 @@ export async function buildZkSyncAnother(activeAddresses: string[]): Promise<Wal
         }
         accountInfos.push(features)
     }
+    shuffleArray(accountInfos)
     accountInfos.sort(
         function(a: ExtendedFeatures, b: ExtendedFeatures){
             if(a.hasOffBridge === b.hasOffBridge){
