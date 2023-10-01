@@ -23,6 +23,11 @@ export enum Dexes {
     SpaceFi = "spacefi"
 }
 
+export interface DexPrice{
+    dex: Dexes,
+    price: BigInt
+}
+
 export interface QuoteRes {
     tx: string,
     price: bigint
@@ -44,7 +49,7 @@ export async function commonTopSwap(
     stoppable: boolean = false
 ): Promise<TxInteraction[]> {
     if (tokenFrom === NATIVE_ADDRESS) {
-        let promises: (Promise<bigint>)[] = []
+        let promises: (Promise<DexPrice>)[] = []
         if (dexes.includes(Dexes.OneInch)) {
             promises.push(oneInchQuoteNativeTo(
                 tokenTo, wallet, chain, contracts, name, execBalance, stoppable
@@ -60,26 +65,40 @@ export async function commonTopSwap(
                 tokenTo, wallet, chain, contracts, name, execBalance, stoppable
             ))
         }
-        let values: bigint[] = await Promise.all(promises)
-        globalLogger.connect(wallet.getAddress(), chain).info("Top quotes: "+ values)
-        if (values[0] >= values[1] && values[0] >= values[2]){
-            if (values[0] === BigInt(0)) {
+        let values: DexPrice[] = await Promise.all(promises)
+        values.sort(
+            function(a: DexPrice, b: DexPrice){
+                return a.price > b.price ? -1 : 1;
+            }
+        )
+        let quotesMsg = ""
+        for (let q of values){
+            quotesMsg += q.dex + ":" + q.price.toString() + " | "
+        }
+        globalLogger.connect(wallet.getAddress(), chain).info("Top quotes: "+ quotesMsg)
+        for (let v of values){
+            if (v.price === BigInt(0)){
                 return []
             }
-            return await oneInchSwapNativeTo(
-                tokenTo, wallet, chain, contracts, name, execBalance, stoppable
-            )
-        } else if (values[1] >= values[0] && values[1] >= values[2]){
-            return await odosSwapNativeTo(
-                tokenTo, wallet, chain, contracts, name, execBalance, stoppable
-            )
-        } else {
-            return await lifiSwapNativeTo(
-                tokenTo, wallet, chain, contracts, name, execBalance, stoppable
-            )
+            if (v.dex === Dexes.OneInch){
+                return await oneInchSwapNativeTo(
+                    tokenTo, wallet, chain, contracts, name, execBalance, stoppable
+                )
+            }
+            if (v.dex === Dexes.Odos){
+                return await odosSwapNativeTo(
+                    tokenTo, wallet, chain, contracts, name, execBalance, stoppable
+                )
+            }
+            if (v.dex === Dexes.Lifi){
+                return await lifiSwapNativeTo(
+                    tokenTo, wallet, chain, contracts, name, execBalance, stoppable
+                )
+            }
         }
+        return []
     } else {
-        let promises: (Promise<bigint>)[] = []
+        let promises: (Promise<DexPrice>)[] = []
         if (dexes.includes(Dexes.OneInch)) {
             promises.push(oneInchQuote(
                 tokenFrom, tokenTo, wallet, chain, contracts, name, execBalance, stoppable
@@ -95,24 +114,34 @@ export async function commonTopSwap(
                 tokenFrom, tokenTo, wallet, chain, contracts, name, execBalance, stoppable
             ))
         }
-        let values: bigint[] = await Promise.all(promises)
+        let values: DexPrice[] = await Promise.all(promises)
+        values.sort(
+            function(a: DexPrice, b: DexPrice){
+                return a.price > b.price ? -1 : 1;
+            }
+        )
         globalLogger.connect(wallet.getAddress(), chain).info("Top quotes: "+ values)
-        if (values[0] >= values[1] && values[0] >= values[2]){
-            if (values[0] === BigInt(0)) {
+        for (let v of values){
+            if (v.price === BigInt(0)){
                 return []
             }
-            return await oneInchSwap(
-                tokenFrom, tokenTo, wallet, chain, contracts, name, execBalance, stoppable
-            )
-        } else if (values[1] >= values[0] && values[1] >= values[2]){
-            return await odosSwap(
-                tokenFrom, tokenTo, wallet, chain, contracts, name, execBalance, stoppable
-            )
-        } else {
-            return await lifiSwap(
-                tokenFrom, tokenTo, wallet, chain, contracts, name, execBalance, stoppable
-            )
+            if (v.dex === Dexes.OneInch){
+                return await oneInchSwap(
+                    tokenFrom, tokenTo, wallet, chain, contracts, name, execBalance, stoppable
+                )
+            }
+            if (v.dex === Dexes.Odos){
+                return await odosSwap(
+                    tokenFrom, tokenTo, wallet, chain, contracts, name, execBalance, stoppable
+                )
+            }
+            if (v.dex === Dexes.Lifi){
+                return await lifiSwap(
+                    tokenFrom, tokenTo, wallet, chain, contracts, name, execBalance, stoppable
+                )
+            }
         }
+        return []
     }
 }
 

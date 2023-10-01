@@ -7,7 +7,7 @@ import erc20 from "./../../abi/erc20.json";
 import {checkAndGetApprovalsInteraction} from "../approvals";
 import {formatIfNativeToken, sleep} from "../../utils/utils";
 import {globalLogger} from "../../utils/logger";
-import {NATIVE_ADDRESS, QuoteRes} from "./common";
+import {Dexes, DexPrice, NATIVE_ADDRESS, QuoteRes} from "./common";
 import {ExecBalance, getExecBalance} from "../common_utils";
 
 
@@ -93,12 +93,18 @@ export async function odosQuoteNativeTo(
     name: string,
     execBalance: ExecBalance = {fullBalance: true},
     stoppable: boolean = false,
-): Promise<bigint> {
+): Promise<DexPrice> {
     let res = await _odosSwapNativeTo(token, wallet, chain, contracts, name, {fullBalance: true}, stoppable, true)
     if (typeof res === "bigint") {
-        return res
+        return {
+            "price": res,
+            "dex": Dexes.Odos
+        }
     }
-    return BigInt(0)
+    return {
+        "price": BigInt(0),
+        "dex": Dexes.Odos
+    }
 }
 
 async function _odosSwapNativeTo(
@@ -172,12 +178,18 @@ export async function odosQuote(
     name: string,
     execBalance: ExecBalance = {fullBalance: true},
     stoppable: boolean = false,
-): Promise<bigint> {
+): Promise<DexPrice> {
     let res = await _odosSwap(tokenFrom, tokenTo, wallet, chain, contracts, name, {fullBalance: true}, stoppable, true)
     if (typeof res === "bigint") {
-        return res
+        return {
+            "price": res,
+            "dex": Dexes.Odos
+        }
     }
-    return BigInt(0)
+    return {
+        "price": BigInt(0),
+        "dex": Dexes.Odos
+    }
 }
 
 

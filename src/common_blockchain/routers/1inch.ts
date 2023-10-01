@@ -4,7 +4,7 @@ import {TxInteraction} from "../../classes/module";
 import {ethers, formatEther, formatUnits} from "ethers-new";
 import {Chain, ethereumChain} from "../../config/chains";
 import erc20 from "./../../abi/erc20.json";
-import {NATIVE_ADDRESS, QuoteRes} from "./common";
+import {Dexes, DexPrice, NATIVE_ADDRESS, QuoteRes} from "./common";
 import {checkAndGetApprovalsInteraction} from "../approvals";
 import {sleep} from "../../utils/utils";
 import {globalLogger} from "../../utils/logger";
@@ -60,12 +60,18 @@ export async function oneInchQuoteNativeTo(
     name: string,
     execBalance: ExecBalance = {fullBalance: true},
     stoppable: boolean = false,
-): Promise<bigint> {
+): Promise<DexPrice> {
     let res = await _oneInchSwapNativeTo(token, wallet, chain, contracts, name, {fullBalance: true}, stoppable, true)
     if (typeof res === "bigint") {
-        return res
+        return {
+            "price": res,
+            "dex": Dexes.OneInch
+        }
     }
-    return BigInt(0)
+    return {
+        "price": BigInt(0),
+        "dex": Dexes.OneInch
+    }
 }
 
 async function _oneInchSwapNativeTo(
@@ -130,12 +136,18 @@ export async function oneInchQuote(
     name: string,
     execBalance: ExecBalance = {fullBalance: true},
     stoppable: boolean = false
-): Promise<bigint> {
+): Promise<DexPrice> {
     let res = await _oneInchSwap(tokenFrom, tokenTo, wallet, chain, contracts, name, {fullBalance: true}, stoppable, true)
     if (typeof res === "bigint") {
-        return res
+        return {
+            "price": res,
+            "dex": Dexes.OneInch
+        }
     }
-    return BigInt(0)
+    return {
+        "price": BigInt(0),
+        "dex": Dexes.OneInch
+    }
 }
 
 export async function _oneInchSwap(
