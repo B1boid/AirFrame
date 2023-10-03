@@ -13,7 +13,7 @@ import {
 import {WALLETS_ACTIONS_1} from "./tests/task1";
 import {Builder, Strategy} from "./builder/common_builder";
 import {WalletActions} from "./classes/actions";
-import {RunConfig, TEST_CONFIG, ZKSYNC_BASIC_CONFIG} from "./config/run_config";
+import {RunConfig, TEST_CONFIG, ZKSYNC_ANOTHER_CONFIG, ZKSYNC_BASIC_CONFIG} from "./config/run_config";
 import {globalLogger} from "./utils/logger";
 import {PromisePool} from "@supercharge/promise-pool";
 import {ethereumChain} from "./config/chains";
