@@ -12,6 +12,7 @@ import {moduleBsc} from "./bsc/bsc";
 export const enum PolygonActivity {
     wrapUnwrap = "wrapUnwrap",
     polygonSwapCycleNativeToUsdc = "polygonSwapCycleNativeToUsdc",
+    polygonAzuro = "polygonAzuro"
 }
 
 export const enum ZkSyncActivity {

@@ -11,7 +11,7 @@ import {Asset} from "../config/tokens";
 const POLYGON_ACTIONS: ModuleActions = {
     chainName: Blockchains.Polygon,
     randomOrder: Randomness.OnlyActivities,
-    activityNames: [PolygonActivity.wrapUnwrap]
+    activityNames: [PolygonActivity.polygonAzuro]
 }
 
 const ZKSYNC_ACTIONS: ModuleActions = {
@@ -24,7 +24,7 @@ const ZKSYNC_ACTIONS: ModuleActions = {
 const ETH_ACTIONS: ModuleActions = {
     chainName: Blockchains.Ethereum,
     randomOrder: Randomness.Full,
-    activityNames: [EthereumActivity.ethRandomStuff]
+    activityNames: [EthereumActivity.ethRandomMint]
 }
 
 const BSC_ACTIONS: ModuleActions = {
@@ -128,10 +128,11 @@ const ACTIONS_1: AnyActions[] =  [
         // POLYGON_ACTIONS,
         // CONNECTION_POLYGON_TO_OKX
         // POLYGON_ACTIONS
-        BRIDGE_ETHEREUM_TO_ZKSYNC,
-         ZKSYNC_ACTIONS,
-         BRIDGE_ORBITER_ZKSYNC_TO_ARBITRUM,
-        CONNECTION_ARBITRUM_TO_OKX
+    POLYGON_ACTIONS
+        // BRIDGE_ETHEREUM_TO_ZKSYNC,
+        //  ZKSYNC_ACTIONS,
+        //  BRIDGE_ORBITER_ZKSYNC_TO_ARBITRUM,
+        // CONNECTION_ARBITRUM_TO_OKX
         // CONNECTION_OKX_TO_ETHEREUM,
         // ETH_ACTIONS
     // BRIDGE_ORBITER_ZKSYNC_TO_OPTIMISM,
@@ -151,7 +152,7 @@ export const WALLETS_ACTIONS_1: WalletActions[] = [
     // {address: "0x2Fd49f2da0d07102b223D89f290F61b265291952", actions: ACTIONS_1},
     // {address: "0x750D0B78E16426a42cd9a5485BA3DF70290912C0", actions: ACTIONS_1},
 
-    {address: "0x99535d60659e3B0A7e5728006DBD958fb5FC80D8", actions: ACTIONS_1},
+    {address: "0xc1679Cc46E155D415D4CCB2FA7953C5d1e09Cc50", actions: ACTIONS_1},
 ]
 
 

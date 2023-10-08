@@ -3,10 +3,14 @@ import {WalletI} from "../../classes/wallet";
 import {polygonContracts, polygonTokens} from "./constants";
 import {ethers} from "ethers-new";
 import wrapped from "./../../abi/wrapped.json";
+import azuroAbi from "./../../abi/azuro.json";
 import {polygonChain} from "../../config/chains";
-import {getRandomizedPercent} from "../../utils/utils";
+import {getCurTimestamp, getRandomizedPercent} from "../../utils/utils";
 import {globalLogger} from "../../utils/logger";
 import {commonSwap, Dexes} from "../../common_blockchain/routers/common";
+import {AzuroBet} from "../../classes/azuro-classes";
+import {ALL_BETS} from "../../azuro-scrap";
+import {defaultAbiCoder} from "ethers/lib/utils";
 
 let tokens = polygonTokens
 let chain = polygonChain
@@ -61,4 +65,43 @@ export async function polygonSwapCycleNativeToUsdc_swapto(wallet: WalletI): Prom
 export async function polygonSwapCycleNativeToUsdc_swapback(wallet: WalletI): Promise<TxInteraction[]> {
     return await commonSwap(tokens.USDC, tokens.MATIC, {fullBalance: true}, [Dexes.OneInch],
         wallet, chain, contracts, tokens, "polygonSwapCycleNativeToUsdc_swapback")
+}
+
+export async function polygonAzuro_bet(wallet: WalletI): Promise<TxInteraction[]> {
+    try {
+        const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+        let azuroContract = new ethers.Contract(contracts.azuroBet, azuroAbi, provider)
+
+        let infos: AzuroBet[] = ALL_BETS[wallet.getAddress()]
+        let objs = []
+        for (let info of infos){
+            let extraData = defaultAbiCoder.encode(
+                [ 'tuple(uint256, uint64)' ],
+                [ [info.condId, info.outcomeId]  ]
+            )
+            objs.push([
+                contracts.azuroCore,
+                info.amount * 10**6,
+                getCurTimestamp() + 1000,
+                [contracts.azuroAffiliate, Math.floor(info.odd * 1000000000000), extraData]
+            ])
+        }
+
+
+        let data: string = azuroContract.interface.encodeFunctionData("bet", [
+            contracts.azuroLP, objs
+        ])
+
+        return [{
+            to: contracts.azuroBet,
+            data: data,
+            value: "0",
+            stoppable: true, // if unwrap failed - we have remaining wrapped tokens, so we need to stop
+            confirmations: 1,
+            name: "polygonAzuro_bet"
+        }]
+    } catch (e) {
+        globalLogger.connect(wallet.getAddress(), polygonChain).warn(`polygonAzuro_bet failed: ${e}`)
+        return []
+    }
 }
