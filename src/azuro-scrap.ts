@@ -1,9 +1,9 @@
 import {AzuroBet} from "./classes/azuro-classes";
-import {checkUsdtBalance, scrap} from "./utils/azuro-utils";
+import {checkUsdtBalance, printBestBatches} from "./utils/azuro-utils";
 
 
 //new-1 0x66d64b69D73Ea9AcB468C267b4CE5d513A41276c
-// arb-2 0x9Ea81A9246d31E9c64C50456de1C948CdE40d62C
+// --- arb-2 0x9Ea81A9246d31E9c64C50456de1C948CdE40d62C
 // arb-3 0x15add8564A1D66c43Ff576f5490b0483469FADA4
 // soljst 0xc1679Cc46E155D415D4CCB2FA7953C5d1e09Cc50
 
@@ -75,11 +75,10 @@ export const ALL_BETS: { [key: string]: AzuroBet[] } = {
 async function task() {
     let addrs = [
         "0x66d64b69D73Ea9AcB468C267b4CE5d513A41276c",
-        "0x9Ea81A9246d31E9c64C50456de1C948CdE40d62C",
         "0x15add8564A1D66c43Ff576f5490b0483469FADA4",
         "0xc1679Cc46E155D415D4CCB2FA7953C5d1e09Cc50"
     ]
     await checkUsdtBalance(addrs)
-    scrap(600)
+    printBestBatches(600)
 }
 // task()

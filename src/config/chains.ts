@@ -40,7 +40,7 @@ export const zkSyncChain: Chain = {
 export const polygonChain: Chain = {
   title: Blockchains.Polygon,
   chainId: 137,
-  nodeUrl: `https://polygon-mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
+  nodeUrl: "https://polygon.llamarpc.com",
   symbol: "MATIC",
   extraGasLimit: 100000,
   explorerUrl: "https://polygonscan.com",

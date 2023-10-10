@@ -52,7 +52,7 @@ export interface Match {
     slug: string
     sport: string
     time: number
-    conditions: Condition[]
+    conditions: {[key: string]: Condition}
 }
 
 export interface AzuroBet {
