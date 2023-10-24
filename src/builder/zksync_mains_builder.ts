@@ -19,21 +19,21 @@ function generateZkSync(): ModuleActions {
     let activities: ZkSyncActivity[]
 
     activities = generateZkSyncRandomActivities(getRandomInt(2, 3))
-    if (getRandomInt(0, 100) < 85) { // 85% chance to mint tevaera
-        activities.push(ZkSyncActivity.zkSyncMintTevaera)
-    }
-    if (getRandomInt(0, 100) < 65) { // 65% chance to mint znsid
-        activities.push(ZkSyncActivity.zkSyncMintZnsId)
-    }
-    if (getRandomInt(0, 100) < 50) { // 35% chance to enterMarketsZkEra
-        activities.push(ZkSyncActivity.zkSyncEraLendInit)
-    }
-    if (getRandomInt(0, 100) < 50) { // 35% chance to enterMarketsReactFusion
-        activities.push(ZkSyncActivity.zkSyncReactFusionInit)
-    }
-    if (getRandomInt(0, 100) < 50) { // 35% chance to mint test tokens
-        activities.push(ZkSyncActivity.zkSyncSynFuturesTest)
-    }
+    // if (getRandomInt(0, 100) < 85) { // 85% chance to mint tevaera
+    //     activities.push(ZkSyncActivity.zkSyncMintTevaera)
+    // }
+    // if (getRandomInt(0, 100) < 65) { // 65% chance to mint znsid
+    //     activities.push(ZkSyncActivity.zkSyncMintZnsId)
+    // }
+    // if (getRandomInt(0, 100) < 50) { // 35% chance to enterMarketsZkEra
+    //     activities.push(ZkSyncActivity.zkSyncEraLendInit)
+    // }
+    // if (getRandomInt(0, 100) < 50) { // 35% chance to enterMarketsReactFusion
+    //     activities.push(ZkSyncActivity.zkSyncReactFusionInit)
+    // }
+    // if (getRandomInt(0, 100) < 50) { // 35% chance to mint test tokens
+    //     activities.push(ZkSyncActivity.zkSyncSynFuturesTest)
+    // }
 
     return {
         chainName: Blockchains.ZkSync,
@@ -45,7 +45,8 @@ function generateZkSync(): ModuleActions {
 
 function generateZkSyncRandomActivities(activitiesNum: number): ZkSyncActivity[] {
     let availableActivities: ZkSyncActivity[] = [
-        ZkSyncActivity.zkSyncRandomApprove, ZkSyncActivity.zkSyncRandomApprove, // x2 chance
+        ZkSyncActivity.zkSyncRandomApprove,
+        ZkSyncActivity.zkSyncDmail,
         ZkSyncActivity.wrapUnwrap,
         ZkSyncActivity.zkSyncDummyRandomSwapCycle,
         ZkSyncActivity.zkSyncDummyRandomLending
