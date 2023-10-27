@@ -16,7 +16,8 @@ export enum Blockchains {
     Ethereum = "Ethereum",
     Optimism = "Optimism",
     Arbitrum = "Arbitrum",
-    Bsc = "Bsc"
+    Bsc = "Bsc",
+    Scroll = "Scroll"
 }
 
 enum Exchanges {
@@ -75,6 +76,16 @@ export const arbitrumChain: Chain = {
     extraGasLimit: 0,
     explorerUrl: "https://arbiscan.io",
     orbiterCode: 9002
+}
+
+export const scrollChain: Chain = {
+    title: Blockchains.Scroll,
+    chainId: 534352,
+    nodeUrl: 'https://rpc.scroll.io',
+    symbol: "ETH",
+    extraGasLimit: 0,
+    explorerUrl: "https://scrollscan.com",
+    orbiterCode: -1 // TODO: oleg pls
 }
 
 export const bscChain: Chain = {
