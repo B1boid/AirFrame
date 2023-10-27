@@ -14,5 +14,9 @@ export const scrollTokens: EnumDictionary<Asset, string> = {
 
 
 export const scrollContracts: { [id: string]: string } = {
-    kyberSwapRouter: "0x6131B5fae19EA4f9D964eAc0408E4408b66337b5"
+    kyberSwapRouter: "0x6131B5fae19EA4f9D964eAc0408E4408b66337b5",
+
+    // spaceRouter: "0xbE7D1FD1f6748bbDefC4fbaCafBb11C6Fc506d1d",
+    syncSwapRouter: "0x80e38291e06339d10AAB483C65695D004dBD5C69",
+    iziRouter: "0x2db0AFD0045F3518c77eC6591a542e326Befd3D7",
 }

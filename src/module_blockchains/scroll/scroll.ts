@@ -1,6 +1,6 @@
 import {Chain, scrollChain} from "../../config/chains";
 import {Activity, BlockchainModule} from "../../classes/module";
-import {scrollRandomApprove} from "./activities";
+import {scrollRandomApprove, scrollRandomStuff} from "./activities";
 
 
 class ScrollModule extends BlockchainModule {
@@ -14,6 +14,6 @@ class ScrollModule extends BlockchainModule {
 export const moduleScroll: ScrollModule = new ScrollModule(
     scrollChain,
     [
-        scrollRandomApprove
+        scrollRandomApprove, scrollRandomStuff
     ]
 )
