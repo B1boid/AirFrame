@@ -49,6 +49,7 @@ export enum Asset {
     GMX = "GMX",
     RDNT = "RDNT",
     AGEUR = "AGEUR",
+    WSTETH = "WSTETH",
 
     // === Only zkSync tokens ==
     MUTE = "MUTE",
