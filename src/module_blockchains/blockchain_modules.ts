@@ -8,6 +8,7 @@ import {moduleOptimism} from "./optimism/optimism";
 import {moduleArbitrum} from "./arbitrum/arbitrum";
 import {moduleBsc} from "./bsc/bsc";
 import {moduleScroll} from "./scroll/scroll";
+import {scrollWrapUnwrap} from "./scroll/activities";
 
 
 export const enum PolygonActivity {
@@ -76,7 +77,12 @@ export const enum ArbActivity {
 
 export const enum ScrollActivity {
     scrollRandomApprove = "scrollRandomApprove",
-    scrollRandomStuff = "scrollRandomStuff"
+    scrollRandomStuff = "scrollRandomStuff",
+    scrollEmptyRouter = "scrollEmptyRouter",
+    scrollSwapCycleNativeToUsdc = "scrollSwapCycleNativeToUsdc",
+    scrollWrapUnwrap = "scrollWrapUnwrap",
+    scrollDmail = "scrollDmail",
+    scrollDeployAndInteract = "scrollDeployAndInteract"
 }
 
 export type ActivityTag = PolygonActivity | ZkSyncActivity | EthereumActivity | OptimismActivity | BscActivity | ArbActivity | ScrollActivity

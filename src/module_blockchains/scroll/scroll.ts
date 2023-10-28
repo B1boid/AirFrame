@@ -1,6 +1,14 @@
 import {Chain, scrollChain} from "../../config/chains";
 import {Activity, BlockchainModule} from "../../classes/module";
-import {scrollRandomApprove, scrollRandomStuff} from "./activities";
+import {
+    scrollDeployAndInteract,
+    scrollDmail,
+    scrollEmptyRouter,
+    scrollRandomApprove,
+    scrollRandomStuff,
+    scrollSwapCycleNativeToUsdc,
+    scrollWrapUnwrap
+} from "./activities";
 
 
 class ScrollModule extends BlockchainModule {
@@ -14,6 +22,7 @@ class ScrollModule extends BlockchainModule {
 export const moduleScroll: ScrollModule = new ScrollModule(
     scrollChain,
     [
-        scrollRandomApprove, scrollRandomStuff
+        scrollRandomApprove, scrollRandomStuff, scrollEmptyRouter, scrollSwapCycleNativeToUsdc, scrollWrapUnwrap,
+        scrollDmail, scrollDeployAndInteract
     ]
 )

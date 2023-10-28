@@ -1,6 +1,6 @@
 import {UnionProvider} from "../classes/wallet";
 import {TxInteraction} from "../classes/module";
-import {Blockchains, Chain} from "../config/chains";
+import {Blockchains, Chain, ethereumChain} from "../config/chains";
 import * as oldethers from "ethers";
 import * as zk from "zksync-web3";
 import {ethers, FeeData, toBigInt} from "ethers-new";
@@ -64,11 +64,23 @@ export async function getFeeData(provider: UnionProvider, chain: Chain): Promise
                     curGasPriceInfo.maxPriorityFeePerGas
                 )
             }
-            if (curGasPriceInfo.gasPrice !== null && curGasPriceInfo.gasPrice < GAS_PRICE_LIMITS(chain.title)) {
-                return curGasPriceInfo
-            }
-            if (counter % HIGH_GAS_PRICE_LOG_STEP === 10) {
-                globalLogger.warn(`Gas price is too high | Gas price: ${curGasPriceInfo.gasPrice}`)
+            if (chain.title == Blockchains.Scroll) {
+                let mainnetProvider = new ethers.JsonRpcProvider(ethereumChain.nodeUrl, ethereumChain.chainId)
+                let mainnetFee = await mainnetProvider.getFeeData()
+                if (curGasPriceInfo.gasPrice !== null && mainnetFee.gasPrice !== null &&
+                    mainnetFee.gasPrice < GAS_PRICE_LIMITS(chain.title)) {
+                    return curGasPriceInfo
+                }
+                if (counter % HIGH_GAS_PRICE_LOG_STEP === 10) {
+                    globalLogger.warn(`Gas price is too high | Gas price: ${curGasPriceInfo.gasPrice} | Mainnet: ${mainnetFee.gasPrice}`)
+                }
+            } else {
+                if (curGasPriceInfo.gasPrice !== null && curGasPriceInfo.gasPrice < GAS_PRICE_LIMITS(chain.title)) {
+                    return curGasPriceInfo
+                }
+                if (counter % HIGH_GAS_PRICE_LOG_STEP === 10) {
+                    globalLogger.warn(`Gas price is too high | Gas price: ${curGasPriceInfo.gasPrice}`)
+                }
             }
             counter++
             await sleep(10)
