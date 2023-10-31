@@ -85,7 +85,7 @@ export const scrollChain: Chain = {
     symbol: "ETH",
     extraGasLimit: 0,
     explorerUrl: "https://scrollscan.com",
-    orbiterCode: -1 // TODO: oleg pls
+    orbiterCode: 9019
 }
 
 export const bscChain: Chain = {
@@ -95,5 +95,5 @@ export const bscChain: Chain = {
     symbol: "BNB",
     extraGasLimit: 0,
     explorerUrl: "https://bscscan.com",
-    orbiterCode: -1 // TODO: oleg pls
+    orbiterCode: 9015
 }

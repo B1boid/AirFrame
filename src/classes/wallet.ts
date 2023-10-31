@@ -1,6 +1,6 @@
 import {TxInteraction} from "./module";
-import {sleep} from "../utils/utils";
-import {ethers, FeeData, toBigInt, TransactionReceipt, TransactionResponse} from "ethers-new";
+import {retry, sleep} from "../utils/utils";
+import {ethers, FeeData, InterfaceAbi, toBigInt, TransactionReceipt, TransactionResponse} from "ethers-new";
 import {Blockchains, Chain, ethereumChain} from "../config/chains";
 import {ConnectedLogger, globalLogger, ILogger} from "../utils/logger"
 import {AddressInfo, OkxCredentials} from "./info";
@@ -9,6 +9,8 @@ import * as zk from "zksync-web3";
 import * as oldethers from "ethers";
 import {getFeeData, getGasLimit} from "../utils/gas";
 import {ZKSYNC_BRIDGE_NAME} from "../module_connections/eth-zksyncofficial/connection_eth_zksync_official";
+import {BigNumberish} from "ethers-new/src.ts/utils";
+
 
 
 export enum TxResult {
@@ -31,6 +33,8 @@ const TX_LOGIC_BY_TRY = [
 
 export interface WalletI {
     getAddress(): string
+
+    getNonce(chain: Chain): Promise<BigNumberish>
 
     getWithdrawAddress(): string | null
 
@@ -76,6 +80,19 @@ export class MyWallet implements WalletI {
         return this.signer.address
     }
 
+    async getNonce(chain: Chain): Promise<BigNumberish> {
+        let provider: UnionProvider
+        let curSigner: UnionWallet
+        if (chain.title === Blockchains.ZkSync) {
+            provider = new zk.Provider(chain.nodeUrl)
+            curSigner = new zk.Wallet(this.signer.privateKey, provider, oldethers.getDefaultProvider())
+        } else {
+            provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+            curSigner = this.signer.connect(provider)
+        }
+        return await curSigner.getNonce()
+    }
+
     getWithdrawAddress(): string | null {
         return this.withdrawAddress
     }
@@ -83,6 +100,8 @@ export class MyWallet implements WalletI {
     getMasterCredentials(): OkxCredentials | null {
         return this.masterCredentials;
     }
+
+
 
     private async resetGasInfo(provider: UnionProvider, txInteraction: TxInteraction, chain: Chain): Promise<TxResult> {
         try {
