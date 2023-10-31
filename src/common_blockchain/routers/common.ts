@@ -12,6 +12,7 @@ import {odosQuote, odosQuoteNativeTo, odosSwap, odosSwapNativeTo} from "./odos";
 import {ExecBalance} from "../common_utils";
 import {globalLogger} from "../../utils/logger";
 import {lifiQuote, lifiQuoteNativeTo, lifiSwap, lifiSwapNativeTo} from "./lifi";
+import {ambientSwap, ambientSwapNativeTo} from "./ambient";
 
 export enum Dexes {
     OneInch = "1inch",
@@ -20,7 +21,8 @@ export enum Dexes {
     Mute = "mute",
     SyncSwap = "syncswap",
     Velocore = "velocore",
-    SpaceFi = "spacefi"
+    SpaceFi = "spacefi",
+    Ambient = "ambient"
 }
 
 export interface DexPrice{
@@ -197,6 +199,16 @@ export async function commonSwap(
                 )
             } else if (tokenTo === NATIVE_ADDRESS) {
                 res = await muteSwap(
+                    tokenFrom, tokens.WETH, wallet, chain, contracts, name, execBalance, stoppable
+                )
+            }
+        } else if (dex === Dexes.Ambient) {
+            if (tokenFrom === NATIVE_ADDRESS) {
+                res = await ambientSwapNativeTo(
+                    tokens.WETH, tokenTo, wallet, chain, contracts, name, execBalance, stoppable
+                )
+            } else if (tokenTo === NATIVE_ADDRESS) {
+                res = await ambientSwap(
                     tokenFrom, tokens.WETH, wallet, chain, contracts, name, execBalance, stoppable
                 )
             }

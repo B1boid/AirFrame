@@ -17,7 +17,7 @@ import {Asset} from "../config/tokens";
 const SCROLL_ACTIONS: ModuleActions = {
     chainName: Blockchains.Scroll,
     randomOrder: Randomness.Full,
-    activityNames: [ScrollActivity.scrollDeployAndInteract]
+    activityNames: [ScrollActivity.scrollSwapCycleNativeToUsdc]
 }
 
 const POLYGON_ACTIONS: ModuleActions = {
@@ -151,11 +151,11 @@ const CONNECTION_SCROLL_TO_OPTIMISM: ConnectionAction = {
 
 
 const ACTIONS_1: AnyActions[] =  [
-        CONNECTION_OKX_TO_ZKSYNC,
-        CONNECTION_ZKSYNC_TO_SCROLL,
+        // CONNECTION_OKX_TO_ZKSYNC,
+        // CONNECTION_ZKSYNC_TO_SCROLL,
         SCROLL_ACTIONS,
-        CONNECTION_SCROLL_TO_OPTIMISM,
-        CONNECTION_OPTIMISM_TO_OKX
+        // CONNECTION_SCROLL_TO_OPTIMISM,
+        // CONNECTION_OPTIMISM_TO_OKX
 ]
 
 
@@ -165,7 +165,7 @@ export const WALLETS_ACTIONS_1: WalletActions[] = [
     // {address: "0x750D0B78E16426a42cd9a5485BA3DF70290912C0", actions: ACTIONS_1},
 
     // {address: "0x1Ce3B1D69e3b1C4DE3b0Bc460714fD81aB203d35", actions: ACTIONS_1},
-    {address: "0x80F6a5D93947268d37640693327ED8cCac491F7f", actions: ACTIONS_1}
+    {address: "0xd8E758e2C23e704383246Cc5c38B5c6b926aBEE7", actions: ACTIONS_1}
 ]
 
 

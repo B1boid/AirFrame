@@ -4,7 +4,7 @@ import {scrollContracts, scrollTokens} from "./constants";
 import {scrollChain} from "../../config/chains";
 import {getRandomApprove} from "../../common_blockchain/approvals";
 import {getRandomElement, getRandomFloat, getRandomInt, getRandomizedPercent} from "../../utils/utils";
-import {ethers, getCreateAddress, hexlify} from "ethers-new";
+import {ethers, getCreateAddress} from "ethers-new";
 import {globalLogger} from "../../utils/logger";
 import allAbi from "../../abi/all.json";
 import {commonSwap, Dexes} from "../../common_blockchain/routers/common";
@@ -88,14 +88,16 @@ export async function scrollEmptyRouter_do(wallet: WalletI): Promise<TxInteracti
 }
 
 export async function scrollSwapCycleNativeToUsdc_swapto(wallet: WalletI): Promise<TxInteraction[]> {
-    return await commonSwap(tokens.ETH, tokens.USDC, {balancePercent: [1, 3]},
-       [Dexes.SyncSwap, Dexes.SpaceFi],
+    return await commonSwap(tokens.ETH, tokens.USDC, {balancePercent: [1, 2]},
+        [Dexes.Ambient],
+       //[Dexes.SyncSwap, Dexes.SpaceFi, Dexes.Ambient],
         wallet, chain, contracts, tokens, "scrollSwapCycleNativeToUsdc_swapto")
 }
 
 export async function scrollSwapCycleNativeToUsdc_swapback(wallet: WalletI): Promise<TxInteraction[]> {
     return await commonSwap(tokens.USDC, tokens.ETH, {fullBalance: true},
-       [Dexes.SyncSwap, Dexes.SpaceFi],
+        [Dexes.Ambient],
+       // [Dexes.SyncSwap, Dexes.SpaceFi, Dexes.Ambient],
         wallet, chain, contracts, tokens,"scrollSwapCycleNativeToUsdc_swapback", true)
 }
 
