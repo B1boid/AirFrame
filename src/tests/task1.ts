@@ -1,12 +1,24 @@
 import {AnyActions, ConnectionAction, ModuleActions, Randomness, WalletActions} from "../classes/actions";
 import {Blockchains, Destination} from "../config/chains";
 import {Connections} from "../module_connections/connection_modules";
-import {BscActivity, EthereumActivity, PolygonActivity, ZkSyncActivity} from "../module_blockchains/blockchain_modules";
+import {
+    BscActivity,
+    EthereumActivity,
+    PolygonActivity,
+    ScrollActivity,
+    ZkSyncActivity
+} from "../module_blockchains/blockchain_modules";
 import {Asset} from "../config/tokens";
 
 ////////////////////////////////////////////////////////////////////////
 // Later we will get it from UI, now it's hardcoded for testing
 ////////////////////////////////////////////////////////////////////////
+
+const SCROLL_ACTIONS: ModuleActions = {
+    chainName: Blockchains.Scroll,
+    randomOrder: Randomness.Full,
+    activityNames: [ScrollActivity.scrollDeployAndInteract]
+}
 
 const POLYGON_ACTIONS: ModuleActions = {
     chainName: Blockchains.Polygon,
@@ -121,28 +133,29 @@ const CONNECTION_ARBITRUM_TO_OKX: ConnectionAction = {
     connectionName: Connections.ExchangeOKX
 }
 
+const CONNECTION_ZKSYNC_TO_SCROLL: ConnectionAction = {
+    from: Destination.ZkSync,
+    to: Destination.Scroll,
+    asset: Asset.ETH,
+    amount: -1,
+    connectionName: Connections.Orbiter
+}
+
+const CONNECTION_SCROLL_TO_OPTIMISM: ConnectionAction = {
+    from: Destination.Scroll,
+    to: Destination.Optimism,
+    asset: Asset.ETH,
+    amount: -1,
+    connectionName: Connections.Orbiter
+}
+
 
 const ACTIONS_1: AnyActions[] =  [
-        // CONNECTION_OKX_TO_ZKSYNC
-        // CONNECTION_OKX_TO_POLYGON,
-        // POLYGON_ACTIONS,
-        // CONNECTION_POLYGON_TO_OKX
-        // POLYGON_ACTIONS
-        BRIDGE_ETHEREUM_TO_ZKSYNC,
-         ZKSYNC_ACTIONS,
-         BRIDGE_ORBITER_ZKSYNC_TO_ARBITRUM,
-        CONNECTION_ARBITRUM_TO_OKX
-        // CONNECTION_OKX_TO_ETHEREUM,
-        // ETH_ACTIONS
-    // BRIDGE_ORBITER_ZKSYNC_TO_OPTIMISM,
-    //    CONNECTION_OPTIMISM_TO_OKX
-    // CONNECTION_ETHEREUM_TO_OKX
-    // CONNECTION_OKX_TO_ZKSYNC,
-    // BRIDGE_ORBITER_ZKSYNC_TO_ARBITRUM,
-    // CONNECTION_ARBITRUM_TO_OKX
-    // CONNECTION_OKX_TO_BSC
-    // BSC_ACTIONS
-
+        CONNECTION_OKX_TO_ZKSYNC,
+        CONNECTION_ZKSYNC_TO_SCROLL,
+        SCROLL_ACTIONS,
+        CONNECTION_SCROLL_TO_OPTIMISM,
+        CONNECTION_OPTIMISM_TO_OKX
 ]
 
 
@@ -151,7 +164,8 @@ export const WALLETS_ACTIONS_1: WalletActions[] = [
     // {address: "0x2Fd49f2da0d07102b223D89f290F61b265291952", actions: ACTIONS_1},
     // {address: "0x750D0B78E16426a42cd9a5485BA3DF70290912C0", actions: ACTIONS_1},
 
-    {address: "0x99535d60659e3B0A7e5728006DBD958fb5FC80D8", actions: ACTIONS_1},
+    // {address: "0x1Ce3B1D69e3b1C4DE3b0Bc460714fD81aB203d35", actions: ACTIONS_1},
+    {address: "0x80F6a5D93947268d37640693327ED8cCac491F7f", actions: ACTIONS_1}
 ]
 
 

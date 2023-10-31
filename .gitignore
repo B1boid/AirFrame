@@ -11,3 +11,5 @@ package-lock.json
 .okx
 src/gen.js
 src/gen_pks.ts
+scroll_meta/scroll_contracts_addresses/*
+scroll_meta/scroll_gen_res/*
