@@ -34,6 +34,8 @@ const TX_LOGIC_BY_TRY = [
 export interface WalletI {
     getAddress(): string
 
+    getSigner(chain: Chain): oldethers.Wallet
+
     getNonce(chain: Chain): Promise<BigNumberish>
 
     getWithdrawAddress(): string | null
@@ -78,6 +80,11 @@ export class MyWallet implements WalletI {
 
     getAddress(): string {
         return this.signer.address
+    }
+
+    getSigner(chain: Chain): oldethers.Wallet {
+        const provider = new oldethers.providers.JsonRpcProvider(chain.nodeUrl)
+        return new oldethers.Wallet(this.signer.privateKey, provider)
     }
 
     async getNonce(chain: Chain): Promise<BigNumberish> {

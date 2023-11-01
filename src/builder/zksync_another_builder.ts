@@ -1,6 +1,14 @@
 import {AnyActions, ConnectionAction, ModuleActions, Randomness, WalletActions} from "../classes/actions";
 import {getTxCount, hasInteractionWithEthContract} from "./features";
-import {arbitrumChain, Blockchains, Destination, ethereumChain, optimismChain, zkSyncChain} from "../config/chains";
+import {
+    arbitrumChain,
+    Blockchains,
+    Destination,
+    ethereumChain,
+    optimismChain,
+    scrollChain,
+    zkSyncChain
+} from "../config/chains";
 import {Asset} from "../config/tokens";
 import {Connections} from "../module_connections/connection_modules";
 import {getMedian, getRandomElement, getRandomFloat, getRandomInt, shuffleArray} from "../utils/utils";
@@ -8,6 +16,7 @@ import {
     ArbActivity,
     EthereumActivity,
     OptimismActivity,
+    ScrollActivity,
     ZkSyncActivity
 } from "../module_blockchains/blockchain_modules";
 import {globalLogger} from "../utils/logger";
@@ -19,6 +28,7 @@ interface ExtendedFeatures {
     zkTxs: number,
     optTxs: number,
     arbTxs: number,
+    scrollTxs: number,
     hasOffBridge: boolean
 }
 
@@ -35,11 +45,12 @@ export async function buildZkSyncAnother(activeAddresses: string[]): Promise<Wal
     shuffleArray(accountInfos)
     accountInfos.sort(
         function(a: ExtendedFeatures, b: ExtendedFeatures){
-            if(a.hasOffBridge === b.hasOffBridge){
-                return a.zkTxs > b.zkTxs ? 1 : -1;
-            }else{
-                return a.hasOffBridge ? 1 : -1;
-            }
+            return a.scrollTxs > b.scrollTxs ? 1 : -1
+            // if(a.hasOffBridge === b.hasOffBridge){
+            //     return a.zkTxs > b.zkTxs ? 1 : -1;
+            // }else{
+            //     return a.hasOffBridge ? 1 : -1;
+            // }
         }
     );
     let res: WalletActions[] = []
@@ -78,8 +89,9 @@ export async function getAccountInfo(address: string, retries: number = 1): Prom
         let zkTxs = await getTxCount(address, zkSyncChain)
         let optTxs = await getTxCount(address, optimismChain)
         let arbTxs = await getTxCount(address, arbitrumChain)
+        let scrollTxs = await getTxCount(address, scrollChain)
         let hasOffBridge = await hasInteractionWithEthContract(address, "0x32400084C286CF3E17e7B677ea9583e60a000324")
-        if (ethTxs === null || zkTxs === null || hasOffBridge === null || optTxs === null || arbTxs === null) {
+        if (ethTxs === null || zkTxs === null || hasOffBridge === null || optTxs === null || arbTxs === null || scrollTxs === null) {
             return null
         }
         return {
@@ -88,6 +100,7 @@ export async function getAccountInfo(address: string, retries: number = 1): Prom
             zkTxs: zkTxs,
             optTxs: optTxs,
             arbTxs: arbTxs,
+            scrollTxs: scrollTxs,
             hasOffBridge: hasOffBridge
         }
     } catch (e) {
@@ -107,6 +120,7 @@ function generateActions(accInfo: ExtendedFeatures): WalletActions {
     let actions: AnyActions[] = []
     generatePathToZkSync(accInfo, actions)
     generateZkSync(accInfo, actions)
+    generateScroll(accInfo, actions)
     return {
         address: accInfo.walletAddress,
         actions: actions,
@@ -152,7 +166,7 @@ function generatePathToZkSync(accInfo: ExtendedFeatures, actions: AnyActions[]):
             const remainEthTxs = Math.min(5, 11 - accInfo.ethTxs) // target at least ~10 eth txs
             actions.push(generateEthRandomActivities(getRandomInt(remainEthTxs - 1, remainEthTxs + 2), 0))
 
-            const PERCENT_TO_USE_OFFICIAL_BRIDGE_AGAIN = 15
+            const PERCENT_TO_USE_OFFICIAL_BRIDGE_AGAIN = 5
             if (getRandomInt(0, 100) < PERCENT_TO_USE_OFFICIAL_BRIDGE_AGAIN) {
                 actions.push(BRIDGE_ALL_ETHEREUM_TO_ZKSYNC)
             } else {
@@ -235,7 +249,7 @@ function generateZkSync(accInfo: ExtendedFeatures, actions: AnyActions[]): void 
             activities.push(ZkSyncActivity.zkSyncSynFuturesTest)
         }
     } else {
-        activities = generateZkSyncRandomActivities(getRandomInt(2, 4))
+        activities = generateZkSyncRandomActivities(getRandomInt(2, 3))
     }
     const ZKSYNC_ACTIONS: ModuleActions = {
         chainName: Blockchains.ZkSync,
@@ -244,63 +258,20 @@ function generateZkSync(accInfo: ExtendedFeatures, actions: AnyActions[]): void 
     }
     actions.push(ZKSYNC_ACTIONS)
 
-    // okx deposit doesn't work :(
-    // const CONNECTION_ZKSYNC_TO_OKX: ConnectionAction = {
-    //     from: Destination.ZkSync,
-    //     to: Destination.OKX,
-    //     asset: Asset.ETH,
-    //     amount: -1,
-    //     connectionName: Connections.ExchangeOKX
-    // }
-    // actions.push(CONNECTION_ZKSYNC_TO_OKX)
-
-    if ((accInfo.optTxs > 0 && accInfo.arbTxs === 0) || getRandomInt(0, 100) < 66){ // 66% chance to use optimism
-        const BRIDGE_ORBITER_ZKSYNC_TO_OPTIMISM: ConnectionAction = {
-            from: Destination.ZkSync,
-            to: Destination.Optimism,
-            asset: Asset.ETH,
-            amount: -1,
-            connectionName: Connections.Orbiter
-        }
-        actions.push(BRIDGE_ORBITER_ZKSYNC_TO_OPTIMISM)
-        actions.push(
-            generateOptimismActivities(getRandomInt(0, 3))
-        )
-        const CONNECTION_OPTIMISM_TO_OKX: ConnectionAction = {
-            from: Destination.Optimism,
-            to: Destination.OKX,
-            asset: Asset.ETH,
-            amount: -1,
-            connectionName: Connections.ExchangeOKX
-        }
-        actions.push(CONNECTION_OPTIMISM_TO_OKX)
-    } else {
-        const BRIDGE_ORBITER_ZKSYNC_TO_ARB: ConnectionAction = {
-            from: Destination.ZkSync,
-            to: Destination.Arbitrum,
-            asset: Asset.ETH,
-            amount: -1,
-            connectionName: Connections.Orbiter
-        }
-        actions.push(BRIDGE_ORBITER_ZKSYNC_TO_ARB)
-        actions.push(
-            generateArbitrumActivities(getRandomInt(0, 3))
-        )
-        const CONNECTION_ARB_TO_OKX: ConnectionAction = {
-            from: Destination.Arbitrum,
-            to: Destination.OKX,
-            asset: Asset.ETH,
-            amount: -1,
-            connectionName: Connections.ExchangeOKX
-        }
-        actions.push(CONNECTION_ARB_TO_OKX)
+    const BRIDGE_ORBITER_ZKSYNC_TO_SCROLL: ConnectionAction = {
+        from: Destination.ZkSync,
+        to: Destination.Scroll,
+        asset: Asset.ETH,
+        amount: -1,
+        connectionName: Connections.Orbiter
     }
+    actions.push(BRIDGE_ORBITER_ZKSYNC_TO_SCROLL)
+
 }
 
 function generateZkSyncRandomActivities(activitiesNum: number): ZkSyncActivity[] {
     let availableActivities: ZkSyncActivity[] = [
         ZkSyncActivity.zkSyncRandomApprove,
-        ZkSyncActivity.wrapUnwrap,
         ZkSyncActivity.zkSyncDummyRandomSwapCycle,
         ZkSyncActivity.zkSyncDummyRandomLending,
         ZkSyncActivity.zkSyncDmail
@@ -401,4 +372,86 @@ function generateArbitrumActivities(activitiesNum: number): ModuleActions {
         randomOrder: Randomness.Full,
         activityNames: res
     }
+}
+
+function generateScroll(accInfo: ExtendedFeatures, actions: AnyActions[]): void {
+    let activities: ScrollActivity[] = generateScrollActivities(getRandomInt(2, 3))
+    if (accInfo.scrollTxs == 0){
+        activities.push(ScrollActivity.scrollDeployAndInteract)
+    }
+    const SCROLL_ACTIONS: ModuleActions = {
+        chainName: Blockchains.Scroll,
+        randomOrder: Randomness.Full,
+        activityNames: activities
+    }
+    actions.push(SCROLL_ACTIONS)
+
+
+    if ((accInfo.optTxs > 0 && accInfo.arbTxs === 0) || getRandomInt(0, 100) < 66){ // 66% chance to use optimism
+        const BRIDGE_ORBITER_SCROLL_TO_OPTIMISM: ConnectionAction = {
+            from: Destination.Scroll,
+            to: Destination.Optimism,
+            asset: Asset.ETH,
+            amount: -1,
+            connectionName: Connections.Orbiter
+        }
+        actions.push(BRIDGE_ORBITER_SCROLL_TO_OPTIMISM)
+        actions.push(
+            generateOptimismActivities(getRandomInt(0, 3))
+        )
+        const CONNECTION_OPTIMISM_TO_OKX: ConnectionAction = {
+            from: Destination.Optimism,
+            to: Destination.OKX,
+            asset: Asset.ETH,
+            amount: -1,
+            connectionName: Connections.ExchangeOKX
+        }
+        actions.push(CONNECTION_OPTIMISM_TO_OKX)
+    } else {
+        const BRIDGE_ORBITER_SCROLL_TO_ARB: ConnectionAction = {
+            from: Destination.Scroll,
+            to: Destination.Arbitrum,
+            asset: Asset.ETH,
+            amount: -1,
+            connectionName: Connections.Orbiter
+        }
+        actions.push(BRIDGE_ORBITER_SCROLL_TO_ARB)
+        actions.push(
+            generateArbitrumActivities(getRandomInt(0, 3))
+        )
+        const CONNECTION_ARB_TO_OKX: ConnectionAction = {
+            from: Destination.Arbitrum,
+            to: Destination.OKX,
+            asset: Asset.ETH,
+            amount: -1,
+            connectionName: Connections.ExchangeOKX
+        }
+        actions.push(CONNECTION_ARB_TO_OKX)
+    }
+}
+
+function generateScrollActivities(activitiesNum: number): ScrollActivity[] {
+    let availableActivities: ScrollActivity[] = [
+        ScrollActivity.scrollDmail,
+        ScrollActivity.scrollWrapUnwrap,
+        ScrollActivity.scrollRandomStuff,
+        ScrollActivity.scrollRandomApprove,
+        ScrollActivity.scrollEmptyRouter,
+        ScrollActivity.scrollSwapCycleNativeToUsdc
+    ]
+
+    let res: ScrollActivity[] = []
+    let repeatedActivities: ScrollActivity[] = []
+    for (let i = 0; i < activitiesNum; i++) {
+        let curActivity: ScrollActivity
+        while (true) {
+            curActivity = getRandomElement(availableActivities)
+            if (!repeatedActivities.includes(curActivity)) {
+                break
+            }
+        }
+        res.push(curActivity)
+        repeatedActivities.push(curActivity)
+    }
+    return res
 }

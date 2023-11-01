@@ -89,7 +89,7 @@ async function doTask(password: string, passwordOkx: string, walletActions: Wall
 
 
 export async function main(accsPassword : string | undefined = undefined, okxPassword: string | undefined = undefined){
-    const runConfig: RunConfig = ZKSYNC_BASIC_CONFIG
+    const runConfig: RunConfig = ZKSYNC_ANOTHER_CONFIG
 
     const threads: number = runConfig.threads
     const strategy: Strategy = runConfig.strategy
