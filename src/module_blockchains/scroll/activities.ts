@@ -36,7 +36,7 @@ export const scrollEmptyRouter: Activity = {
 export const scrollSwapCycleNativeToUsdc: Activity = {
     name: ScrollActivity.scrollSwapCycleNativeToUsdc,
     txs: [
-        //scrollSwapCycleNativeToUsdc_swapto,
+        scrollSwapCycleNativeToUsdc_swapto,
         scrollSwapCycleNativeToUsdc_swapback
     ]
 }

@@ -5,10 +5,8 @@ import {TxInteraction} from "../../classes/module";
 import {ethers, formatEther} from "ethers-new";
 import {globalLogger} from "../../utils/logger";
 import {CrocEnv} from "../../ambient";
-import mute from "../../abi/mute.json";
 import erc20 from "../../abi/erc20.json";
 import {checkAndGetApprovalsInteraction} from "../approvals";
-import {getCurTimestamp} from "../../utils/utils";
 import {BigNumber} from "ethers";
 
 export async function ambientSwapNativeTo(
@@ -65,7 +63,6 @@ export async function ambientSwap(
         }
         tokenBalance = getExecBalance(execBalance, tokenBalance)!
         let txs = await checkAndGetApprovalsInteraction(wallet.getAddress(), contracts.ambientRouter, tokenBalance, tokenContract)
-        console.log(txs)
         const croc = new CrocEnv(chain.chainId, wallet.getSigner(chain))
         let data = await croc.sell(tokenFrom, BigNumber.from(tokenBalance)).forEth().encodeSwap({surplus: false})
 

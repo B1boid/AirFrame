@@ -89,17 +89,17 @@ async function doTask(password: string, passwordOkx: string, walletActions: Wall
 
 
 export async function main(accsPassword : string | undefined = undefined, okxPassword: string | undefined = undefined){
-    const runConfig: RunConfig = TEST_CONFIG
+    const runConfig: RunConfig = ZKSYNC_ANOTHER_CONFIG
 
     const threads: number = runConfig.threads
     const strategy: Strategy = runConfig.strategy
 
     const password: string = accsPassword ? accsPassword : await prompt('Accs password: ')
     const passwordOkx: string = okxPassword ? okxPassword : await prompt('Okx password: ')
-    // pingSubs(passwordOkx).catch(e => {
-    //     globalLogger.warn("Failed to ping subaccs")
-    //     console.log(e)
-    // })
+    pingSubs(passwordOkx).catch(e => {
+        globalLogger.warn("Failed to ping subaccs")
+        console.log(e)
+    })
 
     let actions: WalletActions[]
     if (runConfig.strategy === Strategy.TestMode){
