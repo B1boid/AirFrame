@@ -71,7 +71,7 @@ export const optimismChain: Chain = {
 export const arbitrumChain: Chain = {
     title: Blockchains.Arbitrum,
     chainId: 42161,
-    nodeUrl: `https://arbitrum-mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
+    nodeUrl: "https://arbitrum.llamarpc.com", //`https://arbitrum-mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
     symbol: "ETH",
     extraGasLimit: 0,
     explorerUrl: "https://arbiscan.io",
