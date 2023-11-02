@@ -168,9 +168,9 @@ function generatePathToZkSync(accInfo: ExtendedFeatures, actions: AnyActions[]):
             }
             actions.push(CONNECTION_OKX_TO_ETHEREUM)
             const remainEthTxs = Math.min(5, 11 - accInfo.ethTxs) // target at least ~10 eth txs
-            actions.push(generateEthRandomActivities(getRandomInt(remainEthTxs - 1, remainEthTxs + 2), 0))
+            actions.push(generateEthRandomActivities(getRandomInt(remainEthTxs - 1, remainEthTxs), 0))
 
-            const PERCENT_TO_USE_OFFICIAL_BRIDGE_AGAIN = 5
+            const PERCENT_TO_USE_OFFICIAL_BRIDGE_AGAIN = 10
             if (getRandomInt(0, 100) < PERCENT_TO_USE_OFFICIAL_BRIDGE_AGAIN) {
                 actions.push(BRIDGE_ALL_ETHEREUM_TO_ZKSYNC)
             } else {
