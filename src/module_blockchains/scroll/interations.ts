@@ -179,94 +179,104 @@ export async function scrollDmail_send(wallet: WalletI): Promise<TxInteraction[]
 }
 
 export async function scrollDeployAndInteract_deploy(wallet: WalletI): Promise<TxInteraction[]>{
-    const filename = SCROLL_DEPLOY_ADDRESSES_FOLDER + `${wallet.getAddress()}.json`
-    if (fs.existsSync(filename)) {
-        globalLogger.connect(wallet.getAddress(), scrollChain).warn("Scroll contract already deployed.")
-        return []
-    }
-    const [bytecode, abi] = scrollGetBytecodeAndAbiForAddress(wallet)
-    const factory = new ethers.ContractFactory(abi, bytecode)
-    const nonce = await wallet.getNonce(chain)
-
-    const address = getCreateAddress({from: wallet.getAddress(), nonce: nonce})
-    const address_meta = JSON.stringify({"scroll_contract_addr": address})
     try {
-        fs.writeFileSync(filename, address_meta, 'utf8')
-    } catch (e) {
-        globalLogger.connect(wallet.getAddress(), scrollChain).warn("Could not write scroll deploy address.")
+        const filename = SCROLL_DEPLOY_ADDRESSES_FOLDER + `${wallet.getAddress()}.json`
+        if (fs.existsSync(filename)) {
+            globalLogger.connect(wallet.getAddress(), scrollChain).warn("Scroll contract already deployed.")
+            return []
+        }
+        const [bytecode, abi] = scrollGetBytecodeAndAbiForAddress(wallet)
+        const factory = new ethers.ContractFactory(abi, bytecode)
+        const nonce = await wallet.getNonce(chain)
+
+        const address = getCreateAddress({from: wallet.getAddress(), nonce: nonce})
+        const address_meta = JSON.stringify({"scroll_contract_addr": address})
+        try {
+            fs.writeFileSync(filename, address_meta, 'utf8')
+        } catch (e) {
+            globalLogger.connect(wallet.getAddress(), scrollChain).warn("Could not write scroll deploy address.")
+            return []
+        }
+
+        return [{
+            to: '',
+            data: factory.bytecode,
+            value: '0',
+            stoppable: false,
+            confirmations: 1,
+            name: "scrollDeployAndInteract_deploy"
+        }]
+    } catch (e){
+        globalLogger.connect(wallet.getAddress(), scrollChain).warn(`scrollDeployAndInteract_deploy failed: ${e}`)
         return []
     }
-
-    return [{
-        to: '',
-        data: factory.bytecode,
-        value: '0',
-        stoppable: false,
-        confirmations: 1,
-        name: "scrollDeployAndInteract_deploy"
-    }]
 }
 
 const ACTION_WORDS = ['wrap', 'do', 'push', 'pop', 'enable', 'disable', 'on', 'off', 'turnOn', 'turnOff', 'get', 'set', 'calculate', 'add', 'sub']
 export async function scrollDeployAndInteract_interact(wallet: WalletI): Promise<TxInteraction[]>{
-    const filename = SCROLL_DEPLOY_ADDRESSES_FOLDER + `${wallet.getAddress()}.json`
-    if (!fs.existsSync(filename)) {
-        globalLogger.connect(wallet.getAddress(), scrollChain).warn("Contract is not deployed")
-        return []
-    }
-    const contractAddress: string = JSON.parse(fs.readFileSync(filename, 'utf8'))['scroll_contract_addr']
-    const [_, abi] = scrollGetBytecodeAndAbiForAddress(wallet)
-    const contract = new ethers.Contract(contractAddress, abi)
-    for (const x of abi) {
-        if (!x.name) continue
+    try {
+        const filename = SCROLL_DEPLOY_ADDRESSES_FOLDER + `${wallet.getAddress()}.json`
+        if (!fs.existsSync(filename)) {
+            globalLogger.connect(wallet.getAddress(), scrollChain).warn("Contract is not deployed")
+            return []
+        }
+        const contractAddress: string = JSON.parse(fs.readFileSync(filename, 'utf8'))['scroll_contract_addr']
+        const [_, abi] = scrollGetBytecodeAndAbiForAddress(wallet)
+        const contract = new ethers.Contract(contractAddress, abi)
+        for (const x of abi) {
+            if (!x.name) continue
 
-        for (const word of ACTION_WORDS) {
-            if (x.name.startsWith(word)) {
-                if (x.name === "wrap") {
-                    let balancePercent = [20, 40] // from 20% to 40%
-                    const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
-                    let tokenBalance: bigint = await provider.getBalance(wallet.getAddress())
-                    tokenBalance = getRandomizedPercent(tokenBalance, balancePercent[0], balancePercent[1])
-                    const wrapCalldata = contract.interface.encodeFunctionData("wrap")
-                    const unwrapCalldata = contract.interface.encodeFunctionData("unwrap")
-                    return [
-                        {
-                            to: contractAddress,
-                            data: wrapCalldata,
-                            value: tokenBalance.toString(),
-                            stoppable: false,
-                            confirmations: 1,
-                            name: "scrollDeployAndInteract_interact__wrap"
-                        },
-                        {
-                            to: contractAddress,
-                            data: unwrapCalldata,
-                            value: "0",
-                            stoppable: true,
-                            confirmations: 1,
-                            name: "scrollDeployAndInteract_interact__unwrap"
-                        }
-                    ]
-                }
-                const values = []
-                for (const input of x.inputs) {
-                    if (input.type === "bool") {
-                        values.push(Boolean(getRandomInt(0, 1)))
-                    } else {
-                        values.push(getRandomInt(0, 10000))
+            for (const word of ACTION_WORDS) {
+                if (x.name.startsWith(word)) {
+                    if (x.name === "wrap") {
+                        let balancePercent = [20, 40] // from 20% to 40%
+                        const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+                        let tokenBalance: bigint = await provider.getBalance(wallet.getAddress())
+                        tokenBalance = getRandomizedPercent(tokenBalance, balancePercent[0], balancePercent[1])
+                        const wrapCalldata = contract.interface.encodeFunctionData("wrap")
+                        const unwrapCalldata = contract.interface.encodeFunctionData("unwrap")
+                        return [
+                            {
+                                to: contractAddress,
+                                data: wrapCalldata,
+                                value: tokenBalance.toString(),
+                                stoppable: false,
+                                confirmations: 1,
+                                name: "scrollDeployAndInteract_interact__wrap"
+                            },
+                            {
+                                to: contractAddress,
+                                data: unwrapCalldata,
+                                value: "0",
+                                stoppable: true,
+                                confirmations: 1,
+                                name: "scrollDeployAndInteract_interact__unwrap"
+                            }
+                        ]
                     }
+                    const values = []
+                    for (const input of x.inputs) {
+                        if (input.type === "bool") {
+                            values.push(Boolean(getRandomInt(0, 1)))
+                        } else {
+                            values.push(getRandomInt(0, 10000))
+                        }
+                    }
+                    const calldata = contract.interface.encodeFunctionData(x.name, values)
+                    return [{
+                        to: contractAddress,
+                        data: calldata,
+                        value: '0',
+                        stoppable: false,
+                        confirmations: 1,
+                        name: "scrollDeployAndInteract_interact"
+                    }]
                 }
-                const calldata = contract.interface.encodeFunctionData(x.name, values)
-                return [{
-                    to: contractAddress,
-                    data: calldata,
-                    value: '0',
-                    stoppable: false,
-                    confirmations: 1,
-                    name: "scrollDeployAndInteract_interact"
-                }]
             }
         }
+        return []
+    } catch (e) {
+        globalLogger.connect(wallet.getAddress(), scrollChain).warn(`scrollDeployAndInteract_interact failed: ${e}`)
+        return []
     }
-    return []
 }
