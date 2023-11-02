@@ -67,6 +67,7 @@ function printStats(accs: ExtendedFeatures[]){
     let accsWithOffBridge = 0
     let avgNonZeroEthTxs: number[] = []
     let avgNonZeroZkTxs: number[] = []
+    let avgNonZeroScrollTxs: number[] = []
     for (let accInfo of accs) {
         zeroAccs += accInfo.zkTxs === 0 && accInfo.ethTxs === 0 ? 1 : 0
         accsWithOffBridge += accInfo.hasOffBridge ? 1 : 0
@@ -76,9 +77,12 @@ function printStats(accs: ExtendedFeatures[]){
         if (accInfo.ethTxs > 0) {
             avgNonZeroEthTxs.push(accInfo.ethTxs)
         }
+        if (accInfo.scrollTxs > 0) {
+            avgNonZeroScrollTxs.push(accInfo.scrollTxs)
+        }
     }
     globalLogger.done(
-        `\nTotal accounts: ${accs.length}\nZero accounts: ${zeroAccs}\nAccs off-bridge: ${accsWithOffBridge}\nAvg non-zero ethTxs: ${getMedian(avgNonZeroEthTxs)}\nAvg non-zero zkTxs: ${getMedian(avgNonZeroZkTxs)}`
+        `\nTotal accounts: ${accs.length}\nZero accounts: ${zeroAccs}\nAccs off-bridge: ${accsWithOffBridge}\nAvg non-zero ethTxs: ${getMedian(avgNonZeroEthTxs)}\nAvg non-zero zkTxs: ${getMedian(avgNonZeroZkTxs)}\nAvg non-zero scrollTxs: ${getMedian(avgNonZeroScrollTxs)}`
     )
 }
 
