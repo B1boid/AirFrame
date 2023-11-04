@@ -10,7 +10,7 @@ import {
     Method,
     OKX_BASE_URL,
     OKXApiMethod,
-    OKXGetBalanceResponse,
+    OKXGetBalanceResponse, OKXGetCurrenciesResponse,
     OKXGetDepositWithdrawalStatusResponse,
     OKXTransferResponse,
     OKXTransferType,
@@ -37,7 +37,7 @@ class OkxConnectionModule implements ConnectionModule {
     async sendAsset(wallet: WalletI, from: Destination, to: Destination, asset: Asset, amount: number): Promise<[boolean, number]> {
         if (from === Destination.OKX) {
             const chain: Chain = destToChain(to)
-            const withdrawalConfig: OKXWithdrawalConfig = okxWithdrawalConfig(asset, chain.title)
+            const fee: string = await this.getMinFee(wallet, asset, chain.title)
 
             if (amount === -1) {
                 const okxAssetBalance = await this.getBalance(wallet, asset, null) // get master balance for withdrawal
@@ -46,11 +46,11 @@ class OkxConnectionModule implements ConnectionModule {
                     globalLogger.connect(wallet.getAddress(), chain).error("Failed fetching OKX balance for full withdrawal.")
                     return Promise.resolve([false, 0])
                 }
-                amount = Number(okxAssetBalance) - Number(withdrawalConfig.fee) // TODO
+                amount = Number(okxAssetBalance) - Number(fee) // TODO
             }
 
 
-            const [withdrawSubmitStatus, wdId] = await this.withdraw(wallet, asset, amount.toString(), withdrawalConfig.fee, chain)
+            const [withdrawSubmitStatus, wdId] = await this.withdraw(wallet, asset, amount.toString(), fee, chain)
 
             if (!withdrawSubmitStatus) {
                 globalLogger.connect(wallet.getAddress(), chain).error("Something went wrong during withdrawal creation.")
@@ -226,6 +226,35 @@ class OkxConnectionModule implements ConnectionModule {
 
         globalLogger.connect(wallet.getAddress(), blockchain).done(`Final status fetch: ${JSON.stringify(changed)}.`)
         return Promise.resolve(changed.code === "0" && changed.data[0].state.split(":")[0] === successStatus)
+    }
+
+    private async getMinFee(wallet: WalletI, ccy: Asset, blockchain: Blockchains): Promise<string> {
+        const params: Record<string, string> = {
+            ccy: ccy
+        }
+        const response = await this.fetchOKX<OKXGetCurrenciesResponse>(
+            wallet,
+            Method.GET,
+            OKXApiMethod.OKX_GET_CURRENCIES,
+            wallet.getMasterCredentials(),
+            new URLSearchParams(params)
+        )
+        if (!response || response.code !== "0") {
+            globalLogger.connect(wallet.getAddress(), ethereumChain).warn(`Cannot get fee data. Fallback to default value. Response: ${response}`)
+            return okxWithdrawalConfig(ccy, blockchain).fee
+        }
+
+        const destOkxChain = destToOkxChain(blockchain)
+        const neededFee = response
+            .data
+            .find(x => x.chain === `${ccy}-${destOkxChain}`)
+
+        if (!neededFee) {
+            globalLogger.connect(wallet.getAddress(), ethereumChain).warn(`Cannot find chain in fee data. Fallback to default value. Response: ${response}`)
+            return okxWithdrawalConfig(ccy, blockchain).fee
+        }
+
+        return neededFee.minFee
     }
 
     private async getBalance(wallet: WalletI, ccy: Asset, subAccount: string | null): Promise<string | null> {
