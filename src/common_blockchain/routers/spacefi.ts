@@ -8,6 +8,7 @@ import {checkAndGetApprovalsInteraction} from "../approvals";
 import {globalLogger} from "../../utils/logger";
 import {getCurTimestamp, getRandomizedPercent} from "../../utils/utils";
 import {ExecBalance, getExecBalance} from "../common_utils";
+import {getSlippage} from "./common";
 
 
 
@@ -28,7 +29,7 @@ export async function spaceFiSwapNativeTo(
         let tokenBalance: bigint = await provider.getBalance(wallet.getAddress())
         tokenBalance = getExecBalance(execBalance, tokenBalance)!
         let amountsOutMin: bigint[] = await routerContract.getAmountsOut(tokenBalance.toString(), [wrappedToken, token])
-        let minOut: bigint = amountsOutMin[1] * BigInt(997) / BigInt(1000)
+        let minOut: bigint = amountsOutMin[1] * BigInt(1000 - getSlippage(chain.title)) / BigInt(1000)
         let data = routerContract.interface.encodeFunctionData("swapExactETHForTokens",
             [minOut, [wrappedToken, token], wallet.getAddress(), getCurTimestamp() + 1200])
         txs.push({

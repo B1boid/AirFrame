@@ -25,15 +25,15 @@ function generateZkSync(): ModuleActions {
     // if (getRandomInt(0, 100) < 65) { // 65% chance to mint znsid
     //     activities.push(ZkSyncActivity.zkSyncMintZnsId)
     // }
-    // if (getRandomInt(0, 100) < 50) { // 35% chance to enterMarketsZkEra
-    //     activities.push(ZkSyncActivity.zkSyncEraLendInit)
-    // }
-    // if (getRandomInt(0, 100) < 50) { // 35% chance to enterMarketsReactFusion
-    //     activities.push(ZkSyncActivity.zkSyncReactFusionInit)
-    // }
-    // if (getRandomInt(0, 100) < 50) { // 35% chance to mint test tokens
-    //     activities.push(ZkSyncActivity.zkSyncSynFuturesTest)
-    // }
+    if (getRandomInt(0, 100) < 25) { // 35% chance to enterMarketsZkEra
+        activities.push(ZkSyncActivity.zkSyncEraLendInit)
+    }
+    if (getRandomInt(0, 100) < 25) { // 35% chance to enterMarketsReactFusion
+        activities.push(ZkSyncActivity.zkSyncReactFusionInit)
+    }
+    if (getRandomInt(0, 100) < 25) { // 35% chance to mint test tokens
+        activities.push(ZkSyncActivity.zkSyncSynFuturesTest)
+    }
 
     return {
         chainName: Blockchains.ZkSync,
@@ -47,7 +47,7 @@ function generateZkSyncRandomActivities(activitiesNum: number): ZkSyncActivity[]
     let availableActivities: ZkSyncActivity[] = [
         ZkSyncActivity.zkSyncRandomApprove,
         ZkSyncActivity.zkSyncDmail,
-        ZkSyncActivity.wrapUnwrap,
+        ZkSyncActivity.zkSyncDummyRandomSwapCycle,
         ZkSyncActivity.zkSyncDummyRandomSwapCycle,
         ZkSyncActivity.zkSyncDummyRandomLending
     ]
@@ -57,9 +57,6 @@ function generateZkSyncRandomActivities(activitiesNum: number): ZkSyncActivity[]
         let curActivity: ZkSyncActivity
         while (true) {
             curActivity = getRandomElement(availableActivities)
-            if (curActivity === ZkSyncActivity.zkSyncRandomApprove && res.filter(x => x === curActivity).length < 2){
-                break
-            }
             if (!repeatedActivities.includes(curActivity)) {
                 break
             }

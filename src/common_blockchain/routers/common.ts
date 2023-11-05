@@ -1,7 +1,7 @@
 import {WalletI} from "../../classes/wallet";
 import {TxInteraction} from "../../classes/module";
 import {oneInchQuote, oneInchQuoteNativeTo, oneInchSwap, oneInchSwapNativeTo} from "./1inch";
-import {Chain} from "../../config/chains";
+import {Blockchains, Chain} from "../../config/chains";
 import {EnumDictionary, shuffleArray} from "../../utils/utils";
 import {muteSwap, muteSwapNativeTo} from "./mute";
 import {Asset} from "../../config/tokens";
@@ -36,6 +36,17 @@ export interface QuoteRes {
 }
 
 export const NATIVE_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
+
+export function getSlippage(chain: Blockchains){
+    switch (chain){
+        case Blockchains.Scroll:
+            return 5 // 0.5%
+        case Blockchains.ZkSync:
+            return 3 // 0.3%
+        default:
+            return 2
+    }
+}
 
 
 export async function commonTopSwap(
