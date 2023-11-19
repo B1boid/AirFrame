@@ -79,7 +79,7 @@ export function getRandomElement<T> (list: T[]) {
 }
 
 export function getMedian(arr: number[]) {
-    if (arr.length == 0) {
+    if (arr.length === 0) {
         return; // 0.
     }
     arr.sort((a, b) => a - b); // 1.

@@ -43,7 +43,7 @@ export abstract class BlockchainModule {
                 const interactions: TxInteraction[] = await activityTx.tx(wallet)
                 if (interactions.length === 0) {
                     failed = true // empty array means failure while building tx interactions
-                    if (i == this.extraTries && startedActivities.includes(activityTx.activityName)){ // prefer to stop - as we don't know if tx is stoppable or not
+                    if (i === this.extraTries && startedActivities.includes(activityTx.activityName)){ // prefer to stop - as we don't know if tx is stoppable or not
                         console.log("Tx failed from activity that was already started")
                         return false
                     }
@@ -51,7 +51,7 @@ export abstract class BlockchainModule {
                     for (const tx of interactions) {
                         const [txResult,]: [TxResult, string] = await wallet.sendTransaction(tx, this.chain, 1)
                         if (txResult === TxResult.Fail) {
-                            if (i == this.extraTries && tx.stoppable) {
+                            if (i === this.extraTries && tx.stoppable) {
                                 console.log("Stoppable Transaction failed")
                                 return false
                             }

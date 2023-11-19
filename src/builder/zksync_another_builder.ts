@@ -380,7 +380,7 @@ function generateArbitrumActivities(activitiesNum: number): ModuleActions {
 
 function generateScroll(accInfo: ExtendedFeatures, actions: AnyActions[]): void {
     let activities: ScrollActivity[] = generateScrollActivities(getRandomInt(2, 3))
-    if (accInfo.scrollTxs == 0){
+    if (accInfo.scrollTxs === 0){
         activities.push(ScrollActivity.scrollDeployAndInteract)
     }
     const SCROLL_ACTIONS: ModuleActions = {
