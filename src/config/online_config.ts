@@ -7,11 +7,12 @@ import {globalLogger} from "../utils/logger";
 export const allGases : EnumDictionary<Blockchains, number> = {
     [Blockchains.Ethereum]: 24,
     [Blockchains.Polygon]: 900,
-    [Blockchains.ZkSync]: 24, // mainnet fee
+    [Blockchains.ZkSync]: 40, // mainnet fee
     [Blockchains.Arbitrum]: 1000,
     [Blockchains.Optimism]: 1000,
     [Blockchains.Bsc]: 1000,
-    [Blockchains.Scroll]: 24 // mainnet fee
+    [Blockchains.Scroll]: 40, // mainnet fee
+    [Blockchains.Linea]: 30 // mainnet fee
 }
 
 export function setGasPriceLimit(chain: Blockchains, limit: number) {

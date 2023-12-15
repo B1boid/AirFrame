@@ -17,7 +17,8 @@ export enum Blockchains {
     Optimism = "Optimism",
     Arbitrum = "Arbitrum",
     Bsc = "Bsc",
-    Scroll = "Scroll"
+    Scroll = "Scroll",
+    Linea = "Linea"
 }
 
 enum Exchanges {
@@ -96,4 +97,14 @@ export const bscChain: Chain = {
     extraGasLimit: 0,
     explorerUrl: "https://bscscan.com",
     orbiterCode: 9015
+}
+
+export const lineaChain: Chain = {
+    title: Blockchains.Linea,
+    chainId: 59144,
+    nodeUrl: "https://1rpc.io/linea",
+    symbol: "ETH",
+    extraGasLimit: 0,
+    explorerUrl: "https://lineascan.build",
+    orbiterCode: -1
 }

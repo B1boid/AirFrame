@@ -64,7 +64,7 @@ export async function getFeeData(provider: UnionProvider, chain: Chain): Promise
                     curGasPriceInfo.maxPriorityFeePerGas
                 )
             }
-            if (chain.title === Blockchains.Scroll || chain.title === Blockchains.ZkSync) {
+            if (chain.title === Blockchains.Scroll || chain.title === Blockchains.ZkSync || chain.title === Blockchains.Linea) {
                 let mainnetProvider = new ethers.JsonRpcProvider(ethereumChain.nodeUrl, ethereumChain.chainId)
                 let mainnetFee = await mainnetProvider.getFeeData()
                 if (curGasPriceInfo.gasPrice !== null && mainnetFee.gasPrice !== null &&

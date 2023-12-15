@@ -9,6 +9,7 @@ import {moduleArbitrum} from "./arbitrum/arbitrum";
 import {moduleBsc} from "./bsc/bsc";
 import {moduleScroll} from "./scroll/scroll";
 import {scrollWrapUnwrap} from "./scroll/activities";
+import {moduleLinea} from "./linea/linea";
 
 
 export const enum PolygonActivity {
@@ -85,7 +86,11 @@ export const enum ScrollActivity {
     scrollDeployAndInteract = "scrollDeployAndInteract"
 }
 
-export type ActivityTag = PolygonActivity | ZkSyncActivity | EthereumActivity | OptimismActivity | BscActivity | ArbActivity | ScrollActivity
+export const enum LineaActivity {
+    lineaSwapEthToWst = "lineaSwapEthToWst"
+}
+
+export type ActivityTag = PolygonActivity | ZkSyncActivity | EthereumActivity | OptimismActivity | BscActivity | ArbActivity | ScrollActivity | LineaActivity
 
 export const blockchainModules: EnumDictionary<Blockchains, BlockchainModule> = {
     [Blockchains.ZkSync]: moduleZkSync,
@@ -94,7 +99,8 @@ export const blockchainModules: EnumDictionary<Blockchains, BlockchainModule> = 
     [Blockchains.Optimism]: moduleOptimism,
     [Blockchains.Arbitrum]: moduleArbitrum,
     [Blockchains.Bsc]: moduleBsc,
-    [Blockchains.Scroll]: moduleScroll
+    [Blockchains.Scroll]: moduleScroll,
+    [Blockchains.Linea]: moduleLinea
 }
 
 export const destToChain = (destination: Destination): Chain => {
