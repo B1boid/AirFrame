@@ -83,7 +83,8 @@ export const enum ScrollActivity {
     scrollSwapCycleNativeToUsdc = "scrollSwapCycleNativeToUsdc",
     scrollWrapUnwrap = "scrollWrapUnwrap",
     scrollDmail = "scrollDmail",
-    scrollDeployAndInteract = "scrollDeployAndInteract"
+    scrollDeployAndInteract = "scrollDeployAndInteract",
+    scrollOffMint = "scrollOffMint"
 }
 
 export const enum LineaActivity {

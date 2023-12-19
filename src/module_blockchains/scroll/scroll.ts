@@ -3,7 +3,7 @@ import {Activity, BlockchainModule} from "../../classes/module";
 import {
     scrollDeployAndInteract,
     scrollDmail,
-    scrollEmptyRouter,
+    scrollEmptyRouter, scrollOffMint,
     scrollRandomApprove,
     scrollRandomStuff,
     scrollSwapCycleNativeToUsdc,
@@ -23,6 +23,6 @@ export const moduleScroll: ScrollModule = new ScrollModule(
     scrollChain,
     [
         scrollRandomApprove, scrollRandomStuff, scrollEmptyRouter, scrollSwapCycleNativeToUsdc, scrollWrapUnwrap,
-        scrollDmail, scrollDeployAndInteract
+        scrollDmail, scrollDeployAndInteract, scrollOffMint
     ]
 )

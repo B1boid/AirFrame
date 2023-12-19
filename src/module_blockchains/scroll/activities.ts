@@ -3,7 +3,7 @@ import {ScrollActivity} from "../blockchain_modules";
 import {
     scrollDeployAndInteract_deploy, scrollDeployAndInteract_interact,
     scrollDmail_send,
-    scrollEmptyRouter_do,
+    scrollEmptyRouter_do, scrollOffMint_mint,
     scrollRandomApprove_approve,
     scrollRandomStuff_do, scrollSwapCycleNativeToUsdc_swapback,
     scrollSwapCycleNativeToUsdc_swapto, scrollWrapUnwrap_unwrap, scrollWrapUnwrap_wrap
@@ -61,6 +61,13 @@ export const scrollDeployAndInteract: Activity = {
     txs: [
         scrollDeployAndInteract_deploy,
         scrollDeployAndInteract_interact
+    ]
+}
+
+export const scrollOffMint: Activity = {
+    name: ScrollActivity.scrollOffMint,
+    txs: [
+        scrollOffMint_mint,
     ]
 }
 

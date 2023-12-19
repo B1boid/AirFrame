@@ -11,6 +11,7 @@ import {commonSwap, Dexes} from "../../common_blockchain/routers/common";
 import wrapped from "../../abi/wrapped.json";
 import {scrollGetBytecodeAndAbiForAddress} from "../../utils/scroll_get_code_info";
 import fs from "fs";
+import axios, {AxiosResponse} from "axios";
 
 let tokens = scrollTokens
 let chain = scrollChain
@@ -174,6 +175,49 @@ export async function scrollDmail_send(wallet: WalletI): Promise<TxInteraction[]
         }]
     } catch (e){
         globalLogger.connect(wallet.getAddress(), chain).warn(`scrollDmail_send failed: ${e}`)
+        return []
+    }
+}
+
+export async function scrollOffMint_mint(wallet: WalletI): Promise<TxInteraction[]> {
+    try {
+        const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+        let mintContract= new ethers.Contract(
+            contracts.offMint, ["function mint(address, (address,address,address,uint256), bytes32[])"], provider)
+        interface ScrollOriginMintDataPayload {
+            metadata: {
+                deployer: string;
+                firstDeployedContract: string;
+                bestDeployedContract: string;
+                rarityData: string;
+            };
+            proof: string[];
+        }
+        const mintData: AxiosResponse<ScrollOriginMintDataPayload> = await axios.get(
+            `https://nft.scroll.io/p/${wallet.getAddress()}.json?timestamp=${new Date().getTime()}`
+        );
+
+        let data: string = mintContract.interface.encodeFunctionData(
+            "mint", [wallet.getAddress(),
+                [
+                    mintData.data.metadata.deployer,
+                    mintData.data.metadata.firstDeployedContract,
+                    mintData.data.metadata.bestDeployedContract,
+                    mintData.data.metadata.rarityData,
+                ],
+                mintData.data.proof]
+        )
+
+        return [{
+            to: contracts.offMint,
+            data: data,
+            value: "0",
+            stoppable: false,
+            confirmations: 1,
+            name: "scrollOffMint_mint"
+        }]
+    } catch (e){
+        globalLogger.connect(wallet.getAddress(), chain).warn(`scrollOffMint_mint failed: ${e}`)
         return []
     }
 }

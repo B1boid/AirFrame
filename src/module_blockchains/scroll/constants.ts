@@ -23,5 +23,7 @@ export const scrollContracts: { [id: string]: string } = {
     ambientRouter: "0xaaaaAAAACB71BF2C8CaE522EA5fa455571A74106",
 
     dmail: "0x47fbe95e981C0Df9737B6971B451fB15fdC989d9",
-    syncSwapPool: "0x37BAc764494c8db4e54BDE72f6965beA9fa0AC2d"
+    syncSwapPool: "0x37BAc764494c8db4e54BDE72f6965beA9fa0AC2d",
+
+    offMint: "0x74670a3998d9d6622e32d0847ff5977c37e0ec91"
 }
