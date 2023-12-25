@@ -104,7 +104,7 @@ export async function scrollSwapCycleNativeToUsdc_swapback(wallet: WalletI): Pro
 
 export async function scrollRandomStuff_do(wallet: WalletI): Promise<TxInteraction[]> {
     const choice = getRandomElement(
-        ["rhino", "off", "rnd-signin"]
+        ["rhino", "off"]
     )
     try {
         if (choice === "rhino") {
