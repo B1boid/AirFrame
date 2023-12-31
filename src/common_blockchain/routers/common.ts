@@ -2,7 +2,7 @@ import {WalletI} from "../../classes/wallet";
 import {TxInteraction} from "../../classes/module";
 import {oneInchQuote, oneInchQuoteNativeTo, oneInchSwap, oneInchSwapNativeTo} from "./1inch";
 import {Blockchains, Chain} from "../../config/chains";
-import {EnumDictionary, shuffleArray} from "../../utils/utils";
+import {EnumDictionary, shuffleArray, sleep} from "../../utils/utils";
 import {muteSwap, muteSwapNativeTo} from "./mute";
 import {Asset} from "../../config/tokens";
 import {syncSwap, syncSwapNativeTo} from "./syncswap";
@@ -94,6 +94,7 @@ export async function commonTopSwap(
                 return []
             }
             if (v.dex === Dexes.OneInch){
+                await sleep(1.1);
                 return await oneInchSwapNativeTo(
                     tokenTo, wallet, chain, contracts, name, execBalance, stoppable
                 )
@@ -133,12 +134,17 @@ export async function commonTopSwap(
                 return a.price > b.price ? -1 : 1;
             }
         )
-        globalLogger.connect(wallet.getAddress(), chain).info("Top quotes: "+ values)
+        let quotesMsg = ""
+        for (let q of values){
+            quotesMsg += q.dex + ":" + q.price.toString() + " | "
+        }
+        globalLogger.connect(wallet.getAddress(), chain).info("Top quotes: "+ quotesMsg)
         for (let v of values){
             if (v.price === BigInt(0)){
                 return []
             }
             if (v.dex === Dexes.OneInch){
+                await sleep(1.1);
                 return await oneInchSwap(
                     tokenFrom, tokenTo, wallet, chain, contracts, name, execBalance, stoppable
                 )
