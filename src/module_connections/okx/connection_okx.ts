@@ -18,7 +18,7 @@ import {
 } from "../../utils/okx_api";
 import {TxInteraction} from "../../classes/module";
 import {Asset} from "../../config/tokens";
-import {getTxDataForAllBalanceTransfer, needToStop, retry, sleep} from "../../utils/utils";
+import {getRandomKeepAmount, getTxDataForAllBalanceTransfer, getZkSyncKeepRandomAmount, needToStop, retry, sleep} from "../../utils/utils";
 import axios from "axios";
 import {ethers} from "ethers-new";
 import {destToChain} from "../../module_blockchains/blockchain_modules";
@@ -150,7 +150,14 @@ class OkxConnectionModule implements ConnectionModule {
         if (amount === -1) {
             return await getTxDataForAllBalanceTransfer(wallet, withdrawAddress, asset, chain, extraGasLimit, defaultGasPrice)
         } else {
-            const bigAmount = ethers.parseEther(`${amount}`)
+            let bigAmount = ethers.parseEther(`${amount}`)
+            if (chain.title == Blockchains.ZkSync && getZkSyncKeepRandomAmount()){
+                let keepAmount = getRandomKeepAmount()
+                bigAmount = bigAmount - (keepAmount > bigAmount ? bigAmount * BigInt(20) / BigInt(100) : keepAmount)
+                globalLogger
+                    .connect(wallet.getAddress(), chain)
+                    .info(`ZkSync keep amount: ${keepAmount.toString()}. To transfer: ${bigAmount.toString()}`)
+            }
             const txTransferToWithdrawAddress = getTxForTransfer(asset, withdrawAddress, bigAmount)
             return Promise.resolve([bigAmount, txTransferToWithdrawAddress])
         }

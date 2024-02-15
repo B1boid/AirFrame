@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import {main} from "../main";
 import {getAccountInfo} from "../builder/zksync_builder";
 import {Blockchains, ethereumChain, zkSyncChain} from "../config/chains";
-import {needToStop, setStop} from "../utils/utils";
+import {needToStop, setStop, setZkSyncKeepRandomAmount, getZkSyncKeepRandomAmount} from "../utils/utils";
 import {allGases, setGasPriceLimit} from "../config/online_config";
 let Table = require("easy-table")
 
@@ -111,6 +111,37 @@ bot.onText(/\/set_force_stop/, (msg) => {
 
 bot.onText(/\/get_force_stop/, (msg) => {
     bot.sendMessage(msg.chat.id, `${needToStop()}`)
+})
+
+bot.onText(/\/set_zk_sync_keep_balance/, (msg) => {
+    if (msg.text === undefined) {
+        bot.sendMessage(msg.chat.id, "Usage: /set_zk_sync_keep_balance <true|false>")
+        return
+    }
+
+    const args = msg.text.split(/\s+/).slice(1)
+    if (args.length === 0) {
+        bot.sendMessage(msg.chat.id, "Usage: /set_zk_sync_keep_balance <true|false>")
+        return
+    }
+
+    switch (args[0]) {
+        case "true":
+            setZkSyncKeepRandomAmount(true)
+            break
+        case "false":
+            setZkSyncKeepRandomAmount(false)
+            break
+        default:
+            bot.sendMessage(msg.chat.id, `Wrong status. Expected: <true|false>. Found: ${args[0]}`)
+            return
+    }
+
+    bot.sendMessage(msg.chat.id, `Successfully set status \`${args[0]}\` for zk_sync_keep_balance.`)
+})
+
+bot.onText(/\/get_zk_sync_keep_balance/, (msg) => {
+    bot.sendMessage(msg.chat.id, `${getZkSyncKeepRandomAmount()}`)
 })
 
 bot.onText(/\/set_gas_price_limit/, (msg) => {

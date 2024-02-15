@@ -1,9 +1,9 @@
 import {ConnectionModule} from "../../classes/connection";
 import {TxResult, WalletI} from "../../classes/wallet";
-import {Chain, Destination} from "../../config/chains";
+import {Blockchains, Chain, Destination} from "../../config/chains";
 import {Asset} from "../../config/tokens";
 import {globalLogger} from "../../utils/logger";
-import {bigMax, getTxDataForAllBalanceTransfer, sleep} from "../../utils/utils";
+import {bigMax, getRandomKeepAmount, getTxDataForAllBalanceTransfer, getZkSyncKeepRandomAmount, sleep} from "../../utils/utils";
 import {TxInteraction} from "../../classes/module";
 import {ethers} from "ethers-new";
 import {getTxForTransfer, waitBalanceChanged} from "../utils";
@@ -38,6 +38,13 @@ class OrbiterConnectionModule implements ConnectionModule {
             transferTx.value = transferTx.value.substring(0, transferTx.value.length - 4) + chainTo.orbiterCode.toString()
         } else {
             bigAmount = ethers.parseEther(`${amount}`)
+            if (chainFrom.title == Blockchains.ZkSync && getZkSyncKeepRandomAmount()){
+                let keepAmount = getRandomKeepAmount()
+                bigAmount = bigAmount - (keepAmount > bigAmount ? bigAmount * BigInt(20) / BigInt(100) : keepAmount)
+                globalLogger
+                    .connect(wallet.getAddress(), chainFrom)
+                    .info(`ZkSync keep amount: ${keepAmount.toString()}. To transfer: ${bigAmount.toString()}`)
+            }
             transferTx = getTxForTransfer(asset, ETH_BRIDGE_ROUTER, bigAmount)
             transferTx.value = transferTx.value.substring(0, transferTx.value.length - 4) + chainTo.orbiterCode.toString()
         }
