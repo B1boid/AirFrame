@@ -18,6 +18,7 @@ import {BigNumber} from "ethers";
 dotenv.config();
 
 let stopAll = false;
+let zkSyncKeepRandomAmount = true;
 const MAX_TRIES = 10;
 
 export type EnumDictionary<T extends string | symbol | number, U> = {
@@ -126,6 +127,30 @@ export function setStop(status: boolean): void {
 }
 
 export const needToStop = (): boolean => stopAll;
+
+export function setZkSyncKeepRandomAmount(keep: boolean): void {
+    zkSyncKeepRandomAmount = keep;
+}
+
+export const getZkSyncKeepRandomAmount = (): boolean => zkSyncKeepRandomAmount;
+
+// 20% lvl1 random 0.005 - 0.006
+// 25% lvl2 random 0.01 - 0.011
+// 30% lvl3 random 0.015-0.0151
+// 25% lvl3 random 0.02-0.021
+export function getRandomKeepAmount(): bigint {
+    let level = getRandomFloat(0.0, 1.0, 4)
+
+    if (level < 0.2) {
+        return ethers.parseEther(`${getRandomFloat(0.005, 0.006, 5)}`)
+    } else if (level < 0.45) {
+        return ethers.parseEther(`${getRandomFloat(0.01, 0.011, 5)}`)
+    } else if (level < 0.75) {
+        return ethers.parseEther(`${getRandomFloat(0.015, 0.0151, 5)}`)
+    } else {
+        return ethers.parseEther(`${getRandomFloat(0.02, 0.021, 5)}`)
+    }
+}
 
 export function getAddressInfo(password: string, address: string): AddressInfo {
     const file = readFileSync('.accs', 'utf-8');
@@ -240,7 +265,16 @@ export async function getTxDataForAllBalanceTransfer(
     if (fromChain.title === Blockchains.Optimism) {
         l1Cost = await getL1Cost(provider, fromChain, wallet.getAddress(), txTransferToWithdrawAddress)
     }
-    const amount = balance - l1Cost - BigInt(gasLimit) * (feeData.maxFeePerGas ?? defaultGasPrice)
+    let amount = balance - l1Cost - BigInt(gasLimit) * (feeData.maxFeePerGas ?? defaultGasPrice)
+
+    if (fromChain.title == Blockchains.ZkSync && getZkSyncKeepRandomAmount()){
+        let keepAmount = getRandomKeepAmount()
+        keepAmount = (keepAmount > amount ? amount * BigInt(20) / BigInt(100) : keepAmount)
+        amount = amount - keepAmount;
+        globalLogger
+        .connect(wallet.getAddress(), fromChain)
+        .info(`ZkSync keep amount: ${keepAmount.toString()}. To transfer: ${amount.toString()}`)
+    }
 
     txTransferToWithdrawAddress = getTxForTransfer(asset, toAddress, amount)
     txTransferToWithdrawAddress.feeData = feeData

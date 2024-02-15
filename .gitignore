@@ -9,6 +9,8 @@ package-lock.json
 .active_accs
 .subs
 .okx
+.accs_TODO
+.mainaccs
 src/gen.js
 src/gen_pks.ts
 scroll_meta/scroll_contracts_addresses/*
