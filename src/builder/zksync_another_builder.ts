@@ -149,7 +149,7 @@ function generatePathToZkSync(accInfo: ExtendedFeatures, actions: AnyActions[]):
         }
         actions.push(BRIDGE_ALL_ETHEREUM_TO_ZKSYNC)
     } else {
-        if (accInfo.ethTxs > 9) {
+        if (accInfo.ethTxs >= 0) { // before (accInfo.ethTxs > 9) , we dont want to send ETH txs anymore
             const CONNECTION_OKX_TO_ZKSYNC: ConnectionAction = {
                 from: Destination.OKX,
                 to: Destination.ZkSync,
