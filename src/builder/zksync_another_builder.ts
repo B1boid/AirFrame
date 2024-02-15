@@ -128,7 +128,7 @@ function generateActions(accInfo: ExtendedFeatures): WalletActions {
     return {
         address: accInfo.walletAddress,
         actions: actions,
-        featuresLine: `ethTxs: ${accInfo.ethTxs}, zkTxs: ${accInfo.zkTxs}, hasOffBridge: ${accInfo.hasOffBridge}`
+        featuresLine: `ethTxs: ${accInfo.ethTxs}, zkTxs: ${accInfo.zkTxs}, scrollTxs: ${accInfo.scrollTxs}, hasOffBridge: ${accInfo.hasOffBridge}`
     }
 }
 
@@ -312,7 +312,7 @@ function generateOptimismActivities(activitiesNum: number): ModuleActions {
     let availableActivities: OptimismActivity[] = [
         OptimismActivity.optRandomStuff,
         OptimismActivity.optDummyLendingCycle,
-        OptimismActivity.optSwapCycleNativeToUsdc,
+        // OptimismActivity.optSwapCycleNativeToUsdc,
         OptimismActivity.optFakeUniExec,
         OptimismActivity.optMoveDustGas,
         OptimismActivity.optRandomApprove,
@@ -350,12 +350,12 @@ function generateArbitrumActivities(activitiesNum: number): ModuleActions {
     let availableActivities: ArbActivity[] = [
         ArbActivity.arbRandomStuff,
         ArbActivity.arbAaveCycle,
-        ArbActivity.arbSwapCycleNativeToUsdc,
+        // ArbActivity.arbSwapCycleNativeToUsdc,
         ArbActivity.arbRandomApprove,
         ArbActivity.arbArbitrumDelegate,
         ArbActivity.arbFakeUniExec,
         ArbActivity.arbMoveDustGas,
-        ArbActivity.arbFriendsTech, ArbActivity.arbFriendsTech // x2 chance
+        ArbActivity.arbFriendsTech,
     ]
 
     let res: ArbActivity[] = []
@@ -422,7 +422,7 @@ function generateScroll(accInfo: ExtendedFeatures, actions: AnyActions[]): void 
         }
         actions.push(BRIDGE_ORBITER_SCROLL_TO_ARB)
         actions.push(
-            generateArbitrumActivities(getRandomInt(0, 3))
+            generateArbitrumActivities(getRandomInt(0, 2))
         )
         const CONNECTION_ARB_TO_OKX: ConnectionAction = {
             from: Destination.Arbitrum,
