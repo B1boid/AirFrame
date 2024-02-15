@@ -272,8 +272,8 @@ export async function getTxDataForAllBalanceTransfer(
         keepAmount = (keepAmount > amount ? amount * BigInt(20) / BigInt(100) : keepAmount)
         amount = amount - keepAmount;
         globalLogger
-        .connect(wallet.getAddress(), fromChain)
-        .info(`ZkSync keep amount: ${keepAmount.toString()}. To transfer: ${amount.toString()}`)
+            .connect(wallet.getAddress(), fromChain)
+            .info(`ZkSync keep amount: ${keepAmount.toString()}. To transfer: ${amount.toString()}`)
     }
 
     txTransferToWithdrawAddress = getTxForTransfer(asset, toAddress, amount)
