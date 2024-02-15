@@ -141,6 +141,14 @@ const CONNECTION_ZKSYNC_TO_SCROLL: ConnectionAction = {
     connectionName: Connections.Orbiter
 }
 
+const CONNECTION_ZKSYNC_TO_OPTIMISM: ConnectionAction = {
+    from: Destination.ZkSync,
+    to: Destination.Optimism,
+    asset: Asset.ETH,
+    amount: -1,
+    connectionName: Connections.Orbiter
+}
+
 const CONNECTION_SCROLL_TO_OPTIMISM: ConnectionAction = {
     from: Destination.Scroll,
     to: Destination.Optimism,
@@ -151,9 +159,11 @@ const CONNECTION_SCROLL_TO_OPTIMISM: ConnectionAction = {
 
 
 const ACTIONS_1: AnyActions[] =  [
-        // CONNECTION_OKX_TO_ZKSYNC,
+        CONNECTION_OKX_TO_ZKSYNC,
+        CONNECTION_ZKSYNC_TO_OPTIMISM,
+        CONNECTION_OPTIMISM_TO_OKX
         // CONNECTION_ZKSYNC_TO_SCROLL,
-        SCROLL_ACTIONS,
+        // SCROLL_ACTIONS,
         // CONNECTION_SCROLL_TO_OPTIMISM,
         // CONNECTION_OPTIMISM_TO_OKX
 ]
@@ -165,7 +175,7 @@ export const WALLETS_ACTIONS_1: WalletActions[] = [
     // {address: "0x750D0B78E16426a42cd9a5485BA3DF70290912C0", actions: ACTIONS_1},
 
     // {address: "0x1Ce3B1D69e3b1C4DE3b0Bc460714fD81aB203d35", actions: ACTIONS_1},
-    {address: "0xd8E758e2C23e704383246Cc5c38B5c6b926aBEE7", actions: ACTIONS_1}
+    {address: "0xAAfE4890c4F0F84c4E4585F743EE182fbB102872", actions: ACTIONS_1}
 ]
 
 
