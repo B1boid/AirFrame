@@ -61,13 +61,13 @@ function generateZkSync(): ModuleActions {
     // if (getRandomInt(0, 100) < 65) { // 65% chance to mint znsid
     //     activities.push(ZkSyncActivity.zkSyncMintZnsId)
     // }
-    if (getRandomInt(0, 100) < 25) { // 25% chance to enterMarketsZkEra
+    if (getRandomInt(0, 100) < 10) { // 25% chance to enterMarketsZkEra
         activities.push(ZkSyncActivity.zkSyncEraLendInit)
     }
-    if (getRandomInt(0, 100) < 25) { // 25% chance to enterMarketsReactFusion
+    if (getRandomInt(0, 100) < 10) { // 25% chance to enterMarketsReactFusion
         activities.push(ZkSyncActivity.zkSyncReactFusionInit)
     }
-    if (getRandomInt(0, 100) < 25) { // 25% chance to mint test tokens
+    if (getRandomInt(0, 100) < 10) { // 25% chance to mint test tokens
         activities.push(ZkSyncActivity.zkSyncSynFuturesTest)
     }
 

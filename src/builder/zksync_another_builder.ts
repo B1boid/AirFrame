@@ -275,7 +275,7 @@ function generateZkSync(accInfo: ExtendedFeatures, actions: AnyActions[]): void 
 
 function generateZkSyncRandomActivities(activitiesNum: number): ZkSyncActivity[] {
     let availableActivities: ZkSyncActivity[] = [
-        ZkSyncActivity.zkSyncRandomApprove,
+        // ZkSyncActivity.zkSyncRandomApprove,
         ZkSyncActivity.zkSyncDummyRandomSwapCycle,
         ZkSyncActivity.zkSyncDummyRandomLending,
         ZkSyncActivity.zkSyncDmail
@@ -380,9 +380,10 @@ function generateArbitrumActivities(activitiesNum: number): ModuleActions {
 
 function generateScroll(accInfo: ExtendedFeatures, actions: AnyActions[]): void {
     let activities: ScrollActivity[] = generateScrollActivities(getRandomInt(1, 2))
-    if (accInfo.scrollTxs !== 0){
-        activities.push(ScrollActivity.scrollOffMint)
-    }
+    // по идеи все заклеймиили уже
+    // if (accInfo.scrollTxs !== 0){
+    //     activities.push(ScrollActivity.scrollOffMint)
+    // }
     const SCROLL_ACTIONS: ModuleActions = {
         chainName: Blockchains.Scroll,
         randomOrder: Randomness.Full,
@@ -437,9 +438,9 @@ function generateScroll(accInfo: ExtendedFeatures, actions: AnyActions[]): void 
 function generateScrollActivities(activitiesNum: number): ScrollActivity[] {
     let availableActivities: ScrollActivity[] = [
         ScrollActivity.scrollDmail,
-        ScrollActivity.scrollWrapUnwrap,
+        // ScrollActivity.scrollWrapUnwrap,
         ScrollActivity.scrollRandomStuff,
-        ScrollActivity.scrollRandomApprove,
+        // ScrollActivity.scrollRandomApprove,
         ScrollActivity.scrollEmptyRouter,
         ScrollActivity.scrollSwapCycleNativeToUsdc
     ]
