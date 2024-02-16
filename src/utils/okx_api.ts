@@ -11,7 +11,8 @@ export enum OKXApiMethod {
     OKX_MAIN_BALANCE = "/api/v5/asset/balances",
     OKX_SUB_BALANCE = "/api/v5/asset/subaccount/balances",
     OKX_DEPOSIT_WITHDRAW_STATUS = "/api/v5/asset/deposit-withdraw-status",
-    OKX_TEST = "/api/v5/system/status"
+    OKX_TEST = "/api/v5/system/status",
+    OKX_GET_CURRENCIES = "/api/v5/asset/currencies"
 }
 
 export enum OKXTransferType {
@@ -87,5 +88,38 @@ export interface OKXGetDepositWithdrawalStatusResponse {
     code: string,
     msg: string,
     data: [OKXGetDepositWithdrawalStatus]
+}
+
+
+export interface OKXGetCurrencies {
+    ccy: string,
+    name: string,
+    logoLink: string,
+    chain: string,
+    canDep: boolean,
+    canWd: boolean,
+    canInternal: boolean,
+    minDep: string,
+    minWd: string,
+    maxWd: string,
+    wdTickSz: string,
+    wdQuota: string,
+    usedWdQuota:string,
+    minFee: string,
+    maxFee: string,
+    minFeeForCtAddr: string,
+    maxFeeForCtAddr: string,
+    mainNet: boolean,
+    needTag: boolean,
+    minDepArrivalConfirm: string,
+    minWdUnlockConfirm: string,
+    depQuotaFixed: string,
+    usedDepQuotaFixed: string,
+    depQuoteDailyLayer2: string
+}
+export interface OKXGetCurrenciesResponse {
+    code: string,
+    msg: string,
+    data: [OKXGetCurrencies]
 }
 
