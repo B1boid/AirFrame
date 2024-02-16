@@ -253,7 +253,7 @@ class OkxConnectionModule implements ConnectionModule {
             globalLogger.connect(wallet.getAddress(), ethereumChain).warn(`Cannot find chain in fee data. Fallback to default value. Response: ${response}`)
             return okxWithdrawalConfig(ccy, blockchain).fee
         }
-
+        globalLogger.connect(wallet.getAddress(), ethereumChain).warn(`Fetched okx minFee. Response: ${neededFee.minFee}`)
         return neededFee.minFee
     }
 
