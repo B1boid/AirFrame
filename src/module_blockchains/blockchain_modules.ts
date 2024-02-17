@@ -8,7 +8,7 @@ import {moduleOptimism} from "./optimism/optimism";
 import {moduleArbitrum} from "./arbitrum/arbitrum";
 import {moduleBsc} from "./bsc/bsc";
 import {moduleScroll} from "./scroll/scroll";
-import {scrollWrapUnwrap} from "./scroll/activities";
+import {scrollSwapCycleNativeToWsteth, scrollWrapUnwrap} from "./scroll/activities";
 import {moduleLinea} from "./linea/linea";
 
 
@@ -85,7 +85,8 @@ export const enum ScrollActivity {
     scrollWrapUnwrap = "scrollWrapUnwrap",
     scrollDmail = "scrollDmail",
     scrollDeployAndInteract = "scrollDeployAndInteract",
-    scrollOffMint = "scrollOffMint"
+    scrollOffMint = "scrollOffMint",
+    scrollSwapCycleNativeToWsteth = "scrollSwapCycleNativeToWsteth"
 }
 
 export const enum LineaActivity {

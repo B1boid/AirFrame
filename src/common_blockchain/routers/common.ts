@@ -16,6 +16,7 @@ import {ambientSwap, ambientSwapNativeTo} from "./ambient";
 import {woofiSwap, woofiSwapNativeTo} from "./woofi";
 import {maverickSwapNativeTo, maverickSwapToNative} from "./maverick";
 import {pancakeSwapNativeTo, pancakeSwapToNative} from "./pancake";
+import {zebraSwap, zebraSwapNativeTo} from "./zebra";
 
 export enum Dexes {
     OneInch = "1inch",
@@ -28,7 +29,8 @@ export enum Dexes {
     Ambient = "ambient",
     Woofi = "woofi",
     Maverick = "Maverick",
-    Pancake = "Pancake"
+    Pancake = "Pancake",
+    Zebra = "Zebra"
 }
 
 export interface DexPrice{
@@ -46,9 +48,7 @@ export const NATIVE_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
 export function getSlippage(chain: Blockchains){
     switch (chain){
         case Blockchains.Scroll:
-            return 5 // 0.5%
-        case Blockchains.ZkSync:
-            return 3 // 0.3%
+            return 2 // 0.2%
         default:
             return 2
     }
@@ -292,6 +292,16 @@ export async function commonSwap(
                 )
             } else if (tokenTo === NATIVE_ADDRESS) {
                 res = await pancakeSwapToNative(
+                    tokenFrom, tokens.WETH, wallet, chain, contracts, name, execBalance, stoppable
+                )
+            }
+        } else if (dex === Dexes.Zebra) {
+            if (tokenFrom === NATIVE_ADDRESS) {
+                res = await zebraSwapNativeTo(
+                    tokens.WETH, tokenTo, wallet, chain, contracts, name, execBalance, stoppable
+                )
+            } else if (tokenTo === NATIVE_ADDRESS) {
+                res = await zebraSwap(
                     tokenFrom, tokens.WETH, wallet, chain, contracts, name, execBalance, stoppable
                 )
             }

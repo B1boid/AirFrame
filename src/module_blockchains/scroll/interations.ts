@@ -89,15 +89,27 @@ export async function scrollEmptyRouter_do(wallet: WalletI): Promise<TxInteracti
 }
 
 export async function scrollSwapCycleNativeToUsdc_swapto(wallet: WalletI): Promise<TxInteraction[]> {
-    return await commonSwap(tokens.ETH, tokens.USDC, {balancePercent: [1, 2]},
-        [Dexes.SyncSwap, Dexes.SpaceFi, Dexes.Ambient],
+    return await commonSwap(tokens.ETH, tokens.USDC, {balancePercent: [4, 8]},
+        [Dexes.SyncSwap, Dexes.Ambient],
         wallet, chain, contracts, tokens, "scrollSwapCycleNativeToUsdc_swapto")
 }
 
 export async function scrollSwapCycleNativeToUsdc_swapback(wallet: WalletI): Promise<TxInteraction[]> {
     return await commonSwap(tokens.USDC, tokens.ETH, {fullBalance: true},
-        [Dexes.SyncSwap, Dexes.SpaceFi, Dexes.Ambient],
+        [Dexes.SyncSwap, Dexes.Ambient],
         wallet, chain, contracts, tokens,"scrollSwapCycleNativeToUsdc_swapback", true)
+}
+
+export async function scrollSwapCycleNativeToWsteth_swapto(wallet: WalletI): Promise<TxInteraction[]> {
+    return await commonSwap(tokens.ETH, tokens.WSTETH, {balancePercent: [4, 8]},
+        [Dexes.SyncSwap, Dexes.Ambient],
+        wallet, chain, contracts, tokens, "scrollSwapCycleNativeToWsteth_swapto")
+}
+
+export async function scrollSwapCycleNativeToWsteth_swapback(wallet: WalletI): Promise<TxInteraction[]> {
+    return await commonSwap(tokens.WSTETH, tokens.ETH, {fullBalance: true},
+        [Dexes.SyncSwap, Dexes.Ambient],
+        wallet, chain, contracts, tokens,"scrollSwapCycleNativeToWsteth_swapback", true)
 }
 
 

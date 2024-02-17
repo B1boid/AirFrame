@@ -84,7 +84,7 @@ export const scrollChain: Chain = {
     chainId: 534352,
     nodeUrl: 'https://rpc.scroll.io',
     symbol: "ETH",
-    extraGasLimit: 0,
+    extraGasLimit: 50000,
     explorerUrl: "https://scrollscan.com",
     orbiterCode: 9019
 }

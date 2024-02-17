@@ -21,6 +21,7 @@ export const scrollContracts: { [id: string]: string } = {
     iziRouter: "0x2db0AFD0045F3518c77eC6591a542e326Befd3D7",
     spaceRouter: "0x18b71386418A9FCa5Ae7165E31c385a5130011b6",
     ambientRouter: "0xaaaaAAAACB71BF2C8CaE522EA5fa455571A74106",
+    zebraRouter: "0x0122960d6e391478bfe8fb2408ba412d5600f621",
 
     dmail: "0x47fbe95e981C0Df9737B6971B451fB15fdC989d9",
     syncSwapPool: "0x37BAc764494c8db4e54BDE72f6965beA9fa0AC2d",
