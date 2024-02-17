@@ -20,6 +20,7 @@ export const enum PolygonActivity {
 export const enum ZkSyncActivity {
     wrapUnwrap = "wrapUnwrap",
     zkSyncSwapCycleNativeToUsdc = "zkSyncSwapCycleNativeToUsdc",
+    zkSyncSwapCycleNativeToWsteth = "zkSyncSwapCycleNativeToWsteth",
     zkSyncTopSwapCycleNativeToUsdc = "zkSyncTopSwapCycleNativeToUsdc",
     zkSyncMintTevaera = "zkSyncMintTevaera",
     zkSyncMintZnsId = "zkSyncMintZnsId",

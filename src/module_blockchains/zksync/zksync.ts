@@ -7,7 +7,7 @@ import {
     zkSyncMintTevaera,
     zkSyncMintZnsId, zkSyncParaspaceCycle,
     zkSyncRandomApprove, zkSyncReactFusionCycle, zkSyncReactFusionInit,
-    zkSyncSwapCycleNativeToUsdc, zkSyncSynFuturesTest, zkSyncTopSwapCycleNativeToUsdc,
+    zkSyncSwapCycleNativeToUsdc, zkSyncSwapCycleNativeToWsteth, zkSyncSynFuturesTest, zkSyncTopSwapCycleNativeToUsdc,
     zkSyncWrapUnwrap
 } from "./activities";
 
@@ -24,6 +24,6 @@ export const moduleZkSync: ZkSyncModule = new ZkSyncModule(
     [
         zkSyncWrapUnwrap, zkSyncSwapCycleNativeToUsdc, zkSyncMintTevaera, zkSyncMintZnsId, zkSyncRandomApprove,
         zkSyncEraLendInit, zkSyncEraLendCycle, zkSyncReactFusionCycle, zkSyncReactFusionInit, zkSyncParaspaceCycle,
-        zkSyncSynFuturesTest, zkSyncTopSwapCycleNativeToUsdc, zkSyncDmail
+        zkSyncSynFuturesTest, zkSyncTopSwapCycleNativeToUsdc, zkSyncDmail, zkSyncSwapCycleNativeToWsteth
     ]
 )

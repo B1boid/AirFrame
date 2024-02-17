@@ -20,6 +20,7 @@ export const zkSyncTokens: EnumDictionary<Asset, string> = {
     [Asset.DVF]: "0xBbD1bA24d589C319C86519646817F2F153c9B716",
     [Asset.SIS]: "0xdd9f72afED3631a6C85b5369D84875e6c42f1827",
     [Asset.MAV]: "0x787c09494Ec8Bcb24DcAf8659E7d5D69979eE508",
+    [Asset.WSTETH]: "0x703b52F2b28fEbcB60E1372858AF5b18849FE867",
 }
 
 
@@ -47,6 +48,14 @@ export const zkSyncContracts: { [id: string]: string } = {
     muteRouter: "0x8B791913eB07C32779a16750e3868aA8495F5964",
     odosRouter: "0x4bBa932E9792A2b917D47830C93a9BC79320E4f7",
     lifiRouter: "0x1231DEB6f5749EF6cE6943a275A1D3E7486F4EaE",
+    woofiRouter: "0xfd505702b37Ae9b626952Eb2DD736d9045876417",
+
+    maverickRouter: "0x39E098A153Ad69834a9Dac32f0FCa92066aD03f4",
+    maverickPoolInfo: "0x57D47F505EdaA8Ae1eFD807A860A79A28bE06449",
+
+    pancakeRouter: "0xf8b59f3c3Ab33200ec80a8A58b2aA5F5D2a8944C",
+    pancakeFactory: "0x1BB72E0CbbEA93c08f535fc7856E0338D7F7a8aB",
+    pancakeQuoter: "0x3d146FcE6c1006857750cBe8aF44f76a28041CCc",
 
     syncSwapPool: "0xf2DAd89f2788a8CD54625C60b55cD3d2D0ACa7Cb",
     synFuturesMint1: "0xa6E5e7DDcd6e7C5959f4AdE9aEd97594346436aF",

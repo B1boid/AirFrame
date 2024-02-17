@@ -13,7 +13,7 @@ import {
     zkSyncReactFusionCycle_withdraw,
     zkSyncReactFusionInit_enter,
     zkSyncSwapCycleNativeToUsdc_swapback,
-    zkSyncSwapCycleNativeToUsdc_swapto,
+    zkSyncSwapCycleNativeToUsdc_swapto, zkSyncSwapCycleNativeToWsteth_swapback, zkSyncSwapCycleNativeToWsteth_swapto,
     zkSyncSynFuturesTest_mint, zkSyncTopSwapCycleNativeToUsdc_swapback, zkSyncTopSwapCycleNativeToUsdc_swapto,
     zkSyncWrapUnwrap_unwrap,
     zkSyncWrapUnwrap_wrap
@@ -34,6 +34,14 @@ export const zkSyncSwapCycleNativeToUsdc: Activity = {
     txs: [
         zkSyncSwapCycleNativeToUsdc_swapto,
         zkSyncSwapCycleNativeToUsdc_swapback
+    ]
+}
+
+export const zkSyncSwapCycleNativeToWsteth: Activity = {
+    name: ZkSyncActivity.zkSyncSwapCycleNativeToWsteth,
+    txs: [
+        zkSyncSwapCycleNativeToWsteth_swapto,
+        zkSyncSwapCycleNativeToWsteth_swapback
     ]
 }
 
