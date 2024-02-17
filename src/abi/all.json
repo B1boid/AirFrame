@@ -361,5 +361,13 @@
     "outputs": [],
     "stateMutability": "payable",
     "type": "function"
+  },
+  {
+    "inputs":[{"internalType":"uint256[]","name":"orderNonces","type":"uint256[]"}],
+    "name":"batchCancelERC721Orders","outputs":[],"stateMutability":"nonpayable","type":"function"
+  },
+  {
+    "inputs": [{"internalType":"bytes[]","name":"datas","type":"bytes[]"},{"internalType":"bool","name":"revertIfIncomplete","type":"bool"}],
+    "name":"batchSellERC721s","outputs":[],"stateMutability":"nonpayable","type":"function"
   }
 ]

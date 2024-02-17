@@ -1,10 +1,11 @@
 import {Activity} from "../../classes/module";
-import {ScrollActivity} from "../blockchain_modules";
+import {OptimismActivity, ScrollActivity} from "../blockchain_modules";
 import {
+    scrollAaveCycle_deposit, scrollAaveCycle_withdraw, scrollCreateSafe_do,
     scrollDeployAndInteract_deploy,
     scrollDeployAndInteract_interact,
     scrollDmail_send,
-    scrollEmptyRouter_do,
+    scrollEmptyRouter_do, scrollLayerbankCycle_supply, scrollLayerbankCycle_withdraw,
     scrollOffMint_mint,
     scrollRandomApprove_approve,
     scrollRandomStuff_do,
@@ -14,6 +15,7 @@ import {
     scrollWrapUnwrap_unwrap,
     scrollWrapUnwrap_wrap
 } from "./interations";
+import {optAaveCycle_deposit, optAaveCycle_withdraw} from "../optimism/interations";
 
 
 
@@ -78,10 +80,40 @@ export const scrollDeployAndInteract: Activity = {
     ]
 }
 
+export const scrollInteractWithContract: Activity = {
+    name: ScrollActivity.scrollInteractWithContract,
+    txs: [
+        scrollDeployAndInteract_interact
+    ]
+}
+
 export const scrollOffMint: Activity = {
     name: ScrollActivity.scrollOffMint,
     txs: [
         scrollOffMint_mint,
+    ]
+}
+
+export const scrollAaveCycle: Activity = {
+    name: ScrollActivity.scrollAaveCycle,
+    txs: [
+        scrollAaveCycle_deposit,
+        scrollAaveCycle_withdraw
+    ]
+}
+
+export const scrollLayerbankCycle: Activity = {
+    name: ScrollActivity.scrollLayerbankCycle,
+    txs: [
+        scrollLayerbankCycle_supply,
+        scrollLayerbankCycle_withdraw
+    ]
+}
+
+export const scrollCreateSafe: Activity = {
+    name: ScrollActivity.scrollCreateSafe,
+    txs: [
+        scrollCreateSafe_do
     ]
 }
 
