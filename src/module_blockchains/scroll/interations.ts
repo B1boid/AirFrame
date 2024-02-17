@@ -2,9 +2,9 @@ import {TxInteraction} from "../../classes/module";
 import {WalletI} from "../../classes/wallet";
 import {scrollContracts, scrollTokens} from "./constants";
 import {scrollChain} from "../../config/chains";
-import {getRandomApprove} from "../../common_blockchain/approvals";
-import {getRandomElement, getRandomFloat, getRandomInt, getRandomizedPercent} from "../../utils/utils";
-import {ethers, getCreateAddress} from "ethers-new";
+import {checkAndGetApprovalsInteraction, getRandomApprove} from "../../common_blockchain/approvals";
+import {getCurTimestamp, getRandomElement, getRandomFloat, getRandomInt, getRandomizedPercent} from "../../utils/utils";
+import {ethers, getCreateAddress, MaxUint256} from "ethers-new";
 import {globalLogger} from "../../utils/logger";
 import allAbi from "../../abi/all.json";
 import {commonSwap, Dexes} from "../../common_blockchain/routers/common";
@@ -12,6 +12,11 @@ import wrapped from "../../abi/wrapped.json";
 import {scrollGetBytecodeAndAbiForAddress} from "../../utils/scroll_get_code_info";
 import fs from "fs";
 import axios, {AxiosResponse} from "axios";
+import aave from "../../abi/aave.json";
+import erc20 from "../../abi/erc20.json";
+import layerbank from "../../abi/layerbank.json";
+import safe from "../../abi/safe.json";
+import {ERC20_ABI} from "../../ambient";
 
 let tokens = scrollTokens
 let chain = scrollChain
@@ -116,7 +121,7 @@ export async function scrollSwapCycleNativeToWsteth_swapback(wallet: WalletI): P
 
 export async function scrollRandomStuff_do(wallet: WalletI): Promise<TxInteraction[]> {
     const choice = getRandomElement(
-        ["rhino", "off"]
+        ["rhino", "off", "element"]
     )
     try {
         if (choice === "rhino") {
@@ -160,6 +165,19 @@ export async function scrollRandomStuff_do(wallet: WalletI): Promise<TxInteracti
                 name: "scrollRandomStuff_do"
             }]
         }
+        if (choice === "element") {
+            const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+            let tokenContract = new ethers.Contract("0x0caB6977a9c70E04458b740476B498B214019641", allAbi, provider)
+            let data: string = tokenContract.interface.encodeFunctionData("batchCancelERC721Orders", [[]])
+            return [{
+                to: "0x0caB6977a9c70E04458b740476B498B214019641",
+                data: data,
+                value: "0",
+                stoppable: false,
+                confirmations: 1,
+                name: "scrollRandomStuff_do"
+            }]
+        }
         return []
     } catch (e) {
         globalLogger.connect(wallet.getAddress(), chain).warn(`scrollRandomStuff_do failed: ${e}`)
@@ -187,6 +205,128 @@ export async function scrollDmail_send(wallet: WalletI): Promise<TxInteraction[]
         }]
     } catch (e){
         globalLogger.connect(wallet.getAddress(), chain).warn(`scrollDmail_send failed: ${e}`)
+        return []
+    }
+}
+
+export async function scrollAaveCycle_deposit(wallet: WalletI): Promise<TxInteraction[]> {
+    try {
+        let balancePercent = [10, 25]
+        const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+        let depoContract = new ethers.Contract(contracts.aaveDepo, aave, provider)
+        let data: string = depoContract.interface.encodeFunctionData("depositETH", [contracts.aavePool, wallet.getAddress(), 0])
+        let tokenBalance: bigint = await provider.getBalance(wallet.getAddress())
+        tokenBalance = getRandomizedPercent(tokenBalance, balancePercent[0], balancePercent[1])
+        return [{
+            to: contracts.aaveDepo,
+            data: data,
+            value: tokenBalance.toString(),
+            stoppable: false,
+            confirmations: 1,
+            name: "scrollAaveCycle_deposit"
+        }]
+    } catch (e) {
+        globalLogger.connect(wallet.getAddress(), chain).warn(`scrollAaveCycle_deposit failed: ${e}`)
+        return []
+    }
+}
+
+export async function scrollAaveCycle_withdraw(wallet: WalletI): Promise<TxInteraction[]> {
+    try {
+        const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+        let tokenContract = new ethers.Contract(contracts.aaveWrapped, erc20, provider)
+        let tokenBalance: bigint = await tokenContract.balanceOf(wallet.getAddress())
+
+        let txs: TxInteraction[] = await checkAndGetApprovalsInteraction(wallet.getAddress(), contracts.aaveDepo, tokenBalance, tokenContract)
+
+        let depoContract = new ethers.Contract(contracts.aaveDepo, aave, provider)
+        let data: string = depoContract.interface.encodeFunctionData("withdrawETH", [contracts.aavePool, MaxUint256, wallet.getAddress()])
+        txs.push({
+            to: contracts.aaveDepo,
+            data: data,
+            value: "0",
+            stoppable: true,
+            confirmations: 1,
+            name: "scrollAaveCycle_withdraw"
+        })
+        return txs
+    } catch (e) {
+        globalLogger.connect(wallet.getAddress(), chain).warn(`scrollAaveCycle_withdraw failed: ${e}`)
+        return []
+    }
+}
+
+export async function scrollLayerbankCycle_supply(wallet: WalletI): Promise<TxInteraction[]> {
+    try {
+        let balancePercent = [4, 8]
+        const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+        let tokenBalance: bigint = await provider.getBalance(wallet.getAddress())
+        tokenBalance = getRandomizedPercent(tokenBalance, balancePercent[0], balancePercent[1])
+        let depoContract = new ethers.Contract(contracts.layerbankDepo, layerbank, provider)
+        let data: string = depoContract.interface.encodeFunctionData("supply", [contracts.layerbankEthToken,tokenBalance])
+        return [{
+            to: contracts.layerbankDepo,
+            data: data,
+            value: tokenBalance.toString(),
+            stoppable: false,
+            confirmations: 1,
+            name: "scrollLayerbankCycle_supply"
+        }]
+    } catch (e) {
+        globalLogger.connect(wallet.getAddress(), chain).warn(`scrollLayerbankCycle_supply failed: ${e}`)
+        return []
+    }
+}
+
+export async function scrollLayerbankCycle_withdraw(wallet: WalletI): Promise<TxInteraction[]> {
+    try {
+        const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+        let cTokenContract = new ethers.Contract(contracts.layerbankEthToken, ERC20_ABI, provider)
+        let depoContract = new ethers.Contract(contracts.layerbankDepo, layerbank, provider)
+        let cTokenBalance: bigint = await cTokenContract.balanceOf(wallet.getAddress())
+        let res: TxInteraction[] = await checkAndGetApprovalsInteraction(
+            wallet.getAddress(), contracts.layerbankDepo, BigInt(1), cTokenContract
+        )
+
+        let data: string = depoContract.interface.encodeFunctionData(
+            "redeemUnderlying", [contracts.layerbankEthToken, cTokenBalance.toString()]
+        )
+        res.push({
+            to: contracts.layerbankDepo,
+            data: data,
+            value: "0",
+            stoppable: true,
+            confirmations: 1,
+            name: "scrollLayerbankCycle_withdraw"
+        })
+        return res
+    } catch (e) {
+        globalLogger.connect(wallet.getAddress(), chain).warn(`scrollLayerbankCycle_withdraw failed: ${e}`)
+        return []
+    }
+}
+
+export async function scrollCreateSafe_do(wallet: WalletI): Promise<TxInteraction[]> {
+    try {
+        const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+        let curContract = new ethers.Contract(contracts.safeGnosisDeploy, safe, provider)
+        let setupData: string = curContract.interface.encodeFunctionData("setup", [
+            [wallet.getAddress()], 1, ethers.ZeroAddress, "0x", contracts.safeGnosisArg,
+            ethers.ZeroAddress, 0, ethers.ZeroAddress
+        ])
+        let data: string = curContract.interface.encodeFunctionData("createProxyWithNonce", [
+            contracts.safeGnosisSingleton, setupData, getCurTimestamp()
+        ])
+        return [{
+            to: contracts.safeGnosisDeploy,
+            data: data,
+            value: "0",
+            stoppable: false,
+            confirmations: 1,
+            name: "scrollCreateSafe_do"
+        }]
+    } catch (e) {
+        globalLogger.connect(wallet.getAddress(), chain).warn(`scrollCreateSafe_do failed: ${e}`)
         return []
     }
 }

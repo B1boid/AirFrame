@@ -275,7 +275,6 @@ function generateZkSync(accInfo: ExtendedFeatures, actions: AnyActions[]): void 
 
 function generateZkSyncRandomActivities(activitiesNum: number): ZkSyncActivity[] {
     let availableActivities: ZkSyncActivity[] = [
-        // ZkSyncActivity.zkSyncRandomApprove,
         ZkSyncActivity.zkSyncDummyRandomSwapCycle,
         ZkSyncActivity.zkSyncDummyRandomLending,
         ZkSyncActivity.zkSyncDmail
@@ -379,11 +378,12 @@ function generateArbitrumActivities(activitiesNum: number): ModuleActions {
 }
 
 function generateScroll(accInfo: ExtendedFeatures, actions: AnyActions[]): void {
-    let activities: ScrollActivity[] = generateScrollActivities(getRandomInt(1, 2))
+    let activities: ScrollActivity[] = generateScrollActivities(getRandomInt(2, 3))
     // по идеи все заклеймиили уже
     // if (accInfo.scrollTxs !== 0){
     //     activities.push(ScrollActivity.scrollOffMint)
     // }
+    activities.push(ScrollActivity.scrollInteractWithContract)
     const SCROLL_ACTIONS: ModuleActions = {
         chainName: Blockchains.Scroll,
         randomOrder: Randomness.Full,
@@ -438,11 +438,11 @@ function generateScroll(accInfo: ExtendedFeatures, actions: AnyActions[]): void 
 function generateScrollActivities(activitiesNum: number): ScrollActivity[] {
     let availableActivities: ScrollActivity[] = [
         ScrollActivity.scrollDmail,
-        // ScrollActivity.scrollWrapUnwrap,
         ScrollActivity.scrollRandomStuff,
-        // ScrollActivity.scrollRandomApprove,
         ScrollActivity.scrollEmptyRouter,
-        ScrollActivity.scrollSwapCycleNativeToUsdc
+        ScrollActivity.scrollDummyLendingCycle,
+        ScrollActivity.scrollDummySwapCycle,
+        ScrollActivity.scrollCreateSafe
     ]
 
     let res: ScrollActivity[] = []
@@ -455,7 +455,20 @@ function generateScrollActivities(activitiesNum: number): ScrollActivity[] {
                 break
             }
         }
-        res.push(curActivity)
+        if (curActivity === ScrollActivity.scrollDummySwapCycle) {
+            let swapActivities: ScrollActivity[] = [
+                ScrollActivity.scrollSwapCycleNativeToWsteth, ScrollActivity.scrollSwapCycleNativeToUsdc
+            ]
+            res.push(getRandomElement(swapActivities))
+        } else if (curActivity === ScrollActivity.scrollDummyLendingCycle) {
+            let lendingActivities: ScrollActivity[] = [
+                ScrollActivity.scrollAaveCycle, ScrollActivity.scrollLayerbankCycle
+            ]
+            res.push(getRandomElement(lendingActivities))
+        } else {
+            res.push(curActivity)
+        }
+
         repeatedActivities.push(curActivity)
     }
     return res

@@ -26,5 +26,17 @@ export const scrollContracts: { [id: string]: string } = {
     dmail: "0x47fbe95e981C0Df9737B6971B451fB15fdC989d9",
     syncSwapPool: "0x37BAc764494c8db4e54BDE72f6965beA9fa0AC2d",
 
-    offMint: "0x74670a3998d9d6622e32d0847ff5977c37e0ec91"
+    offMint: "0x74670a3998d9d6622e32d0847ff5977c37e0ec91",
+
+    aaveDepo: "0xFF75A4B698E3Ec95E608ac0f22A03B8368E05F5D",
+    aavePool: "0x11fCfe756c05AD438e312a7fd934381537D3cFfe",
+    aaveWrapped: "0xf301805bE1Df81102C957f6d4Ce29d2B8c056B2a",
+
+    layerbankDepo: "0xEC53c830f4444a8A56455c6836b5D2aA794289Aa",
+    layerbankEthToken: "0x274C3795dadfEbf562932992bF241ae087e0a98C",
+
+    safeGnosisDeploy: "0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2",
+    safeGnosisSingleton: "0x3E5c63644E683549055b9Be8653de26E0B4CD36E",
+    safeGnosisArg: "0xf48f2B2d2a534e402487b3ee7C18c33Aec0Fe5e4",
+
 }
