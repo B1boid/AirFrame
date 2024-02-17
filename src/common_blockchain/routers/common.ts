@@ -13,6 +13,10 @@ import {ExecBalance} from "../common_utils";
 import {globalLogger} from "../../utils/logger";
 import {lifiQuote, lifiQuoteNativeTo, lifiSwap, lifiSwapNativeTo} from "./lifi";
 import {ambientSwap, ambientSwapNativeTo} from "./ambient";
+import {woofiSwap, woofiSwapNativeTo} from "./woofi";
+import {maverickSwapNativeTo, maverickSwapToNative} from "./maverick";
+import {pancakeSwapNativeTo, pancakeSwapToNative} from "./pancake";
+import {zebraSwap, zebraSwapNativeTo} from "./zebra";
 
 export enum Dexes {
     OneInch = "1inch",
@@ -22,7 +26,11 @@ export enum Dexes {
     SyncSwap = "syncswap",
     Velocore = "velocore",
     SpaceFi = "spacefi",
-    Ambient = "ambient"
+    Ambient = "ambient",
+    Woofi = "woofi",
+    Maverick = "Maverick",
+    Pancake = "Pancake",
+    Zebra = "Zebra"
 }
 
 export interface DexPrice{
@@ -40,9 +48,7 @@ export const NATIVE_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
 export function getSlippage(chain: Blockchains){
     switch (chain){
         case Blockchains.Scroll:
-            return 5 // 0.5%
-        case Blockchains.ZkSync:
-            return 3 // 0.3%
+            return 2 // 0.2%
         default:
             return 2
     }
@@ -259,7 +265,48 @@ export async function commonSwap(
                     tokenFrom, tokens.WETH, wallet, chain, contracts, name, execBalance, stoppable
                 )
             }
+        } else if (dex === Dexes.Woofi) {
+            if (tokenFrom === NATIVE_ADDRESS) {
+                res = await woofiSwapNativeTo(
+                    tokens.WETH, tokenTo, wallet, chain, contracts, name, execBalance, stoppable
+                )
+            } else if (tokenTo === NATIVE_ADDRESS) {
+                res = await woofiSwap(
+                    tokenFrom, NATIVE_ADDRESS, wallet, chain, contracts, name, execBalance, stoppable
+                )
+            }
+        } else if (dex === Dexes.Maverick) {
+            if (tokenFrom === NATIVE_ADDRESS) {
+                res = await maverickSwapNativeTo(
+                    tokens.WETH, tokenTo, wallet, chain, contracts, name, execBalance, stoppable
+                )
+            } else if (tokenTo === NATIVE_ADDRESS) {
+                res = await maverickSwapToNative(
+                    tokenFrom, tokens.WETH, wallet, chain, contracts, name, execBalance, stoppable
+                )
+            }
+        } else if (dex === Dexes.Pancake) {
+            if (tokenFrom === NATIVE_ADDRESS) {
+                res = await pancakeSwapNativeTo(
+                    tokens.WETH, tokenTo, wallet, chain, contracts, name, execBalance, stoppable
+                )
+            } else if (tokenTo === NATIVE_ADDRESS) {
+                res = await pancakeSwapToNative(
+                    tokenFrom, tokens.WETH, wallet, chain, contracts, name, execBalance, stoppable
+                )
+            }
+        } else if (dex === Dexes.Zebra) {
+            if (tokenFrom === NATIVE_ADDRESS) {
+                res = await zebraSwapNativeTo(
+                    tokens.WETH, tokenTo, wallet, chain, contracts, name, execBalance, stoppable
+                )
+            } else if (tokenTo === NATIVE_ADDRESS) {
+                res = await zebraSwap(
+                    tokenFrom, tokens.WETH, wallet, chain, contracts, name, execBalance, stoppable
+                )
+            }
         }
+
         if (res.length > 0) break
     }
     return res

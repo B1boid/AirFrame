@@ -1,12 +1,18 @@
 import {Activity} from "../../classes/module";
 import {ScrollActivity} from "../blockchain_modules";
 import {
-    scrollDeployAndInteract_deploy, scrollDeployAndInteract_interact,
+    scrollDeployAndInteract_deploy,
+    scrollDeployAndInteract_interact,
     scrollDmail_send,
-    scrollEmptyRouter_do, scrollOffMint_mint,
+    scrollEmptyRouter_do,
+    scrollOffMint_mint,
     scrollRandomApprove_approve,
-    scrollRandomStuff_do, scrollSwapCycleNativeToUsdc_swapback,
-    scrollSwapCycleNativeToUsdc_swapto, scrollWrapUnwrap_unwrap, scrollWrapUnwrap_wrap
+    scrollRandomStuff_do,
+    scrollSwapCycleNativeToUsdc_swapback,
+    scrollSwapCycleNativeToUsdc_swapto,
+    scrollSwapCycleNativeToWsteth_swapback, scrollSwapCycleNativeToWsteth_swapto,
+    scrollWrapUnwrap_unwrap,
+    scrollWrapUnwrap_wrap
 } from "./interations";
 
 
@@ -38,6 +44,14 @@ export const scrollSwapCycleNativeToUsdc: Activity = {
     txs: [
         scrollSwapCycleNativeToUsdc_swapto,
         scrollSwapCycleNativeToUsdc_swapback
+    ]
+}
+
+export const scrollSwapCycleNativeToWsteth: Activity = {
+    name: ScrollActivity.scrollSwapCycleNativeToWsteth,
+    txs: [
+        scrollSwapCycleNativeToWsteth_swapto,
+        scrollSwapCycleNativeToWsteth_swapback
     ]
 }
 

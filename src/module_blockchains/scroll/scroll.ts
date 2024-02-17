@@ -6,7 +6,7 @@ import {
     scrollEmptyRouter, scrollOffMint,
     scrollRandomApprove,
     scrollRandomStuff,
-    scrollSwapCycleNativeToUsdc,
+    scrollSwapCycleNativeToUsdc, scrollSwapCycleNativeToWsteth,
     scrollWrapUnwrap
 } from "./activities";
 
@@ -23,6 +23,6 @@ export const moduleScroll: ScrollModule = new ScrollModule(
     scrollChain,
     [
         scrollRandomApprove, scrollRandomStuff, scrollEmptyRouter, scrollSwapCycleNativeToUsdc, scrollWrapUnwrap,
-        scrollDmail, scrollDeployAndInteract, scrollOffMint
+        scrollDmail, scrollDeployAndInteract, scrollOffMint, scrollSwapCycleNativeToWsteth
     ]
 )
