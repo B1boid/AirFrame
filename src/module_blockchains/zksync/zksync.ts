@@ -1,14 +1,15 @@
 import {Chain, zkSyncChain} from "../../config/chains";
 import {Activity, BlockchainModule} from "../../classes/module";
 import {
-    zkSyncDmail,
+    zkSyncCreateSafe,
+    zkSyncDmail, zkSyncEmptyMulticall,
     zkSyncEraLendCycle,
     zkSyncEraLendInit,
     zkSyncMintTevaera,
     zkSyncMintZnsId, zkSyncParaspaceCycle,
-    zkSyncRandomApprove, zkSyncReactFusionCycle, zkSyncReactFusionInit,
+    zkSyncRandomApprove, zkSyncReactFusionCycle, zkSyncReactFusionInit, zkSyncRhinoDeposit,
     zkSyncSwapCycleNativeToUsdc, zkSyncSwapCycleNativeToWsteth, zkSyncSynFuturesTest, zkSyncTopSwapCycleNativeToUsdc,
-    zkSyncWrapUnwrap
+    zkSyncWrapUnwrap, zkSyncZerolendCycle
 } from "./activities";
 
 
@@ -24,6 +25,7 @@ export const moduleZkSync: ZkSyncModule = new ZkSyncModule(
     [
         zkSyncWrapUnwrap, zkSyncSwapCycleNativeToUsdc, zkSyncMintTevaera, zkSyncMintZnsId, zkSyncRandomApprove,
         zkSyncEraLendInit, zkSyncEraLendCycle, zkSyncReactFusionCycle, zkSyncReactFusionInit, zkSyncParaspaceCycle,
-        zkSyncSynFuturesTest, zkSyncTopSwapCycleNativeToUsdc, zkSyncDmail, zkSyncSwapCycleNativeToWsteth
+        zkSyncSynFuturesTest, zkSyncTopSwapCycleNativeToUsdc, zkSyncDmail, zkSyncSwapCycleNativeToWsteth, zkSyncCreateSafe,
+        zkSyncZerolendCycle, zkSyncEmptyMulticall, zkSyncRhinoDeposit
     ]
 )

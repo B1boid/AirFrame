@@ -41,7 +41,7 @@ export async function muteSwapNativeTo(
         })
         return txs
     } catch (e) {
-        globalLogger.connect(wallet.getAddress(), chain).warn(`${name} failed: ${e}`)
+        globalLogger.connect(wallet.getAddress(), chain).warn(`${name}-mute failed: ${e}`)
         return []
     }
 }
@@ -81,7 +81,7 @@ export async function muteSwap(
         })
         return txs
     } catch (e) {
-        globalLogger.connect(wallet.getAddress(), chain).warn(`${name} failed: ${e}`)
+        globalLogger.connect(wallet.getAddress(), chain).warn(`${name}-mute failed: ${e}`)
         return []
     }
 }

@@ -20,7 +20,7 @@ import {TxInteraction} from "../../classes/module";
 import {Asset} from "../../config/tokens";
 import {getRandomKeepAmount, getTxDataForAllBalanceTransfer, getZkSyncKeepRandomAmount, needToStop, retry, sleep} from "../../utils/utils";
 import axios from "axios";
-import {ethers} from "ethers-new";
+import {ethers, toBigInt} from "ethers-new";
 import {destToChain} from "../../module_blockchains/blockchain_modules";
 import {allGases} from "../../config/online_config";
 
@@ -34,7 +34,7 @@ enum DepositWithdrawType {
 }
 
 class OkxConnectionModule implements ConnectionModule {
-    async sendAsset(wallet: WalletI, from: Destination, to: Destination, asset: Asset, amount: number): Promise<[boolean, number]> {
+    async sendAsset(wallet: WalletI, from: Destination, to: Destination, asset: Asset, amount: number, keepAmount: bigint): Promise<[boolean, number]> {
         if (from === Destination.OKX) {
             const chain: Chain = destToChain(to)
             const fee: string = await this.getMinFee(wallet, asset, chain.title)
@@ -100,7 +100,7 @@ class OkxConnectionModule implements ConnectionModule {
 
             const response: [TxResult, string] | null = (await retry(async (i) => {
                 const [bigAmount, txTransferToWithdrawAddress] = await this.buildTransferToOkx(wallet, amount, withdrawAddress,
-                    asset, chain, i * EXTRA_GAS_LIMIT, ethers.parseUnits(`${allGases[chain.title]}`, "gwei"))
+                    asset, chain, i * EXTRA_GAS_LIMIT, ethers.parseUnits(`${allGases[chain.title]}`, "gwei"), keepAmount)
 
                 txTransferToWithdrawAddress.confirmations = withdrawalConfig.confirmations
 
@@ -146,17 +146,16 @@ class OkxConnectionModule implements ConnectionModule {
         throw new Error(`No OKX destination was found. From: ${from}. To: ${to}. Check configs.`)
     }
 
-    private async buildTransferToOkx(wallet: WalletI, amount: number, withdrawAddress: string, asset: Asset, chain: Chain, extraGasLimit: number, defaultGasPrice: bigint): Promise<[bigint, TxInteraction]> {
+    private async buildTransferToOkx(wallet: WalletI, amount: number, withdrawAddress: string, asset: Asset, chain: Chain, extraGasLimit: number, defaultGasPrice: bigint, keepAmount: bigint): Promise<[bigint, TxInteraction]> {
         if (amount === -1) {
-            return await getTxDataForAllBalanceTransfer(wallet, withdrawAddress, asset, chain, extraGasLimit, defaultGasPrice)
+            return await getTxDataForAllBalanceTransfer(wallet, withdrawAddress, asset, chain, extraGasLimit, defaultGasPrice, keepAmount)
         } else {
             let bigAmount = ethers.parseEther(`${amount}`)
-            if (chain.title == Blockchains.ZkSync && getZkSyncKeepRandomAmount()){
-                let keepAmount = getRandomKeepAmount()
+            if (keepAmount !== toBigInt(0)){
                 bigAmount = bigAmount - (keepAmount > bigAmount ? bigAmount * BigInt(20) / BigInt(100) : keepAmount)
                 globalLogger
                     .connect(wallet.getAddress(), chain)
-                    .info(`ZkSync keep amount: ${keepAmount.toString()}. To transfer: ${bigAmount.toString()}`)
+                    .info(`Keep amount: ${keepAmount.toString()}. To transfer: ${bigAmount.toString()}`)
             }
             const txTransferToWithdrawAddress = getTxForTransfer(asset, withdrawAddress, bigAmount)
             return Promise.resolve([bigAmount, txTransferToWithdrawAddress])

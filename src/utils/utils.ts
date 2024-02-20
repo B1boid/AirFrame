@@ -122,6 +122,23 @@ export function getActiveAddresses(): string[] {
     return result
 }
 
+export function getActiveAddressesWithLabels(): string[][] {
+    const file = readFileSync('.active_accs', 'utf-8');
+    const accs = file.split('\n');
+    let result = [];
+    for (const [ind, accLine] of accs.entries()) {
+        const [label, addr, withdrawAddr, subacc, pkCipher] = accLine.trim().split(',');
+        if (addr === undefined){
+            if (ind === accs.length - 1){
+                break
+            }
+            throw Error(`Invalid address in .active_accs file: ${accLine}`)
+        }
+        result.push([addr, label])
+    }
+    return result
+}
+
 export function setStop(status: boolean): void {
     stopAll = status
 }
@@ -146,11 +163,30 @@ export function getRandomKeepAmount(): bigint {
     } else if (level < 0.45) {
         return ethers.parseEther(`${getRandomFloat(0.01, 0.011, 5)}`)
     } else if (level < 0.75) {
-        return ethers.parseEther(`${getRandomFloat(0.015, 0.0151, 5)}`)
+        return ethers.parseEther(`${getRandomFloat(0.015, 0.016, 5)}`)
     } else {
         return ethers.parseEther(`${getRandomFloat(0.02, 0.021, 5)}`)
     }
 }
+
+// 20% lvl1 random 0.005 - 0.006
+// 25% lvl2 random 0.01 - 0.011
+// 30% lvl3 random 0.015-0.0151
+// 25% lvl3 random 0.02-0.021
+export function getRandomKeepAmountFloat(): number {
+    let level = getRandomFloat(0.0, 1.0, 4)
+
+    if (level < 0.2) {
+        return getRandomFloat(0.005, 0.006, 5)
+    } else if (level < 0.45) {
+        return getRandomFloat(0.01, 0.011, 5)
+    } else if (level < 0.75) {
+        return getRandomFloat(0.015, 0.016, 5)
+    } else {
+        return getRandomFloat(0.02, 0.021, 5)
+    }
+}
+
 
 export function getAddressInfo(password: string, address: string): AddressInfo {
     const file = readFileSync('.accs', 'utf-8');
@@ -223,7 +259,7 @@ export function getOkxCredentialsSubs( password: string): OkxCredentials[]{
 
 const ESTIMATE_GAS_LIMIT = BigInt(500_000) // берем сразу много, чтобы точно на любом чейне сработало. Нужно только для эстимейта, тк если эстимейтить с фул балансом, то падает тк не хватает средств на газ
 export async function getTxDataForAllBalanceTransfer(
-    wallet: WalletI, toAddress: string, asset: Asset, fromChain: Chain, extraGasLimit: number, defaultGasPrice: bigint
+    wallet: WalletI, toAddress: string, asset: Asset, fromChain: Chain, extraGasLimit: number, defaultGasPrice: bigint, keepAmount: bigint
 ): Promise<[bigint, TxInteraction]> {
     let provider: UnionProvider
     if (fromChain.title === Blockchains.ZkSync) {
@@ -267,8 +303,7 @@ export async function getTxDataForAllBalanceTransfer(
     }
     let amount = balance - l1Cost - BigInt(gasLimit) * (feeData.maxFeePerGas ?? defaultGasPrice)
 
-    if (fromChain.title == Blockchains.ZkSync && getZkSyncKeepRandomAmount()){
-        let keepAmount = getRandomKeepAmount()
+    if (keepAmount !== BigInt(0)){
         keepAmount = (keepAmount > amount ? amount * BigInt(20) / BigInt(100) : keepAmount)
         amount = amount - keepAmount;
         globalLogger

@@ -64,7 +64,7 @@ export async function syncSwapNativeTo(
         return txs
     } catch (e) {
         let logger = globalLogger.connect(wallet.getAddress(), chain)
-        logger.warn(`${name} failed: ${e}`)
+        logger.warn(`${name}-syncswap failed: ${e}`)
         return []
     }
 }
@@ -128,7 +128,7 @@ export async function syncSwap(
         return txs
     } catch (e) {
         let logger = globalLogger.connect(wallet.getAddress(), chain)
-        logger.warn(`${name} failed: ${e}`)
+        logger.warn(`${name}-syncswap failed: ${e}`)
         return []
     }
 }

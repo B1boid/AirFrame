@@ -1,24 +1,32 @@
 import {Activity} from "../../classes/module";
 import {ZkSyncActivity} from "../blockchain_modules";
 import {
+    zkSyncCreateSafe_do,
     zkSyncDmail_send,
+    zkSyncEmptyMulticall_do,
     zkSyncEraLendCycle_supply,
     zkSyncEraLendCycle_withdraw,
     zkSyncEraLendInit_enter,
     zkSyncMintTevaera_buyid,
     zkSyncMintTevaera_mint,
-    zkSyncMintZnsId_mint, zkSyncParaspaceCycle_supply,
+    zkSyncMintZnsId_mint,
+    zkSyncParaspaceCycle_supply,
     zkSyncRandomApprove_approve,
     zkSyncReactFusionCycle_supply,
     zkSyncReactFusionCycle_withdraw,
-    zkSyncReactFusionInit_enter,
+    zkSyncReactFusionInit_enter, zkSyncRhinoCycle_deposit,
     zkSyncSwapCycleNativeToUsdc_swapback,
-    zkSyncSwapCycleNativeToUsdc_swapto, zkSyncSwapCycleNativeToWsteth_swapback, zkSyncSwapCycleNativeToWsteth_swapto,
-    zkSyncSynFuturesTest_mint, zkSyncTopSwapCycleNativeToUsdc_swapback, zkSyncTopSwapCycleNativeToUsdc_swapto,
+    zkSyncSwapCycleNativeToUsdc_swapto,
+    zkSyncSwapCycleNativeToWsteth_swapback,
+    zkSyncSwapCycleNativeToWsteth_swapto,
+    zkSyncSynFuturesTest_mint,
+    zkSyncTopSwapCycleNativeToUsdc_swapback,
+    zkSyncTopSwapCycleNativeToUsdc_swapto,
     zkSyncWrapUnwrap_unwrap,
-    zkSyncWrapUnwrap_wrap
+    zkSyncWrapUnwrap_wrap,
+    zkSyncZerolendCycle_deposit,
+    zkSyncZerolendCycle_withdraw
 } from "./interations";
-
 
 
 export const zkSyncWrapUnwrap: Activity = {
@@ -122,5 +130,34 @@ export const zkSyncDmail: Activity = {
     name: ZkSyncActivity.zkSyncDmail,
     txs: [
         zkSyncDmail_send
+    ]
+}
+
+export const zkSyncCreateSafe: Activity = {
+    name: ZkSyncActivity.zkSyncCreateSafe,
+    txs: [
+        zkSyncCreateSafe_do
+    ]
+}
+
+export const zkSyncZerolendCycle: Activity = {
+    name: ZkSyncActivity.zkSyncZerolendCycle,
+    txs: [
+        zkSyncZerolendCycle_deposit,
+        zkSyncZerolendCycle_withdraw
+    ]
+}
+
+export const zkSyncEmptyMulticall: Activity = {
+    name: ZkSyncActivity.zkSyncEmptyMulticall,
+    txs: [
+        zkSyncEmptyMulticall_do
+    ]
+}
+
+export const zkSyncRhinoDeposit: Activity = {
+    name: ZkSyncActivity.zkSyncRhinoDeposit,
+    txs: [
+        zkSyncRhinoCycle_deposit
     ]
 }

@@ -14,7 +14,7 @@ import {WALLETS_ACTIONS_1} from "./tests/task1";
 import {Builder, Strategy} from "./builder/common_builder";
 import {WalletActions} from "./classes/actions";
 import {
-    MAINS_ZKSYNC_CONFIG,
+    MAINS_ZKSYNC_CONFIG, MEGA_CONFIG,
     RunConfig,
     TEST_CONFIG,
     ZKSYNC_ANOTHER_CONFIG,
@@ -26,6 +26,7 @@ import {ethereumChain} from "./config/chains";
 import AsyncLock from "async-lock";
 import {pingSubs} from "./utils/okx_pinger";
 import {AddressInfo} from "./classes/info";
+import {toBigInt} from "ethers-new";
 
 let prompt = require('password-prompt')
 const okxLock = new AsyncLock()
@@ -53,11 +54,11 @@ async function doTask(password: string, passwordOkx: string, walletActions: Wall
                 const [status, sent] = action.connectionName === Connections.ExchangeOKX ?
                     await okxLock.acquire<[boolean, number]>("okxOp", async () => {
                         globalLogger.connect(wallet.getAddress(), ethereumChain).info("Enter OKX lock.")
-                        const res = await connectionModule.sendAsset(wallet, action.from, action.to, action.asset, action.amount)
+                        const res = await connectionModule.sendAsset(wallet, action.from, action.to, action.asset, action.amount, action.keepAmount || toBigInt(0))
                         globalLogger.connect(wallet.getAddress(), ethereumChain).info("Exit OKX lock.")
                         return res
                     }) :
-                    await connectionModule.sendAsset(wallet, action.from, action.to, action.asset, action.amount)
+                    await connectionModule.sendAsset(wallet, action.from, action.to, action.asset, action.amount, action.keepAmount || toBigInt(0))
                 actionsRes = status
                 if (firstSentAmount === -1) {
                     firstSentAmount = sent
@@ -95,7 +96,7 @@ async function doTask(password: string, passwordOkx: string, walletActions: Wall
 
 
 export async function main(accsPassword : string | undefined = undefined, okxPassword: string | undefined = undefined){
-    const runConfig: RunConfig = ZKSYNC_ANOTHER_CONFIG
+    const runConfig: RunConfig = MEGA_CONFIG
 
     const threads: number = runConfig.threads
     const strategy: Strategy = runConfig.strategy
@@ -111,8 +112,7 @@ export async function main(accsPassword : string | undefined = undefined, okxPas
     if (runConfig.strategy === Strategy.TestMode){
         actions = WALLETS_ACTIONS_1
     } else {
-        let activeAddresses: string[] = getActiveAddresses()
-        actions = await Builder.build(activeAddresses, strategy)
+        actions = await Builder.build(strategy)
     }
 
 

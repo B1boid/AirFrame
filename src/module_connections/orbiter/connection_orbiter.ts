@@ -5,7 +5,7 @@ import {Asset} from "../../config/tokens";
 import {globalLogger} from "../../utils/logger";
 import {bigMax, getRandomKeepAmount, getTxDataForAllBalanceTransfer, getZkSyncKeepRandomAmount, sleep} from "../../utils/utils";
 import {TxInteraction} from "../../classes/module";
-import {ethers} from "ethers-new";
+import {ethers, toBigInt} from "ethers-new";
 import {getTxForTransfer, waitBalanceChanged} from "../utils";
 import {destToChain} from "../../module_blockchains/blockchain_modules";
 
@@ -14,7 +14,7 @@ const DEFAULT_GAS_PRICE = ethers.parseUnits("20", "gwei")
 const ETH_BRIDGE_ROUTER = "0x80C67432656d59144cEFf962E8fAF8926599bCF8"
 
 class OrbiterConnectionModule implements ConnectionModule {
-    async sendAsset(wallet: WalletI, from: Destination, to: Destination, asset: Asset, amount: number): Promise<[boolean, number]> {
+    async sendAsset(wallet: WalletI, from: Destination, to: Destination, asset: Asset, amount: number, keepAmount: bigint): Promise<[boolean, number]> {
         const chainFrom: Chain = destToChain(from)
         const chainTo: Chain = destToChain(to)
         const logger = globalLogger.connect(wallet.getAddress(), chainFrom)
@@ -33,17 +33,16 @@ class OrbiterConnectionModule implements ConnectionModule {
         let transferTx: TxInteraction;
         let bigAmount: bigint
         if (amount === -1) {
-            [bigAmount, transferTx] = await getTxDataForAllBalanceTransfer(wallet, ETH_BRIDGE_ROUTER, asset, chainFrom, EXTRA_GAS_LIMIT, DEFAULT_GAS_PRICE)
+            [bigAmount, transferTx] = await getTxDataForAllBalanceTransfer(wallet, ETH_BRIDGE_ROUTER, asset, chainFrom, EXTRA_GAS_LIMIT, DEFAULT_GAS_PRICE, keepAmount)
             amount = Number(ethers.formatEther(bigAmount))
             transferTx.value = transferTx.value.substring(0, transferTx.value.length - 4) + chainTo.orbiterCode.toString()
         } else {
             bigAmount = ethers.parseEther(`${amount}`)
-            if (chainFrom.title == Blockchains.ZkSync && getZkSyncKeepRandomAmount()){
-                let keepAmount = getRandomKeepAmount()
+            if (keepAmount !== toBigInt(0)){
                 bigAmount = bigAmount - (keepAmount > bigAmount ? bigAmount * BigInt(20) / BigInt(100) : keepAmount)
                 globalLogger
                     .connect(wallet.getAddress(), chainFrom)
-                    .info(`ZkSync keep amount: ${keepAmount.toString()}. To transfer: ${bigAmount.toString()}`)
+                    .info(`Keep amount: ${keepAmount.toString()}. To transfer: ${bigAmount.toString()}`)
             }
             transferTx = getTxForTransfer(asset, ETH_BRIDGE_ROUTER, bigAmount)
             transferTx.value = transferTx.value.substring(0, transferTx.value.length - 4) + chainTo.orbiterCode.toString()

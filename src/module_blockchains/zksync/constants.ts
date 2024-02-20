@@ -60,6 +60,14 @@ export const zkSyncContracts: { [id: string]: string } = {
     syncSwapPool: "0xf2DAd89f2788a8CD54625C60b55cD3d2D0ACa7Cb",
     synFuturesMint1: "0xa6E5e7DDcd6e7C5959f4AdE9aEd97594346436aF",
     synFuturesMint2: "0xB2578E4D0f94c76Cde665a884b86fb4EE16CBFB8",
-    rhinoDeposit: "0x1fa66e2B38d0cC496ec51F81c3e05E6A6708986F"
+    rhinoDeposit: "0x1fa66e2B38d0cC496ec51F81c3e05E6A6708986F",
+
+    safeGnosisDeploy: "0xDAec33641865E4651fB43181C6DB6f7232Ee91c2",
+    safeGnosisSingleton: "0x1727c2c531cf966f902E5927b98490fDFb3b2b70",
+    safeGnosisArg: "0x2f870a80647BbC554F3a0EBD093f11B4d2a7492A",
+
+    zerolendDepo: "0x767b4A087c11d7581Ac95eaFfc1FeBFA26bad3d2",
+    zerolendPool: "0x4d9429246EA989C9CeE203B43F6d1C7D83e3B8F8",
+    zerolendWrapped: "0x9002ecb8a06060e3b56669c6B8F18E1c3b119914",
 
 }

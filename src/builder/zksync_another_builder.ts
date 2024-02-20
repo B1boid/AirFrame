@@ -277,7 +277,8 @@ function generateZkSyncRandomActivities(activitiesNum: number): ZkSyncActivity[]
     let availableActivities: ZkSyncActivity[] = [
         ZkSyncActivity.zkSyncDummyRandomSwapCycle,
         ZkSyncActivity.zkSyncDummyRandomLending,
-        ZkSyncActivity.zkSyncDmail
+        ZkSyncActivity.zkSyncDummyRandomStuff,
+        ZkSyncActivity.zkSyncEmptyMulticall
     ]
     let res: ZkSyncActivity[] = []
     let repeatedActivities: ZkSyncActivity[] = []
@@ -291,12 +292,17 @@ function generateZkSyncRandomActivities(activitiesNum: number): ZkSyncActivity[]
         }
         if (curActivity === ZkSyncActivity.zkSyncDummyRandomLending) {
             let lendingActivities: ZkSyncActivity[] = [
-                ZkSyncActivity.zkSyncParaspaceCycle, ZkSyncActivity.zkSyncEraLendCycle, ZkSyncActivity.zkSyncReactFusionCycle
+                ZkSyncActivity.zkSyncReactFusionCycle, ZkSyncActivity.zkSyncEraLendCycle, ZkSyncActivity.zkSyncZerolendCycle
             ]
             res.push(getRandomElement(lendingActivities))
         } else if (curActivity === ZkSyncActivity.zkSyncDummyRandomSwapCycle) {
             let lendingActivities: ZkSyncActivity[] = [
                 ZkSyncActivity.zkSyncTopSwapCycleNativeToUsdc, ZkSyncActivity.zkSyncSwapCycleNativeToUsdc
+            ]
+            res.push(getRandomElement(lendingActivities))
+        } else if (curActivity === ZkSyncActivity.zkSyncDummyRandomStuff) {
+            let lendingActivities: ZkSyncActivity[] = [
+                ZkSyncActivity.zkSyncDmail, ZkSyncActivity.zkSyncCreateSafe, ZkSyncActivity.zkSyncRhinoDeposit
             ]
             res.push(getRandomElement(lendingActivities))
         } else {

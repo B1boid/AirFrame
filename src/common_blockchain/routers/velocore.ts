@@ -41,7 +41,7 @@ export async function velocoreSwapNativeTo(
         })
         return txs
     } catch (e) {
-        globalLogger.connect(wallet.getAddress(), chain).warn(`${name} failed: ${e}`)
+        globalLogger.connect(wallet.getAddress(), chain).warn(`${name}-velocore failed: ${e}`)
         return []
     }
 }
@@ -82,7 +82,7 @@ export async function velocoreSwap(
         return txs
     } catch (e) {
         let logger = globalLogger.connect(wallet.getAddress(), chain)
-        logger.warn(`${name} failed: ${e}`)
+        logger.warn(`${name}-velocore failed: ${e}`)
         return []
     }
 }

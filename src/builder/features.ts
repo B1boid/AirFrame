@@ -18,6 +18,19 @@ export async function getTxCount(address: string, chain: Chain, retries: number 
 
 }
 
+export async function getAccBalance(address: string, chain: Chain, retries: number = 1): Promise<bigint | null> {
+    if (retries < 0) return null
+    try {
+        let provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+        return await provider.getBalance(address)
+    } catch (e) {
+        globalLogger.warn(`Failed to get tx count for ${address} on ${chain.title}, try: ${retries}, error: ${e}`)
+        await sleep(1)
+        return await getAccBalance(address, chain, retries - 1)
+    }
+
+}
+
 export async function hasInteractionWithEthContract(user: string, contract: string, retries: number = 1): Promise<boolean | null>{
     if (retries < 0) return null
     try {

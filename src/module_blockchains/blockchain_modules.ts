@@ -10,6 +10,7 @@ import {moduleBsc} from "./bsc/bsc";
 import {moduleScroll} from "./scroll/scroll";
 import {scrollCreateSafe, scrollSwapCycleNativeToWsteth, scrollWrapUnwrap} from "./scroll/activities";
 import {moduleLinea} from "./linea/linea";
+import {zkSyncZerolendCycle} from "./zksync/activities";
 
 
 export const enum PolygonActivity {
@@ -34,7 +35,12 @@ export const enum ZkSyncActivity {
 
     zkSyncDummyRandomLending = "zkSyncDummyRandomLending",
     zkSyncDummyRandomSwapCycle = "zkSyncDummyRandomSwapCycle",
-    zkSyncDmail = "zkSyncDmail"
+    zkSyncDummyRandomStuff = "zkSyncDummyRandomStuff",
+    zkSyncDmail = "zkSyncDmail",
+    zkSyncCreateSafe = "zkSyncCreateSafe",
+    zkSyncZerolendCycle = "zkSyncZerolendCycle",
+    zkSyncEmptyMulticall = "zkSyncEmptyMulticall",
+    zkSyncRhinoDeposit = "zkSyncRhinoDeposit"
 }
 
 export const enum EthereumActivity {
