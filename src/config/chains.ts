@@ -32,7 +32,7 @@ export const Destination = {...Blockchains, ...Exchanges};
 export const zkSyncChain: Chain = {
   title: Blockchains.ZkSync,
   chainId: 324,
-  nodeUrl: "https://1rpc.io/zksync2-era",
+  nodeUrl: "https://mainnet.era.zksync.io",
   symbol: "ETH",
   extraGasLimit: 100000,
   explorerUrl: "https://explorer.zksync.io",
@@ -82,7 +82,7 @@ export const arbitrumChain: Chain = {
 export const scrollChain: Chain = {
     title: Blockchains.Scroll,
     chainId: 534352,
-    nodeUrl: 'https://rpc.scroll.io',
+    nodeUrl: 'https://rpc.ankr.com/scroll',
     symbol: "ETH",
     extraGasLimit: 50000,
     explorerUrl: "https://scrollscan.com",

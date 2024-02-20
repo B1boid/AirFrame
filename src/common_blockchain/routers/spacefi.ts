@@ -42,7 +42,7 @@ export async function spaceFiSwapNativeTo(
         })
         return txs
     } catch (e) {
-        globalLogger.connect(wallet.getAddress(), chain).warn(`${name} failed: ${e}`)
+        globalLogger.connect(wallet.getAddress(), chain).warn(`${name}-spacefi failed: ${e}`)
         return []
     }
 }
@@ -83,7 +83,7 @@ export async function spaceFiSwap(
         })
         return txs
     } catch (e) {
-        globalLogger.connect(wallet.getAddress(), chain).warn(`${name} failed: ${e}`)
+        globalLogger.connect(wallet.getAddress(), chain).warn(`${name}-spacefi failed: ${e}`)
         return []
     }
 }

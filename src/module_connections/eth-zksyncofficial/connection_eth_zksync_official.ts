@@ -25,7 +25,7 @@ const L1_DEFAULT_GAS = BigInt(120_000)
 const L2_BRIDGE_GAS_LIMIT = 733664;
 
 class ZkSyncEthOfficialConectionModule implements ConnectionModule {
-    async sendAsset(wallet: WalletI, from: Destination, to: Destination, asset: Asset, amount: number): Promise<[boolean, number]> {
+    async sendAsset(wallet: WalletI, from: Destination, to: Destination, asset: Asset, amount: number, keepAmount: bigint): Promise<[boolean, number]> {
         if (!(to === Destination.ZkSync && from === Destination.Ethereum)) {
             globalLogger.connect(wallet.getAddress(), ethereumChain)
                 .error(`Wrong networks for ${tag}. Expected ETH -> ZKSYNC. Found: ${from} -> ${to}.`)

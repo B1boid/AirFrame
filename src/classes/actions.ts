@@ -31,4 +31,5 @@ export interface ConnectionAction {
     asset: Asset
     amount: number // -1 if fullBalance
     connectionName: Connections
+    keepAmount?: bigint
 }

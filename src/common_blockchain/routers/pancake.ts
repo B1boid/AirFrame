@@ -68,7 +68,7 @@ export async function pancakeSwapNativeTo(
         })
         return txs
     } catch (e) {
-        globalLogger.connect(wallet.getAddress(), chain).warn(`${name} failed: ${e}`)
+        globalLogger.connect(wallet.getAddress(), chain).warn(`${name}-pancake failed: ${e}`)
         return []
     }
 }
@@ -122,7 +122,7 @@ export async function pancakeSwapToNative(
         })
         return txs
     } catch (e) {
-        globalLogger.connect(wallet.getAddress(), chain).warn(`${name} failed: ${e}`)
+        globalLogger.connect(wallet.getAddress(), chain).warn(`${name}-pancake failed: ${e}`)
         return []
     }
 }

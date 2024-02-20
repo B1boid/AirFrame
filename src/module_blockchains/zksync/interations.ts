@@ -1,6 +1,6 @@
 import {TxInteraction} from "../../classes/module";
 import {WalletI} from "../../classes/wallet";
-import {getRandomElement, getRandomFloat, getRandomInt, getRandomizedPercent} from "../../utils/utils";
+import {getCurTimestamp, getRandomElement, getRandomFloat, getRandomInt, getRandomizedPercent} from "../../utils/utils";
 import {globalLogger} from "../../utils/logger";
 import wrapped from "../../abi/wrapped.json";
 import zns_1 from "../../abi/zns_1.json";
@@ -13,7 +13,10 @@ import {zkSyncChain} from "../../config/chains";
 import {zkSyncContracts, zkSyncTokens} from "./constants";
 import {ethers, MaxUint256, parseEther} from "ethers-new";
 import {generateUsername} from "unique-username-generator";
-import {getRandomApprove} from "../../common_blockchain/approvals";
+import {checkAndGetApprovalsInteraction, getRandomApprove} from "../../common_blockchain/approvals";
+import safe from "../../abi/safe.json";
+import zerolend from "../../abi/aave.json";
+import erc20 from "../../abi/erc20.json";
 
 
 let tokens = zkSyncTokens
@@ -75,13 +78,13 @@ export async function zkSyncSwapCycleNativeToUsdc_swapback(wallet: WalletI): Pro
 
 export async function zkSyncSwapCycleNativeToWsteth_swapto(wallet: WalletI): Promise<TxInteraction[]> {
     return await commonSwap(tokens.ETH, tokens.WSTETH, {balancePercent: [5, 10]},
-        [Dexes.SyncSwap],
+        [Dexes.SyncSwap, Dexes.Maverick],
         wallet, chain, contracts, tokens, "zkSyncSwapCycleNativeToWsteth_swapto")
 }
 
 export async function zkSyncSwapCycleNativeToWsteth_swapback(wallet: WalletI): Promise<TxInteraction[]> {
     return await commonSwap(tokens.WSTETH, tokens.ETH, {fullBalance: true},
-        [Dexes.SyncSwap],
+        [Dexes.SyncSwap, Dexes.Maverick],
         wallet, chain, contracts, tokens,"zkSyncSwapCycleNativeToWsteth_swapback", true)
 }
 
@@ -290,7 +293,7 @@ export async function zkSyncParaspaceCycle_supply(wallet: WalletI): Promise<TxIn
         let data: string = depositContract.interface.encodeFunctionData(
             "depositETH", [wallet.getAddress(), 0]
         )
-        let balance = getRandomFloat(0.00003, 0.00010, 5) // dust ready to lose
+        let balance = getRandomFloat(0.000003, 0.000010, 6) // dust ready to lose
 
         return [{
             to: contracts.paraspace,
@@ -342,14 +345,11 @@ export async function zkSyncSynFuturesTest_mint(wallet: WalletI): Promise<TxInte
 
 export async function zkSyncRhinoCycle_deposit(wallet: WalletI): Promise<TxInteraction[]> {
     try {
-        let balancePercent = [20, 35]
-        const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
-        let tokenBalance: bigint = await provider.getBalance(wallet.getAddress())
-        tokenBalance = getRandomizedPercent(tokenBalance, balancePercent[0], balancePercent[1])
+        let balance = getRandomFloat(0.000005, 0.000015, 6) // dust ready to lose
         return [{
             to: contracts.rhinoDeposit,
             data: "0xdb6b5246",
-            value: tokenBalance.toString(),
+            value: balance.toString(),
             stoppable: false,
             confirmations: 1,
             name: "zkSyncRhinoCycle_deposit"
@@ -380,6 +380,103 @@ export async function zkSyncDmail_send(wallet: WalletI): Promise<TxInteraction[]
         }]
     } catch (e){
         globalLogger.connect(wallet.getAddress(), chain).warn(`zkSyncDmail_send failed: ${e}`)
+        return []
+    }
+}
+
+export async function zkSyncCreateSafe_do(wallet: WalletI): Promise<TxInteraction[]> {
+    try {
+        const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+        let curContract = new ethers.Contract(contracts.safeGnosisDeploy, safe, provider)
+        let setupData: string = curContract.interface.encodeFunctionData("setup", [
+            [wallet.getAddress()], 1, ethers.ZeroAddress, "0x", contracts.safeGnosisArg,
+            ethers.ZeroAddress, 0, ethers.ZeroAddress
+        ])
+        let data: string = curContract.interface.encodeFunctionData("createProxyWithNonce", [
+            contracts.safeGnosisSingleton, setupData, getCurTimestamp()
+        ])
+        return [{
+            to: contracts.safeGnosisDeploy,
+            data: data,
+            value: "0",
+            stoppable: false,
+            confirmations: 1,
+            name: "zkSyncCreateSafe_do"
+        }]
+    } catch (e) {
+        globalLogger.connect(wallet.getAddress(), chain).warn(`zkSyncCreateSafe_do failed: ${e}`)
+        return []
+    }
+}
+
+export async function zkSyncZerolendCycle_deposit(wallet: WalletI): Promise<TxInteraction[]> {
+    try {
+        let balancePercent = [10, 25]
+        const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+        let depoContract = new ethers.Contract(contracts.zerolendDepo, zerolend, provider)
+        let data: string = depoContract.interface.encodeFunctionData("depositETH", [contracts.zerolendPool, wallet.getAddress(), 0])
+        let tokenBalance: bigint = await provider.getBalance(wallet.getAddress())
+        tokenBalance = getRandomizedPercent(tokenBalance, balancePercent[0], balancePercent[1])
+        return [{
+            to: contracts.zerolendDepo,
+            data: data,
+            value: tokenBalance.toString(),
+            stoppable: false,
+            confirmations: 1,
+            name: "zkSyncZerolendCycle_deposit"
+        }]
+    } catch (e) {
+        globalLogger.connect(wallet.getAddress(), chain).warn(`zkSyncZerolendCycle_deposit failed: ${e}`)
+        return []
+    }
+}
+
+export async function zkSyncZerolendCycle_withdraw(wallet: WalletI): Promise<TxInteraction[]> {
+    try {
+        const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+        let tokenContract = new ethers.Contract(contracts.zerolendWrapped, erc20, provider)
+        let tokenBalance: bigint = await tokenContract.balanceOf(wallet.getAddress())
+
+        let txs: TxInteraction[] = await checkAndGetApprovalsInteraction(wallet.getAddress(), contracts.zerolendDepo, tokenBalance, tokenContract)
+
+        let depoContract = new ethers.Contract(contracts.zerolendDepo, zerolend, provider)
+        let data: string = depoContract.interface.encodeFunctionData("withdrawETH", [contracts.zerolendPool, MaxUint256, wallet.getAddress()])
+        txs.push({
+            to: contracts.zerolendDepo,
+            data: data,
+            value: "0",
+            stoppable: true,
+            confirmations: 1,
+            name: "zkSyncZerolendCycle_withdraw"
+        })
+        return txs
+    } catch (e) {
+        globalLogger.connect(wallet.getAddress(), chain).warn(`zkSyncZerolendCycle_withdraw failed: ${e}`)
+        return []
+    }
+}
+
+export async function zkSyncEmptyMulticall_do(wallet: WalletI): Promise<TxInteraction[]> {
+    try {
+        const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+        const contracts = [
+            "0x240D5645bFFAF6f8Bc3586e459A4155F270BCb3b", //derivio
+            "0x943ac2310D9BC703d6AB5e5e76876e212100f894", //izumi
+        ]
+        let contract = getRandomElement(contracts)
+
+        let curContract = new ethers.Contract(contract, allAbi, provider)
+        let data: string = curContract.interface.encodeFunctionData("multicall", [[]])
+        return [{
+            to: contract,
+            data: data,
+            value: "0",
+            stoppable: false,
+            confirmations: 1,
+            name: "zkSyncEmptyMulticall_do"
+        }]
+    } catch (e) {
+        globalLogger.connect(wallet.getAddress(), chain).warn(`zkSyncEmptyMulticall_do failed: ${e}`)
         return []
     }
 }

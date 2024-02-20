@@ -70,7 +70,7 @@ export async function maverickSwapNativeTo(
         })
         return txs
     } catch (e) {
-        globalLogger.connect(wallet.getAddress(), chain).warn(`${name} failed: ${e}`)
+        globalLogger.connect(wallet.getAddress(), chain).warn(`${name}-maverick failed: ${e}`)
         return []
     }
 }
@@ -120,7 +120,7 @@ export async function maverickSwapToNative(
         })
         return txs
     } catch (e) {
-        globalLogger.connect(wallet.getAddress(), chain).warn(`${name} failed: ${e}`)
+        globalLogger.connect(wallet.getAddress(), chain).warn(`${name}-maverick failed: ${e}`)
         return []
     }
 }
