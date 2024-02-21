@@ -367,7 +367,7 @@ function generateZkSyncRandomActivities(activitiesNum: number): ZkSyncActivity[]
             res.push(getRandomElement(lendingActivities))
         } else if (curActivity === ZkSyncActivity.zkSyncDummyRandomSwapCycle) {
             let lendingActivities: ZkSyncActivity[] = [
-                ZkSyncActivity.zkSyncTopSwapCycleNativeToUsdc, ZkSyncActivity.zkSyncSwapCycleNativeToUsdc
+                ZkSyncActivity.zkSyncSwapCycleNativeToWsteth, ZkSyncActivity.zkSyncSwapCycleNativeToUsdc
             ]
             res.push(getRandomElement(lendingActivities))
         } else if (curActivity === ZkSyncActivity.zkSyncDummyRandomStuff) {
