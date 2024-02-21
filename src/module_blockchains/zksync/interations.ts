@@ -349,7 +349,7 @@ export async function zkSyncRhinoCycle_deposit(wallet: WalletI): Promise<TxInter
         return [{
             to: contracts.rhinoDeposit,
             data: "0xdb6b5246",
-            value: balance.toString(),
+            value: parseEther(balance.toString()).toString(),
             stoppable: false,
             confirmations: 1,
             name: "zkSyncRhinoCycle_deposit"
