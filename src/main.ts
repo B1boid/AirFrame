@@ -54,11 +54,11 @@ async function doTask(password: string, passwordOkx: string, walletActions: Wall
                 const [status, sent] = action.connectionName === Connections.ExchangeOKX ?
                     await okxLock.acquire<[boolean, number]>("okxOp", async () => {
                         globalLogger.connect(wallet.getAddress(), ethereumChain).info("Enter OKX lock.")
-                        const res = await connectionModule.sendAsset(wallet, action.from, action.to, action.asset, action.amount, action.keepAmount || toBigInt(0))
+                        const res = await connectionModule.sendAsset(wallet, action.from, action.to, action.asset, action.amount, action.keepAmount || 0)
                         globalLogger.connect(wallet.getAddress(), ethereumChain).info("Exit OKX lock.")
                         return res
                     }) :
-                    await connectionModule.sendAsset(wallet, action.from, action.to, action.asset, action.amount, action.keepAmount || toBigInt(0))
+                    await connectionModule.sendAsset(wallet, action.from, action.to, action.asset, action.amount, action.keepAmount || 0)
                 actionsRes = status
                 if (firstSentAmount === -1) {
                     firstSentAmount = sent

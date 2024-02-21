@@ -205,7 +205,7 @@ function generateTypeVol(accInfo: ExtendedFeatures, actions: AnyActions[]): void
     }
     actions.push(SCROLL_ACTIONS)
 
-    backToOkx(accInfo, actions, toBigInt(0))
+    backToOkx(accInfo, actions, 0)
 
 }
 
@@ -255,7 +255,7 @@ function generateTypeCoolOrBomzh(accInfo: ExtendedFeatures, actions: AnyActions[
             asset: Asset.ETH,
             amount: -1,
             connectionName: Connections.Orbiter,
-            keepAmount: ethers.parseEther(zksyncAmount.toString())
+            keepAmount: zksyncAmount
         }
         actions.push(BRIDGE_ORBITER_ZKSYNC_TO_SCROLL)
     } else {
@@ -265,7 +265,7 @@ function generateTypeCoolOrBomzh(accInfo: ExtendedFeatures, actions: AnyActions[
             asset: Asset.ETH,
             amount: -1,
             connectionName: Connections.Orbiter,
-            keepAmount: ethers.parseEther(zksyncAmount.toString())
+            keepAmount: zksyncAmount
         }
         actions.push(BRIDGE_ORBITER_ZKSYNC_TO_OPT)
         actions.push(generateOptimismActivities(getRandomInt(1, 3)))
@@ -289,12 +289,12 @@ function generateTypeCoolOrBomzh(accInfo: ExtendedFeatures, actions: AnyActions[
     actions.push(SCROLL_ACTIONS)
 
     if (progonType === 1){
-        backToOkx(accInfo, actions, ethers.parseEther(scrollAmount.toString()))
+        backToOkx(accInfo, actions, scrollAmount)
     }
 }
 
 
-function backToOkx(accInfo: ExtendedFeatures, actions: AnyActions[], keepAmount: bigint): void {
+function backToOkx(accInfo: ExtendedFeatures, actions: AnyActions[], keepAmount: number): void {
 
     if (getRandomInt(0, 100) < 66){ // 66% chance to use optimism
         const BRIDGE_ORBITER_SCROLL_TO_OPTIMISM: ConnectionAction = {

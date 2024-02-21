@@ -259,7 +259,7 @@ export function getOkxCredentialsSubs( password: string): OkxCredentials[]{
 
 const ESTIMATE_GAS_LIMIT = BigInt(500_000) // берем сразу много, чтобы точно на любом чейне сработало. Нужно только для эстимейта, тк если эстимейтить с фул балансом, то падает тк не хватает средств на газ
 export async function getTxDataForAllBalanceTransfer(
-    wallet: WalletI, toAddress: string, asset: Asset, fromChain: Chain, extraGasLimit: number, defaultGasPrice: bigint, keepAmount: bigint
+    wallet: WalletI, toAddress: string, asset: Asset, fromChain: Chain, extraGasLimit: number, defaultGasPrice: bigint, keepAmount: number
 ): Promise<[bigint, TxInteraction]> {
     let provider: UnionProvider
     if (fromChain.title === Blockchains.ZkSync) {
@@ -303,9 +303,10 @@ export async function getTxDataForAllBalanceTransfer(
     }
     let amount = balance - l1Cost - BigInt(gasLimit) * (feeData.maxFeePerGas ?? defaultGasPrice)
 
-    if (keepAmount !== BigInt(0)){
-        keepAmount = (keepAmount > amount ? amount * BigInt(20) / BigInt(100) : keepAmount)
-        amount = amount - keepAmount;
+    if (keepAmount !== 0){
+        let _keepAmount = ethers.parseEther(keepAmount.toString())
+        _keepAmount = (_keepAmount > amount ? amount * BigInt(20) / BigInt(100) : _keepAmount)
+        amount = amount - _keepAmount;
         globalLogger
             .connect(wallet.getAddress(), fromChain)
             .info(`ZkSync keep amount: ${keepAmount.toString()}. To transfer: ${amount.toString()}`)

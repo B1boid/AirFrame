@@ -34,7 +34,7 @@ enum DepositWithdrawType {
 }
 
 class OkxConnectionModule implements ConnectionModule {
-    async sendAsset(wallet: WalletI, from: Destination, to: Destination, asset: Asset, amount: number, keepAmount: bigint): Promise<[boolean, number]> {
+    async sendAsset(wallet: WalletI, from: Destination, to: Destination, asset: Asset, amount: number, keepAmount: number): Promise<[boolean, number]> {
         if (from === Destination.OKX) {
             const chain: Chain = destToChain(to)
             const fee: string = await this.getMinFee(wallet, asset, chain.title)
@@ -146,13 +146,14 @@ class OkxConnectionModule implements ConnectionModule {
         throw new Error(`No OKX destination was found. From: ${from}. To: ${to}. Check configs.`)
     }
 
-    private async buildTransferToOkx(wallet: WalletI, amount: number, withdrawAddress: string, asset: Asset, chain: Chain, extraGasLimit: number, defaultGasPrice: bigint, keepAmount: bigint): Promise<[bigint, TxInteraction]> {
+    private async buildTransferToOkx(wallet: WalletI, amount: number, withdrawAddress: string, asset: Asset, chain: Chain, extraGasLimit: number, defaultGasPrice: bigint, keepAmount: number): Promise<[bigint, TxInteraction]> {
         if (amount === -1) {
             return await getTxDataForAllBalanceTransfer(wallet, withdrawAddress, asset, chain, extraGasLimit, defaultGasPrice, keepAmount)
         } else {
             let bigAmount = ethers.parseEther(`${amount}`)
-            if (keepAmount !== toBigInt(0)){
-                bigAmount = bigAmount - (keepAmount > bigAmount ? bigAmount * BigInt(20) / BigInt(100) : keepAmount)
+            if (keepAmount !== 0){
+                let _keepAmount = ethers.parseEther(keepAmount.toString())
+                bigAmount = bigAmount - (_keepAmount > bigAmount ? bigAmount * BigInt(20) / BigInt(100) : _keepAmount)
                 globalLogger
                     .connect(wallet.getAddress(), chain)
                     .info(`Keep amount: ${keepAmount.toString()}. To transfer: ${bigAmount.toString()}`)

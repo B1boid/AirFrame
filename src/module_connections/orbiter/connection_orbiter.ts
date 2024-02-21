@@ -14,7 +14,7 @@ const DEFAULT_GAS_PRICE = ethers.parseUnits("20", "gwei")
 const ETH_BRIDGE_ROUTER = "0x80C67432656d59144cEFf962E8fAF8926599bCF8"
 
 class OrbiterConnectionModule implements ConnectionModule {
-    async sendAsset(wallet: WalletI, from: Destination, to: Destination, asset: Asset, amount: number, keepAmount: bigint): Promise<[boolean, number]> {
+    async sendAsset(wallet: WalletI, from: Destination, to: Destination, asset: Asset, amount: number, keepAmount: number): Promise<[boolean, number]> {
         const chainFrom: Chain = destToChain(from)
         const chainTo: Chain = destToChain(to)
         const logger = globalLogger.connect(wallet.getAddress(), chainFrom)
@@ -38,8 +38,9 @@ class OrbiterConnectionModule implements ConnectionModule {
             transferTx.value = transferTx.value.substring(0, transferTx.value.length - 4) + chainTo.orbiterCode.toString()
         } else {
             bigAmount = ethers.parseEther(`${amount}`)
-            if (keepAmount !== toBigInt(0)){
-                bigAmount = bigAmount - (keepAmount > bigAmount ? bigAmount * BigInt(20) / BigInt(100) : keepAmount)
+            if (keepAmount !== 0){
+                let _keepAmount = ethers.parseEther(keepAmount.toString())
+                bigAmount = bigAmount - (_keepAmount > bigAmount ? bigAmount * BigInt(20) / BigInt(100) : _keepAmount)
                 globalLogger
                     .connect(wallet.getAddress(), chainFrom)
                     .info(`Keep amount: ${keepAmount.toString()}. To transfer: ${bigAmount.toString()}`)
