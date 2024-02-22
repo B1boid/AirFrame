@@ -14,7 +14,8 @@ import {
     zkSyncRandomApprove_approve,
     zkSyncReactFusionCycle_supply,
     zkSyncReactFusionCycle_withdraw,
-    zkSyncReactFusionInit_enter, zkSyncRhinoCycle_deposit,
+    zkSyncReactFusionInit_enter,
+    zkSyncRhinoCycle_deposit, zkSyncSimpleSwap_do,
     zkSyncSwapCycleNativeToUsdc_swapback,
     zkSyncSwapCycleNativeToUsdc_swapto,
     zkSyncSwapCycleNativeToWsteth_swapback,
@@ -34,6 +35,13 @@ export const zkSyncWrapUnwrap: Activity = {
     txs: [
         zkSyncWrapUnwrap_wrap,
         zkSyncWrapUnwrap_unwrap
+    ]
+}
+
+export const zkSyncSimpleSwap: Activity = {
+    name: ZkSyncActivity.zkSyncSimpleSwap,
+    txs: [
+        zkSyncSimpleSwap_do
     ]
 }
 

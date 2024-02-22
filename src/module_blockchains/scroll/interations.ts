@@ -93,6 +93,33 @@ export async function scrollEmptyRouter_do(wallet: WalletI): Promise<TxInteracti
     }
 }
 
+export async function scrollSimpleSwap_do(wallet: WalletI): Promise<TxInteraction[]> {
+    const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+    let usdcToken = new ethers.Contract(tokens.USDC, ERC20_ABI, provider)
+    let usdcBalance: bigint = await usdcToken.balanceOf(wallet.getAddress())
+    if (usdcBalance > 0){
+        return await commonSwap(tokens.USDC, tokens.ETH, {fullBalance: true},
+            [Dexes.SyncSwap, Dexes.Ambient],
+            wallet, chain, contracts, tokens,"scrollSwapCycleNativeToUsdc_swapback", true)
+    }
+    let wstToken = new ethers.Contract(tokens.WSTETH, ERC20_ABI, provider)
+    let wstBalance: bigint = await wstToken.balanceOf(wallet.getAddress())
+    if (wstBalance > 0){
+        return await commonSwap(tokens.WSTETH, tokens.ETH, {fullBalance: true},
+            [Dexes.SyncSwap, Dexes.Ambient],
+            wallet, chain, contracts, tokens,"scrollSwapCycleNativeToWsteth_swapback", true)
+    }
+    if (getRandomInt(1, 100) > 50){
+        return await commonSwap(tokens.ETH, tokens.USDC, {balancePercent: [4, 8]},
+            [Dexes.SyncSwap, Dexes.Ambient],
+            wallet, chain, contracts, tokens, "scrollSwapCycleNativeToUsdc_swapto")
+    } else {
+        return await commonSwap(tokens.ETH, tokens.WSTETH, {balancePercent: [4, 8]},
+            [Dexes.SyncSwap, Dexes.Ambient],
+            wallet, chain, contracts, tokens, "scrollSwapCycleNativeToWsteth_swapto")
+    }
+}
+
 export async function scrollSwapCycleNativeToUsdc_swapto(wallet: WalletI): Promise<TxInteraction[]> {
     return await commonSwap(tokens.ETH, tokens.USDC, {balancePercent: [4, 8]},
         [Dexes.SyncSwap, Dexes.Ambient],

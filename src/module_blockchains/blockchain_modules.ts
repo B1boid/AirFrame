@@ -40,7 +40,8 @@ export const enum ZkSyncActivity {
     zkSyncCreateSafe = "zkSyncCreateSafe",
     zkSyncZerolendCycle = "zkSyncZerolendCycle",
     zkSyncEmptyMulticall = "zkSyncEmptyMulticall",
-    zkSyncRhinoDeposit = "zkSyncRhinoDeposit"
+    zkSyncRhinoDeposit = "zkSyncRhinoDeposit",
+    zkSyncSimpleSwap = "zkSyncSimpleSwap"
 }
 
 export const enum EthereumActivity {
@@ -99,7 +100,8 @@ export const enum ScrollActivity {
     scrollInteractWithContract = "scrollInteractWithContract",
 
     scrollDummyLendingCycle = "scrollDummyLendingCycle",
-    scrollDummySwapCycle = "scrollDummySwapCycle"
+    scrollDummySwapCycle = "scrollDummySwapCycle",
+    scrollSimpleSwap = "scrollSimpleSwap"
 }
 
 export const enum LineaActivity {

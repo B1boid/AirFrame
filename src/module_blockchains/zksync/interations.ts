@@ -17,6 +17,7 @@ import {checkAndGetApprovalsInteraction, getRandomApprove} from "../../common_bl
 import safe from "../../abi/safe.json";
 import zerolend from "../../abi/aave.json";
 import erc20 from "../../abi/erc20.json";
+import {ERC20_ABI} from "../../ambient";
 
 
 let tokens = zkSyncTokens
@@ -61,6 +62,33 @@ export async function zkSyncWrapUnwrap_unwrap(wallet: WalletI): Promise<TxIntera
     } catch (e) {
         globalLogger.connect(wallet.getAddress(), chain).warn(`zkSyncWrapUnwrap_unwrap failed: ${e}`)
         return []
+    }
+}
+
+export async function zkSyncSimpleSwap_do(wallet: WalletI): Promise<TxInteraction[]> {
+    const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+    let usdcToken = new ethers.Contract(tokens.USDC, ERC20_ABI, provider)
+    let usdcBalance: bigint = await usdcToken.balanceOf(wallet.getAddress())
+    if (usdcBalance > 0){
+        return await commonSwap(tokens.USDC, tokens.ETH, {fullBalance: true},
+            [Dexes.SyncSwap, Dexes.Mute, Dexes.Woofi, Dexes.Maverick, Dexes.Pancake],
+            wallet, chain, contracts, tokens,"zkSyncSwapCycleNativeToUsdc_swapback", true)
+    }
+    let wstToken = new ethers.Contract(tokens.WSTETH, ERC20_ABI, provider)
+    let wstBalance: bigint = await wstToken.balanceOf(wallet.getAddress())
+    if (wstBalance > 0){
+        return await commonSwap(tokens.WSTETH, tokens.ETH, {fullBalance: true},
+            [Dexes.SyncSwap, Dexes.Maverick],
+            wallet, chain, contracts, tokens,"zkSyncSwapCycleNativeToWsteth_swapback", true)
+    }
+    if (getRandomInt(1, 100) > 50){
+        return await commonSwap(tokens.ETH, tokens.USDC, {balancePercent: [10, 30]},
+            [Dexes.SyncSwap, Dexes.Mute, Dexes.Woofi, Dexes.Maverick, Dexes.Pancake],
+            wallet, chain, contracts, tokens, "zkSyncSwapCycleNativeToUsdc_swapto")
+    } else {
+        return await commonSwap(tokens.ETH, tokens.WSTETH, {balancePercent: [10, 30]},
+            [Dexes.SyncSwap, Dexes.Maverick],
+            wallet, chain, contracts, tokens, "zkSyncSwapCycleNativeToWsteth_swapto")
     }
 }
 

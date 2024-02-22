@@ -2,6 +2,7 @@ import {AnyActions, ModuleActions, Randomness, WalletActions} from "../classes/a
 import {ScrollActivity, ZkSyncActivity} from "../module_blockchains/blockchain_modules";
 import {getRandomElement, getRandomInt} from "../utils/utils";
 import {Blockchains} from "../config/chains";
+import {scrollSimpleSwap} from "../module_blockchains/scroll/activities";
 
 export async function buildZkSyncMains(activeAddresses: string[]): Promise<WalletActions[]> {
     let res: WalletActions[] = []
@@ -27,11 +28,11 @@ function generateScroll(): ModuleActions {
 function generateScrollActivities(activitiesNum: number): ScrollActivity[] {
     let availableActivities: ScrollActivity[] = [
         ScrollActivity.scrollDmail,
-        ScrollActivity.scrollWrapUnwrap,
         ScrollActivity.scrollRandomStuff,
-        ScrollActivity.scrollRandomApprove,
         ScrollActivity.scrollEmptyRouter,
-        ScrollActivity.scrollSwapCycleNativeToUsdc
+        ScrollActivity.scrollDummyLendingCycle,
+        ScrollActivity.scrollDummySwapCycle,
+        ScrollActivity.scrollCreateSafe
     ]
 
     let res: ScrollActivity[] = []
@@ -44,7 +45,20 @@ function generateScrollActivities(activitiesNum: number): ScrollActivity[] {
                 break
             }
         }
-        res.push(curActivity)
+        if (curActivity === ScrollActivity.scrollDummySwapCycle) {
+            let swapActivities: ScrollActivity[] = [
+                ScrollActivity.scrollSimpleSwap
+            ]
+            res.push(getRandomElement(swapActivities))
+        } else if (curActivity === ScrollActivity.scrollDummyLendingCycle) {
+            let lendingActivities: ScrollActivity[] = [
+                ScrollActivity.scrollLayerbankCycle, // ScrollActivity.scrollAaveCycle,
+            ]
+            res.push(getRandomElement(lendingActivities))
+        } else {
+            res.push(curActivity)
+        }
+
         repeatedActivities.push(curActivity)
     }
     return res
@@ -54,22 +68,22 @@ function generateScrollActivities(activitiesNum: number): ScrollActivity[] {
 function generateZkSync(): ModuleActions {
     let activities: ZkSyncActivity[]
 
-    activities = generateZkSyncRandomActivities(getRandomInt(1, 2))
+    activities = generateZkSyncRandomActivities(getRandomInt(2, 3))
     // if (getRandomInt(0, 100) < 85) { // 85% chance to mint tevaera
     //     activities.push(ZkSyncActivity.zkSyncMintTevaera)
     // }
     // if (getRandomInt(0, 100) < 65) { // 65% chance to mint znsid
     //     activities.push(ZkSyncActivity.zkSyncMintZnsId)
     // }
-    if (getRandomInt(0, 100) < 10) { // 25% chance to enterMarketsZkEra
-        activities.push(ZkSyncActivity.zkSyncEraLendInit)
-    }
-    if (getRandomInt(0, 100) < 10) { // 25% chance to enterMarketsReactFusion
-        activities.push(ZkSyncActivity.zkSyncReactFusionInit)
-    }
-    if (getRandomInt(0, 100) < 10) { // 25% chance to mint test tokens
-        activities.push(ZkSyncActivity.zkSyncSynFuturesTest)
-    }
+    // if (getRandomInt(0, 100) < 10) { // 25% chance to enterMarketsZkEra
+    //     activities.push(ZkSyncActivity.zkSyncEraLendInit)
+    // }
+    // if (getRandomInt(0, 100) < 10) { // 25% chance to enterMarketsReactFusion
+    //     activities.push(ZkSyncActivity.zkSyncReactFusionInit)
+    // }
+    // if (getRandomInt(0, 100) < 10) { // 25% chance to mint test tokens
+    //     activities.push(ZkSyncActivity.zkSyncSynFuturesTest)
+    // }
 
     return {
         chainName: Blockchains.ZkSync,
@@ -81,11 +95,10 @@ function generateZkSync(): ModuleActions {
 
 function generateZkSyncRandomActivities(activitiesNum: number): ZkSyncActivity[] {
     let availableActivities: ZkSyncActivity[] = [
-        ZkSyncActivity.zkSyncRandomApprove,
-        ZkSyncActivity.zkSyncDmail,
         ZkSyncActivity.zkSyncDummyRandomSwapCycle,
-        ZkSyncActivity.zkSyncDummyRandomSwapCycle,
-        ZkSyncActivity.zkSyncDummyRandomLending
+        ZkSyncActivity.zkSyncDummyRandomLending,
+        ZkSyncActivity.zkSyncDummyRandomStuff,
+        ZkSyncActivity.zkSyncEmptyMulticall,
     ]
     let res: ZkSyncActivity[] = []
     let repeatedActivities: ZkSyncActivity[] = []
@@ -99,12 +112,19 @@ function generateZkSyncRandomActivities(activitiesNum: number): ZkSyncActivity[]
         }
         if (curActivity === ZkSyncActivity.zkSyncDummyRandomLending) {
             let lendingActivities: ZkSyncActivity[] = [
-                ZkSyncActivity.zkSyncParaspaceCycle, ZkSyncActivity.zkSyncEraLendCycle, ZkSyncActivity.zkSyncReactFusionCycle
+                ZkSyncActivity.zkSyncReactFusionCycle, ZkSyncActivity.zkSyncEraLendCycle, ZkSyncActivity.zkSyncZerolendCycle
             ]
             res.push(getRandomElement(lendingActivities))
         } else if (curActivity === ZkSyncActivity.zkSyncDummyRandomSwapCycle) {
             let lendingActivities: ZkSyncActivity[] = [
-                ZkSyncActivity.zkSyncTopSwapCycleNativeToUsdc, ZkSyncActivity.zkSyncSwapCycleNativeToUsdc
+                ZkSyncActivity.zkSyncSimpleSwap
+            ]
+            res.push(getRandomElement(lendingActivities))
+        } else if (curActivity === ZkSyncActivity.zkSyncDummyRandomStuff) {
+            let lendingActivities: ZkSyncActivity[] = [
+                ZkSyncActivity.zkSyncDmail, ZkSyncActivity.zkSyncDmail,
+                ZkSyncActivity.zkSyncCreateSafe,
+                ZkSyncActivity.zkSyncRhinoDeposit, ZkSyncActivity.zkSyncRhinoDeposit
             ]
             res.push(getRandomElement(lendingActivities))
         } else {

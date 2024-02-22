@@ -1,23 +1,25 @@
 import {Activity} from "../../classes/module";
-import {OptimismActivity, ScrollActivity} from "../blockchain_modules";
+import {ScrollActivity} from "../blockchain_modules";
 import {
-    scrollAaveCycle_deposit, scrollAaveCycle_withdraw, scrollCreateSafe_do,
+    scrollAaveCycle_deposit,
+    scrollAaveCycle_withdraw,
+    scrollCreateSafe_do,
     scrollDeployAndInteract_deploy,
     scrollDeployAndInteract_interact,
     scrollDmail_send,
-    scrollEmptyRouter_do, scrollLayerbankCycle_supply, scrollLayerbankCycle_withdraw,
+    scrollEmptyRouter_do,
+    scrollLayerbankCycle_supply,
+    scrollLayerbankCycle_withdraw,
     scrollOffMint_mint,
     scrollRandomApprove_approve,
-    scrollRandomStuff_do,
+    scrollRandomStuff_do, scrollSimpleSwap_do,
     scrollSwapCycleNativeToUsdc_swapback,
     scrollSwapCycleNativeToUsdc_swapto,
-    scrollSwapCycleNativeToWsteth_swapback, scrollSwapCycleNativeToWsteth_swapto,
+    scrollSwapCycleNativeToWsteth_swapback,
+    scrollSwapCycleNativeToWsteth_swapto,
     scrollWrapUnwrap_unwrap,
     scrollWrapUnwrap_wrap
 } from "./interations";
-import {optAaveCycle_deposit, optAaveCycle_withdraw} from "../optimism/interations";
-
-
 
 
 export const scrollRandomApprove: Activity = {
@@ -38,6 +40,13 @@ export const scrollEmptyRouter: Activity = {
     name: ScrollActivity.scrollEmptyRouter,
     txs: [
         scrollEmptyRouter_do
+    ]
+}
+
+export const scrollSimpleSwap: Activity = {
+    name: ScrollActivity.scrollSimpleSwap,
+    txs: [
+        scrollSimpleSwap_do
     ]
 }
 
