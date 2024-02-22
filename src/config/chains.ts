@@ -82,7 +82,7 @@ export const arbitrumChain: Chain = {
 export const scrollChain: Chain = {
     title: Blockchains.Scroll,
     chainId: 534352,
-    nodeUrl: `${process.env.QUICKNODE_RPC}`,
+    nodeUrl: `${process.env.CHAINSTACK_RPC}`,
     symbol: "ETH",
     extraGasLimit: 50000,
     explorerUrl: "https://scrollscan.com",
