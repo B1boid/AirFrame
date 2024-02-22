@@ -196,7 +196,7 @@ function generateTypeVol(accInfo: ExtendedFeatures, actions: AnyActions[]): void
     }
     actions.push(BRIDGE_ORBITER_ZKSYNC_TO_SCROLL)
 
-    let scroll_activities: ScrollActivity[] = generateScrollActivities(getRandomInt(2, 3))
+    let scroll_activities: ScrollActivity[] = generateScrollActivities(getRandomInt(2, 3), true)
     scroll_activities.push(ScrollActivity.scrollInteractWithContract)
     const SCROLL_ACTIONS: ModuleActions = {
         chainName: Blockchains.Scroll,
@@ -279,7 +279,8 @@ function generateTypeCoolOrBomzh(accInfo: ExtendedFeatures, actions: AnyActions[
         actions.push(BRIDGE_ORBITER_OPT_TO_SCROLL)
     }
 
-    let scroll_activities: ScrollActivity[] = generateScrollActivities(getRandomInt(2, 3))
+    let isBigBalance = (accInfo.scrollBalance > ethers.parseEther("0.1"));
+    let scroll_activities: ScrollActivity[] = generateScrollActivities(getRandomInt(2, 3), isBigBalance)
     scroll_activities.push(ScrollActivity.scrollInteractWithContract)
     const SCROLL_ACTIONS: ModuleActions = {
         chainName: Blockchains.Scroll,
@@ -372,7 +373,9 @@ function generateZkSyncRandomActivities(activitiesNum: number): ZkSyncActivity[]
             res.push(getRandomElement(lendingActivities))
         } else if (curActivity === ZkSyncActivity.zkSyncDummyRandomStuff) {
             let lendingActivities: ZkSyncActivity[] = [
-                ZkSyncActivity.zkSyncDmail, ZkSyncActivity.zkSyncCreateSafe, ZkSyncActivity.zkSyncRhinoDeposit
+                ZkSyncActivity.zkSyncDmail, ZkSyncActivity.zkSyncDmail, // 2x
+                ZkSyncActivity.zkSyncRhinoDeposit, ZkSyncActivity.zkSyncRhinoDeposit, // 2x
+                ZkSyncActivity.zkSyncCreateSafe
             ]
             res.push(getRandomElement(lendingActivities))
         } else {
@@ -383,7 +386,7 @@ function generateZkSyncRandomActivities(activitiesNum: number): ZkSyncActivity[]
     return res
 }
 
-function generateScrollActivities(activitiesNum: number): ScrollActivity[] {
+function generateScrollActivities(activitiesNum: number, bigBalance: boolean = false): ScrollActivity[] {
     let availableActivities: ScrollActivity[] = [
         ScrollActivity.scrollDmail,
         ScrollActivity.scrollRandomStuff,
@@ -392,6 +395,13 @@ function generateScrollActivities(activitiesNum: number): ScrollActivity[] {
         ScrollActivity.scrollDummySwapCycle,
         ScrollActivity.scrollCreateSafe
     ]
+    if (bigBalance){
+        availableActivities.push(ScrollActivity.scrollDummyLendingCycle)
+        availableActivities.push(ScrollActivity.scrollDummyLendingCycle)
+        availableActivities.push(ScrollActivity.scrollDummySwapCycle)
+        availableActivities.push(ScrollActivity.scrollDummySwapCycle)
+        availableActivities.push(ScrollActivity.scrollDummySwapCycle)
+    }
 
     let res: ScrollActivity[] = []
     let repeatedActivities: ScrollActivity[] = []
@@ -410,7 +420,7 @@ function generateScrollActivities(activitiesNum: number): ScrollActivity[] {
             res.push(getRandomElement(swapActivities))
         } else if (curActivity === ScrollActivity.scrollDummyLendingCycle) {
             let lendingActivities: ScrollActivity[] = [
-                ScrollActivity.scrollAaveCycle, ScrollActivity.scrollLayerbankCycle
+                ScrollActivity.scrollLayerbankCycle, //reached limit: ScrollActivity.scrollAaveCycle,
             ]
             res.push(getRandomElement(lendingActivities))
         } else {

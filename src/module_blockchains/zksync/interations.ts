@@ -65,7 +65,7 @@ export async function zkSyncWrapUnwrap_unwrap(wallet: WalletI): Promise<TxIntera
 }
 
 export async function zkSyncSwapCycleNativeToUsdc_swapto(wallet: WalletI): Promise<TxInteraction[]> {
-    return await commonSwap(tokens.ETH, tokens.USDC, {balancePercent: [5, 15]},
+    return await commonSwap(tokens.ETH, tokens.USDC, {balancePercent: [10, 30]},
         [Dexes.SyncSwap, Dexes.Mute, Dexes.Woofi, Dexes.Maverick, Dexes.Pancake],
         wallet, chain, contracts, tokens, "zkSyncSwapCycleNativeToUsdc_swapto")
 }
@@ -77,7 +77,7 @@ export async function zkSyncSwapCycleNativeToUsdc_swapback(wallet: WalletI): Pro
 }
 
 export async function zkSyncSwapCycleNativeToWsteth_swapto(wallet: WalletI): Promise<TxInteraction[]> {
-    return await commonSwap(tokens.ETH, tokens.WSTETH, {balancePercent: [5, 10]},
+    return await commonSwap(tokens.ETH, tokens.WSTETH, {balancePercent: [10, 30]},
         [Dexes.SyncSwap, Dexes.Maverick],
         wallet, chain, contracts, tokens, "zkSyncSwapCycleNativeToWsteth_swapto")
 }

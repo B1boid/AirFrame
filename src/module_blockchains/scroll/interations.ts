@@ -26,7 +26,7 @@ const SCROLL_DEPLOY_ADDRESSES_FOLDER = "scroll_meta/scroll_contracts_addresses/"
 
 export async function scrollRandomApprove_approve(wallet: WalletI): Promise<TxInteraction[]> {
     let rndTokens: string[] = [
-        tokens.DAI, tokens.USDT, tokens.WSTETH, tokens.WBTC
+        tokens.DAI, tokens.USDT, tokens.WBTC
     ]
     let rndSpenders: string[] = [
         contracts.kyberSwapRouter, contracts.syncSwapRouter, contracts.iziRouter
