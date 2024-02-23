@@ -32,7 +32,7 @@ export const Destination = {...Blockchains, ...Exchanges};
 export const zkSyncChain: Chain = {
   title: Blockchains.ZkSync,
   chainId: 324,
-  nodeUrl: "https://mainnet.era.zksync.io",
+  nodeUrl: `${process.env.ZK_CHAINSTACK_RPC}`,
   symbol: "ETH",
   extraGasLimit: 100000,
   explorerUrl: "https://explorer.zksync.io",
