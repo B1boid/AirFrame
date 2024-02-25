@@ -10,6 +10,7 @@ package-lock.json
 .subs
 .okx
 .accs_TODO
+class.py
 .mainaccs
 .mega_accs
 .mega_accs_tmp
