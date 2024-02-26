@@ -268,26 +268,7 @@ export async function getTxDataForAllBalanceTransfer(
         provider = new ethers.JsonRpcProvider(fromChain.nodeUrl, fromChain.chainId)
     }
 
-    const balanceOr: bigint | BigNumber | null = await retry(async () => {
-        try {
-            return await provider.getBalance(wallet.getAddress())
-        } catch {
-            await sleep(5 * 60)
-            return null
-        }
-    }, MAX_TRIES)
-
-    if (balanceOr === null) {
-        throw new Error("Failed to fetch balance for all transfer.")
-    }
-
-    let balance: bigint
-    if (balanceOr instanceof BigNumber) {
-        balance = balanceOr.toBigInt()
-    } else {
-        balance = balanceOr
-    }
-
+    const balance = await getChainBalance(wallet.getAddress(), fromChain)
 
     globalLogger
         .connect(wallet.getAddress(), fromChain)
@@ -315,6 +296,37 @@ export async function getTxDataForAllBalanceTransfer(
     txTransferToWithdrawAddress = getTxForTransfer(asset, toAddress, amount)
     txTransferToWithdrawAddress.feeData = feeData
     return [amount, txTransferToWithdrawAddress]
+}
+
+export async function getChainBalance(address: string, fromChain: Chain): Promise<bigint> {
+    let provider: UnionProvider
+    if (fromChain.title === Blockchains.ZkSync) {
+        provider = new zk.Provider(fromChain.nodeUrl)
+    } else {
+        provider = new ethers.JsonRpcProvider(fromChain.nodeUrl, fromChain.chainId)
+    }
+
+    const balanceOr: bigint | BigNumber | null = await retry(async () => {
+        try {
+            return await provider.getBalance(address)
+        } catch {
+            await sleep(5 * 60)
+            return null
+        }
+    }, MAX_TRIES)
+
+    if (balanceOr === null) {
+        throw new Error("Failed to fetch balance for all transfer.")
+    }
+
+    let balance: bigint
+    if (balanceOr instanceof BigNumber) {
+        balance = balanceOr.toBigInt()
+    } else {
+        balance = balanceOr
+    }
+
+    return balance
 }
 
 export function bigMax(a: bigint, b: bigint): bigint {

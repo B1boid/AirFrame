@@ -8,7 +8,8 @@ export interface Chain {
   symbol: string
   extraGasLimit: number
   explorerUrl: string
-  orbiterCode?: number
+  nitroConnectionId: string
+  orbiterCode?: number,
 }
 export enum Blockchains {
     ZkSync = "ZkSync",
@@ -36,7 +37,8 @@ export const zkSyncChain: Chain = {
   symbol: "ETH",
   extraGasLimit: 100000,
   explorerUrl: "https://explorer.zksync.io",
-  orbiterCode: 9014
+  orbiterCode: 9014,
+  nitroConnectionId: "324"
 }
 
 export const polygonChain: Chain = {
@@ -46,7 +48,8 @@ export const polygonChain: Chain = {
   symbol: "MATIC",
   extraGasLimit: 100000,
   explorerUrl: "https://polygonscan.com",
-  orbiterCode: 9006
+  orbiterCode: 900,
+  nitroConnectionId: "137"
 }
 
 export const ethereumChain: Chain = {
@@ -56,7 +59,8 @@ export const ethereumChain: Chain = {
     symbol: "ETH",
     extraGasLimit: 100000,
     explorerUrl: "https://etherscan.io",
-    orbiterCode: 9001
+    orbiterCode: 9001,
+    nitroConnectionId: "1"
 }
 
 export const optimismChain: Chain = {
@@ -66,7 +70,8 @@ export const optimismChain: Chain = {
     symbol: "ETH",
     extraGasLimit: 0,
     explorerUrl: "https://optimistic.etherscan.io",
-    orbiterCode: 9007
+    orbiterCode: 9007,
+    nitroConnectionId: "10"
 }
 
 export const arbitrumChain: Chain = {
@@ -76,7 +81,8 @@ export const arbitrumChain: Chain = {
     symbol: "ETH",
     extraGasLimit: 0,
     explorerUrl: "https://arbiscan.io",
-    orbiterCode: 9002
+    orbiterCode: 9002,
+    nitroConnectionId: "42161"
 }
 
 export const scrollChain: Chain = {
@@ -86,7 +92,8 @@ export const scrollChain: Chain = {
     symbol: "ETH",
     extraGasLimit: 50000,
     explorerUrl: "https://scrollscan.com",
-    orbiterCode: 9019
+    orbiterCode: 9019,
+    nitroConnectionId: "534352"
 }
 
 export const bscChain: Chain = {
@@ -96,7 +103,8 @@ export const bscChain: Chain = {
     symbol: "BNB",
     extraGasLimit: 0,
     explorerUrl: "https://bscscan.com",
-    orbiterCode: 9015
+    orbiterCode: 9015,
+    nitroConnectionId: "56"
 }
 
 export const lineaChain: Chain = {
@@ -106,5 +114,6 @@ export const lineaChain: Chain = {
     symbol: "ETH",
     extraGasLimit: 0,
     explorerUrl: "https://lineascan.build",
-    orbiterCode: -1
+    orbiterCode: -1,
+    nitroConnectionId: "59144"
 }

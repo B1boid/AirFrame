@@ -157,11 +157,20 @@ const CONNECTION_SCROLL_TO_OPTIMISM: ConnectionAction = {
     connectionName: Connections.Orbiter
 }
 
+const CONNECTION_ZKSYNC_TO_SCROLL_NITRO: ConnectionAction = {
+    from: Destination.ZkSync,
+    to: Destination.Scroll,
+    asset: Asset.ETH,
+    amount: -1,
+    connectionName: Connections.Universal
+}
+
 
 const ACTIONS_1: AnyActions[] =  [
-        CONNECTION_OKX_TO_ZKSYNC,
-        CONNECTION_ZKSYNC_TO_OPTIMISM,
-        CONNECTION_OPTIMISM_TO_OKX
+    CONNECTION_ZKSYNC_TO_SCROLL_NITRO
+        // CONNECTION_OKX_TO_ZKSYNC,
+        // CONNECTION_ZKSYNC_TO_OPTIMISM,
+        // CONNECTION_OPTIMISM_TO_OKX
         // CONNECTION_ZKSYNC_TO_SCROLL,
         // SCROLL_ACTIONS,
         // CONNECTION_SCROLL_TO_OPTIMISM,
