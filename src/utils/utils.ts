@@ -268,7 +268,7 @@ export async function getTxDataForAllBalanceTransfer(
         provider = new ethers.JsonRpcProvider(fromChain.nodeUrl, fromChain.chainId)
     }
 
-    const balance = await getChainBalance(wallet, fromChain)
+    const balance = await getChainBalance(wallet.getAddress(), fromChain)
 
     globalLogger
         .connect(wallet.getAddress(), fromChain)
@@ -298,7 +298,7 @@ export async function getTxDataForAllBalanceTransfer(
     return [amount, txTransferToWithdrawAddress]
 }
 
-export async function getChainBalance(wallet: WalletI, fromChain: Chain): Promise<bigint> {
+export async function getChainBalance(address: string, fromChain: Chain): Promise<bigint> {
     let provider: UnionProvider
     if (fromChain.title === Blockchains.ZkSync) {
         provider = new zk.Provider(fromChain.nodeUrl)
@@ -308,7 +308,7 @@ export async function getChainBalance(wallet: WalletI, fromChain: Chain): Promis
 
     const balanceOr: bigint | BigNumber | null = await retry(async () => {
         try {
-            return await provider.getBalance(wallet.getAddress())
+            return await provider.getBalance(address)
         } catch {
             await sleep(5 * 60)
             return null

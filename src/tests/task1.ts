@@ -162,8 +162,7 @@ const CONNECTION_ZKSYNC_TO_SCROLL_NITRO: ConnectionAction = {
     to: Destination.Scroll,
     asset: Asset.ETH,
     amount: -1,
-    connectionName: Connections.Nitro,
-    keepAmount: 0.01
+    connectionName: Connections.Universal
 }
 
 

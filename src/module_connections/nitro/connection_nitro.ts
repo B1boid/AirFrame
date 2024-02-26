@@ -24,7 +24,7 @@ class NitroConnectionModule implements ConnectionModule {
         
         let bigAmount: bigint;
         if (amount === -1) {
-            bigAmount = await getChainBalance(wallet, chainFrom)
+            bigAmount = await getChainBalance(wallet.getAddress(), chainFrom)
             if (keepAmount !== 0){
                 let _keepAmount = ethers.parseEther(keepAmount.toString())
                 bigAmount = bigAmount - (_keepAmount > bigAmount ? bigAmount * BigInt(20) / BigInt(100) : _keepAmount)
@@ -42,7 +42,7 @@ class NitroConnectionModule implements ConnectionModule {
                     .info(`Keep amount: ${keepAmount.toString()}. To transfer: ${bigAmount.toString()}`)
             }
         }
-        const balanceToBefore = await getChainBalance(wallet, chainTo)
+        const balanceToBefore = await getChainBalance(wallet.getAddress(), chainTo)
 
         // estimate gasLimit/gasPrice
         const quoteEstimate = await this.getQuote(bigAmount, chainFrom, chainTo)
