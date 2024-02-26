@@ -32,7 +32,7 @@ export const Destination = {...Blockchains, ...Exchanges};
 export const zkSyncChain: Chain = {
   title: Blockchains.ZkSync,
   chainId: 324,
-  nodeUrl: `${process.env.ZK_CHAINSTACK_RPC}`,
+  nodeUrl: `${process.env.RPC_ZK}`,
   symbol: "ETH",
   extraGasLimit: 100000,
   explorerUrl: "https://explorer.zksync.io",
@@ -62,7 +62,7 @@ export const ethereumChain: Chain = {
 export const optimismChain: Chain = {
     title: Blockchains.Optimism,
     chainId: 10,
-    nodeUrl: `https://optimism-mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
+    nodeUrl: `${process.env.RPC_OPT}`,
     symbol: "ETH",
     extraGasLimit: 0,
     explorerUrl: "https://optimistic.etherscan.io",
@@ -72,7 +72,7 @@ export const optimismChain: Chain = {
 export const arbitrumChain: Chain = {
     title: Blockchains.Arbitrum,
     chainId: 42161,
-    nodeUrl: `https://arbitrum-mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
+    nodeUrl: `${process.env.RPC_ARB}`,
     symbol: "ETH",
     extraGasLimit: 0,
     explorerUrl: "https://arbiscan.io",
@@ -82,7 +82,7 @@ export const arbitrumChain: Chain = {
 export const scrollChain: Chain = {
     title: Blockchains.Scroll,
     chainId: 534352,
-    nodeUrl: `${process.env.CHAINSTACK_RPC}`,
+    nodeUrl: `${process.env.RPC_SCROLL}`,
     symbol: "ETH",
     extraGasLimit: 50000,
     explorerUrl: "https://scrollscan.com",

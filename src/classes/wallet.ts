@@ -135,7 +135,7 @@ export class MyWallet implements WalletI {
             curSigner = new zk.Wallet(this.signer.privateKey, provider, oldethers.getDefaultProvider())
         } else {
             provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
-            curSigner = this.signer.connect(provider)
+            curSigner = new ethers.Wallet(this.signer.privateKey, provider)
         }
 
         for (let retry = 0; retry < maxRetries + 1; retry++) {
