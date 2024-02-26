@@ -16,18 +16,13 @@ import {
     getMedian,
     getRandomElement,
     getRandomFloat,
-    getRandomInt, getRandomKeepAmount, getRandomKeepAmountFloat,
+    getRandomInt,
+    getRandomKeepAmountFloat,
     shuffleArray
 } from "../utils/utils";
-import {
-    ArbActivity,
-    EthereumActivity,
-    OptimismActivity,
-    ScrollActivity,
-    ZkSyncActivity
-} from "../module_blockchains/blockchain_modules";
+import {ArbActivity, OptimismActivity, ScrollActivity, ZkSyncActivity} from "../module_blockchains/blockchain_modules";
 import {globalLogger} from "../utils/logger";
-import {ethers, toBigInt} from "ethers-new";
+import {ethers} from "ethers-new";
 
 
 interface ExtendedFeatures {
@@ -232,12 +227,12 @@ function generateTypeCoolOrBomzh(accInfo: ExtendedFeatures, actions: AnyActions[
         scrollAmount = getRandomFloat(0.0035, 0.0055, 5);
         zksyncAmount = getRandomFloat(0.0035, 0.0055, 5);
     }
-    let progonType; // 1(bigAm) - 20%, 2(through l2) - 20%, 3 - 60%
+    let progonType; // 1(bigAm) - 15%, 2(through l2) - 15%, 3 - 60%
     let rnd = getRandomInt(1, 100)
-    if (rnd < 20){
+    if (rnd < 15){
         progonType = 1;
         fee += getRandomFloat(0.2, 0.5, 3);
-    } else if (rnd < 40){
+    } else if (rnd < 30){
         progonType = 2;
     } else {
         progonType = 3;
@@ -266,7 +261,7 @@ function generateTypeCoolOrBomzh(accInfo: ExtendedFeatures, actions: AnyActions[
             to: Destination.Scroll,
             asset: Asset.ETH,
             amount: -1,
-            connectionName: Connections.Orbiter,
+            connectionName: (getRandomInt(1, 100) < 66 ? Connections.Orbiter : Connections.Universal),
             keepAmount: zksyncAmount
         }
         actions.push(BRIDGE_ORBITER_ZKSYNC_TO_SCROLL)
@@ -315,7 +310,7 @@ function backToOkx(accInfo: ExtendedFeatures, actions: AnyActions[], keepAmount:
             to: Destination.Optimism,
             asset: Asset.ETH,
             amount: -1,
-            connectionName: Connections.Orbiter,
+            connectionName: (getRandomInt(1, 100) < 66 ? Connections.Orbiter : Connections.Universal),
             keepAmount: keepAmount
         }
         actions.push(BRIDGE_ORBITER_SCROLL_TO_OPTIMISM)
@@ -336,7 +331,7 @@ function backToOkx(accInfo: ExtendedFeatures, actions: AnyActions[], keepAmount:
             to: Destination.Arbitrum,
             asset: Asset.ETH,
             amount: -1,
-            connectionName: Connections.Orbiter,
+            connectionName: (getRandomInt(1, 100) < 66 ? Connections.Orbiter : Connections.Universal),
             keepAmount: keepAmount
         }
         actions.push(BRIDGE_ORBITER_SCROLL_TO_ARB)
@@ -380,7 +375,9 @@ function generateZkSyncRandomActivities(activitiesNum: number): ZkSyncActivity[]
             res.push(getRandomElement(lendingActivities))
         } else if (curActivity === ZkSyncActivity.zkSyncDummyRandomSwapCycle) {
             let lendingActivities: ZkSyncActivity[] = [
-                ZkSyncActivity.zkSyncSwapCycleNativeToWsteth, ZkSyncActivity.zkSyncSwapCycleNativeToUsdc
+                ZkSyncActivity.zkSyncSwapCycleNativeToWsteth,
+                ZkSyncActivity.zkSyncSwapCycleNativeToUsdc,
+                ZkSyncActivity.zkSyncSwapCycleNativeToUsdcWithPaymaster, ZkSyncActivity.zkSyncSwapCycleNativeToUsdcWithPaymaster //2x
             ]
             res.push(getRandomElement(lendingActivities))
         } else if (curActivity === ZkSyncActivity.zkSyncDummyRandomStuff) {

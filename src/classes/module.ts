@@ -102,4 +102,5 @@ export interface TxInteraction {
     confirmations: number
     name: string
     feeData?: FeeData
+    customData?: Record<string, any>
 }

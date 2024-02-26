@@ -15,11 +15,12 @@ import {
     zkSyncReactFusionCycle_supply,
     zkSyncReactFusionCycle_withdraw,
     zkSyncReactFusionInit_enter,
-    zkSyncRhinoCycle_deposit, zkSyncSimpleSwap_do,
+    zkSyncRhinoCycle_deposit,
+    zkSyncSimpleSwap_do,
     zkSyncSwapCycleNativeToUsdc_swapback,
     zkSyncSwapCycleNativeToUsdc_swapto,
     zkSyncSwapCycleNativeToWsteth_swapback,
-    zkSyncSwapCycleNativeToWsteth_swapto,
+    zkSyncSwapCycleNativeToWsteth_swapto, zkSyncSwapPaymaster_do,
     zkSyncSynFuturesTest_mint,
     zkSyncTopSwapCycleNativeToUsdc_swapback,
     zkSyncTopSwapCycleNativeToUsdc_swapto,
@@ -45,6 +46,13 @@ export const zkSyncSimpleSwap: Activity = {
     ]
 }
 
+export const zkSyncPaymaster: Activity = {
+    name: ZkSyncActivity.zkSyncPaymaster,
+    txs: [
+        zkSyncSwapPaymaster_do
+    ]
+}
+
 export const zkSyncSwapCycleNativeToUsdc: Activity = {
     name: ZkSyncActivity.zkSyncSwapCycleNativeToUsdc,
     txs: [
@@ -52,6 +60,16 @@ export const zkSyncSwapCycleNativeToUsdc: Activity = {
         zkSyncSwapCycleNativeToUsdc_swapback
     ]
 }
+
+export const zkSyncSwapCycleNativeToUsdcWithPaymaster: Activity = {
+    name: ZkSyncActivity.zkSyncSwapCycleNativeToUsdcWithPaymaster,
+    txs: [
+        zkSyncSwapCycleNativeToUsdc_swapto,
+        zkSyncSwapPaymaster_do,
+        zkSyncSwapCycleNativeToUsdc_swapback
+    ]
+}
+
 
 export const zkSyncSwapCycleNativeToWsteth: Activity = {
     name: ZkSyncActivity.zkSyncSwapCycleNativeToWsteth,

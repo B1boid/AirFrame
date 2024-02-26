@@ -10,7 +10,7 @@ import {moduleBsc} from "./bsc/bsc";
 import {moduleScroll} from "./scroll/scroll";
 import {scrollCreateSafe, scrollSwapCycleNativeToWsteth, scrollWrapUnwrap} from "./scroll/activities";
 import {moduleLinea} from "./linea/linea";
-import {zkSyncZerolendCycle} from "./zksync/activities";
+import {zkSyncSwapCycleNativeToUsdcWithPaymaster, zkSyncZerolendCycle} from "./zksync/activities";
 
 
 export const enum PolygonActivity {
@@ -23,6 +23,7 @@ export const enum ZkSyncActivity {
     zkSyncSwapCycleNativeToUsdc = "zkSyncSwapCycleNativeToUsdc",
     zkSyncSwapCycleNativeToWsteth = "zkSyncSwapCycleNativeToWsteth",
     zkSyncTopSwapCycleNativeToUsdc = "zkSyncTopSwapCycleNativeToUsdc",
+    zkSyncSwapCycleNativeToUsdcWithPaymaster = "zkSyncSwapCycleNativeToUsdcWithPaymaster",
     zkSyncMintTevaera = "zkSyncMintTevaera",
     zkSyncMintZnsId = "zkSyncMintZnsId",
     zkSyncRandomApprove = "zkSyncRandomApprove",
@@ -41,7 +42,8 @@ export const enum ZkSyncActivity {
     zkSyncZerolendCycle = "zkSyncZerolendCycle",
     zkSyncEmptyMulticall = "zkSyncEmptyMulticall",
     zkSyncRhinoDeposit = "zkSyncRhinoDeposit",
-    zkSyncSimpleSwap = "zkSyncSimpleSwap"
+    zkSyncSimpleSwap = "zkSyncSimpleSwap",
+    zkSyncPaymaster = "zkSyncPaymaster"
 }
 
 export const enum EthereumActivity {

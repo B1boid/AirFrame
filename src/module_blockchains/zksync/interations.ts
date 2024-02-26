@@ -11,13 +11,15 @@ import allAbi from "../../abi/all.json";
 import {commonSwap, commonTopSwap, Dexes} from "../../common_blockchain/routers/common";
 import {zkSyncChain} from "../../config/chains";
 import {zkSyncContracts, zkSyncTokens} from "./constants";
-import {ethers, MaxUint256, parseEther} from "ethers-new";
+import {ethers, FeeData, MaxUint256, parseEther} from "ethers-new";
 import {generateUsername} from "unique-username-generator";
 import {checkAndGetApprovalsInteraction, getRandomApprove} from "../../common_blockchain/approvals";
 import safe from "../../abi/safe.json";
 import zerolend from "../../abi/aave.json";
 import erc20 from "../../abi/erc20.json";
 import {ERC20_ABI} from "../../ambient";
+import { utils } from "zksync-web3";
+import * as oldethers from "ethers";
 
 
 let tokens = zkSyncTokens
@@ -70,9 +72,13 @@ export async function zkSyncSimpleSwap_do(wallet: WalletI): Promise<TxInteractio
     let usdcToken = new ethers.Contract(tokens.USDC, ERC20_ABI, provider)
     let usdcBalance: bigint = await usdcToken.balanceOf(wallet.getAddress())
     if (usdcBalance > 0){
-        return await commonSwap(tokens.USDC, tokens.ETH, {fullBalance: true},
-            [Dexes.SyncSwap, Dexes.Mute, Dexes.Woofi, Dexes.Maverick, Dexes.Pancake],
-            wallet, chain, contracts, tokens,"zkSyncSwapCycleNativeToUsdc_swapback", true)
+        if (getRandomInt(1, 100) > 50){
+            return await zkSyncSwapPaymaster_do(wallet)
+        } else {
+            return await commonSwap(tokens.USDC, tokens.ETH, {fullBalance: true},
+                [Dexes.SyncSwap, Dexes.Mute, Dexes.Woofi, Dexes.Maverick, Dexes.Pancake],
+                wallet, chain, contracts, tokens,"zkSyncSwapCycleNativeToUsdc_swapback", true)
+        }
     }
     let wstToken = new ethers.Contract(tokens.WSTETH, ERC20_ABI, provider)
     let wstBalance: bigint = await wstToken.balanceOf(wallet.getAddress())
@@ -81,14 +87,46 @@ export async function zkSyncSimpleSwap_do(wallet: WalletI): Promise<TxInteractio
             [Dexes.SyncSwap, Dexes.Maverick],
             wallet, chain, contracts, tokens,"zkSyncSwapCycleNativeToWsteth_swapback", true)
     }
-    if (getRandomInt(1, 100) > 50){
-        return await commonSwap(tokens.ETH, tokens.USDC, {balancePercent: [10, 30]},
+    if (getRandomInt(1, 100) > 33){
+        return await commonSwap(tokens.ETH, tokens.USDC, {balancePercent: [5, 10]},
             [Dexes.SyncSwap, Dexes.Mute, Dexes.Woofi, Dexes.Maverick, Dexes.Pancake],
             wallet, chain, contracts, tokens, "zkSyncSwapCycleNativeToUsdc_swapto")
     } else {
         return await commonSwap(tokens.ETH, tokens.WSTETH, {balancePercent: [10, 30]},
             [Dexes.SyncSwap, Dexes.Maverick],
             wallet, chain, contracts, tokens, "zkSyncSwapCycleNativeToWsteth_swapto")
+    }
+}
+
+export async function zkSyncSwapPaymaster_do(wallet: WalletI): Promise<TxInteraction[]> {
+    try {
+        let r = await commonSwap(tokens.ETH, tokens.USDC, {balancePercent: [2, 5]},
+            [Dexes.Mute], wallet, chain, contracts, tokens, "zkSyncSwapPaymaster_do")
+
+        if (r.length === 0) {
+            return []
+        }
+        r[0] = {
+            to: r[0].to,
+            data: r[0].data,
+            value: r[0].value,
+            stoppable: r[0].stoppable,
+            confirmations: r[0].confirmations,
+            name: "zkSyncSwapPaymaster_do",
+            customData: {
+                gasPerPubdata: utils.DEFAULT_GAS_PER_PUBDATA_LIMIT,
+                paymasterParams: utils.getPaymasterParams(contracts.paymasterMute, {
+                    type: "ApprovalBased",
+                    token: tokens.USDC,
+                    minimalAllowance: oldethers.BigNumber.from(MaxUint256),
+                    innerInput: new Uint8Array(),
+                })
+            }
+        }
+        return r
+    } catch (e) {
+        globalLogger.connect(wallet.getAddress(), chain).warn(`zkSyncSwapPaymaster_do failed: ${e}`)
+        return []
     }
 }
 

@@ -44,17 +44,18 @@ export async function syncSwapNativeTo(
             data: swapData,
             callback: ZERO_ADDRESS,
             callbackData: '0x',
+            useVault: true
         }];
         const paths = [{
             steps: steps,
             tokenIn: ZERO_ADDRESS,
             amountIn: tokenBalance.toString(),
         }];
-        const routerContract: Contract = new Contract(contracts.syncSwapRouter, SyncSwapRouter, provider);
+        const routerContract: Contract = new Contract(contracts.syncSwapRouterV2, SyncSwapRouter, provider);
 
         let data = routerContract.interface.encodeFunctionData("swap", [paths, 0, getCurTimestamp() + 1800])
         txs.push({
-            to: contracts.syncSwapRouter,
+            to: contracts.syncSwapRouterV2,
             data: data,
             value: tokenBalance.toString(),
             stoppable: stoppable,
@@ -89,7 +90,7 @@ export async function syncSwap(
             return []
         }
         tokenBalance = getExecBalance(execBalance, tokenBalance)!
-        let txs = await checkAndGetApprovalsInteraction(wallet.getAddress(), contracts.syncSwapRouter, tokenBalance, tokenContract)
+        let txs = await checkAndGetApprovalsInteraction(wallet.getAddress(), contracts.syncSwapRouterV2, tokenBalance, tokenContract)
 
         const classicPoolFactory: Contract = new Contract(
             contracts.syncSwapPool, SyncPool, provider
@@ -113,12 +114,12 @@ export async function syncSwap(
             tokenIn: tokenFrom,
             amountIn: tokenBalance.toString(),
         }];
-        const routerContract: Contract = new Contract(contracts.syncSwapRouter, SyncSwapRouter, provider);
+        const routerContract: Contract = new Contract(contracts.syncSwapRouterV2, SyncSwapRouter, provider);
 
         let data = routerContract.interface.encodeFunctionData("swap", [paths, 0, getCurTimestamp() + 1800])
 
         txs.push({
-            to: contracts.syncSwapRouter,
+            to: contracts.syncSwapRouterV2,
             data: data,
             value: "0",
             stoppable: stoppable,
