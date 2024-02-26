@@ -76,6 +76,7 @@ function megaClassifier(label: string): MegaType {
     // label format examples: em_sub2_9, xxx_sub3_19
     let splitted = label.split("_")
     let firstPachka = splitted[0] === "em"
+    let olType = splitted[0] === "ol"
     let num = Number.parseInt(splitted[2])
     if (firstPachka){
         if (num % 3 !== 0){
@@ -83,6 +84,17 @@ function megaClassifier(label: string): MegaType {
         }
         if (num % 2 === 0){
             return MegaType.BomzhAcc
+        }
+        return MegaType.VolAcc
+    } else if (olType) {
+        if (num == 0) {
+            return MegaType.CoolAcc
+        }
+        if (num == 1) {
+            return MegaType.BomzhAcc
+        }
+        if (num == 2) {
+            return MegaType.VolAcc
         }
         return MegaType.VolAcc
     } else {

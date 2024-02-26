@@ -11,6 +11,10 @@ package-lock.json
 .okx
 .accs_TODO
 .mainaccs
+.mega_accs
+.mega_accs_tmp
+.used_mega
+class.py
 src/gen.js
 src/gen_pks.ts
 scroll_meta/scroll_contracts_addresses/*
