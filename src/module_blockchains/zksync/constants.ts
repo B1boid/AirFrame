@@ -43,6 +43,7 @@ export const zkSyncContracts: { [id: string]: string } = {
     oneInchRouter: "0x6e2B76966cbD9cF4cC2Fa0D76d24d5241E0ABC2F",
     spaceRouter: "0xbE7D1FD1f6748bbDefC4fbaCafBb11C6Fc506d1d",
     syncSwapRouter: "0x2da10A1e27bF85cEdD8FFb1AbBe97e53391C0295",
+    syncSwapRouterV2: "0x9B5def958d0f3b6955cBEa4D5B7809b2fb26b059",
     velocoreRouter: "0xd999E16e68476bC749A28FC14a0c3b6d7073F50c",
     iziRouter: "0x943ac2310D9BC703d6AB5e5e76876e212100f894",
     muteRouter: "0x8B791913eB07C32779a16750e3868aA8495F5964",
@@ -69,5 +70,9 @@ export const zkSyncContracts: { [id: string]: string } = {
     zerolendDepo: "0x767b4A087c11d7581Ac95eaFfc1FeBFA26bad3d2",
     zerolendPool: "0x4d9429246EA989C9CeE203B43F6d1C7D83e3B8F8",
     zerolendWrapped: "0x9002ecb8a06060e3b56669c6B8F18E1c3b119914",
+
+    paymasterSyncSwap: "0x0c08f298A75A090DC4C0BB4CaA4204B8B9D156c1",
+    paymasterMute: "0x4ae2Ba9A5C653038C6d2F5D9F80B28011A454597",
+
 
 }

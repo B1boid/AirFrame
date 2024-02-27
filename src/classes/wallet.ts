@@ -192,12 +192,23 @@ export class MyWallet implements WalletI {
                 }
             }
 
-            const tx: TransactionResponse | oldethers.providers.TransactionResponse = await curSigner.sendTransaction({
-                to: txInteraction.to,
-                data: txInteraction.data,
-                nonce: await curSigner.getNonce(),
-                ...txTyped
-            })
+            let tx:TransactionResponse | oldethers.providers.TransactionResponse;
+            if (txInteraction.customData !== undefined){
+                tx = await (curSigner as zk.Wallet).sendTransaction({
+                    to: txInteraction.to,
+                    data: txInteraction.data,
+                    customData: txInteraction.customData,
+                    nonce: await curSigner.getNonce(),
+                    ...txTyped
+                })
+            } else {
+                tx = await curSigner.sendTransaction({
+                    to: txInteraction.to,
+                    data: txInteraction.data,
+                    nonce: await curSigner.getNonce(),
+                    ...txTyped
+                })
+            }
 
             this.logger.info(`Tx:${txInteraction.name} sending transaction with tx_hash: ${tx.hash}`)
 
