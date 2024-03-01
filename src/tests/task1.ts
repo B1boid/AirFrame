@@ -157,9 +157,9 @@ const CONNECTION_SCROLL_TO_OPTIMISM: ConnectionAction = {
     connectionName: Connections.Orbiter
 }
 
-const CONNECTION_ZKSYNC_TO_SCROLL_NITRO: ConnectionAction = {
-    from: Destination.ZkSync,
-    to: Destination.Scroll,
+const CONNECTION_SCROLL_TO_OPTIMISM_UNIVERSAL: ConnectionAction = {
+    from: Destination.Scroll,
+    to: Destination.Optimism,
     asset: Asset.ETH,
     amount: -1,
     connectionName: Connections.Universal
@@ -167,7 +167,8 @@ const CONNECTION_ZKSYNC_TO_SCROLL_NITRO: ConnectionAction = {
 
 
 const ACTIONS_1: AnyActions[] =  [
-    CONNECTION_ZKSYNC_TO_SCROLL_NITRO
+    CONNECTION_SCROLL_TO_OPTIMISM_UNIVERSAL,
+    CONNECTION_OPTIMISM_TO_OKX
         // CONNECTION_OKX_TO_ZKSYNC,
         // CONNECTION_ZKSYNC_TO_OPTIMISM,
         // CONNECTION_OPTIMISM_TO_OKX
@@ -184,7 +185,7 @@ export const WALLETS_ACTIONS_1: WalletActions[] = [
     // {address: "0x750D0B78E16426a42cd9a5485BA3DF70290912C0", actions: ACTIONS_1},
 
     // {address: "0x1Ce3B1D69e3b1C4DE3b0Bc460714fD81aB203d35", actions: ACTIONS_1},
-    {address: "0xAAfE4890c4F0F84c4E4585F743EE182fbB102872", actions: ACTIONS_1}
+    {address: "0x3Ef5141F891BFDF15BbdF9741fbf6348a9ffba2e", actions: ACTIONS_1}
 ]
 
 
