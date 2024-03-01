@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {ConnectionModule} from "../../classes/connection";
-import { TxResult, WalletI } from '../../classes/wallet';
-import { Chain, Destination } from '../../config/chains';
+import { TxResult, UnionProvider, WalletI } from '../../classes/wallet';
+import { Blockchains, Chain, Destination } from '../../config/chains';
 import { Asset } from '../../config/tokens';
 import {ethers} from "ethers-new";
 import { bigMax, getChainBalance } from '../../utils/utils';
@@ -9,6 +9,9 @@ import { destToChain } from '../../module_blockchains/blockchain_modules';
 import { globalLogger } from '../../utils/logger';
 import { TxInteraction } from '../../classes/module';
 import { waitBalanceChanged } from '../utils';
+import { getFeeData } from '../../utils/gas';
+import * as zk from "zksync-web3";
+import { DEFAULT_GAS_PRICE } from '../orbiter/connection_orbiter';
 
 const QUOTE_ENDPOINT = "https://api-beta.pathfinder.routerprotocol.com/api/v2/quote"
 const TX_ENDPOINT = "https://api-beta.pathfinder.routerprotocol.com/api/v2/transaction"
@@ -50,7 +53,16 @@ class NitroConnectionModule implements ConnectionModule {
         quoteEstimate["receiverAddress"] = wallet.getAddress()
         const txDataRawEstimate = await this.buildTx(quoteEstimate)
 
-        bigAmount = bigAmount - BigInt(500_000) * BigInt(txDataRawEstimate.txn.gasPrice) // в эстимейте есть газлимит, но он какой-то лажовый
+        let provider: UnionProvider
+        if (chainFrom.title === Blockchains.ZkSync) {
+            provider = new zk.Provider(chainFrom.nodeUrl)
+        } else {
+            provider = new ethers.JsonRpcProvider(chainFrom.nodeUrl, chainFrom.chainId)
+        }
+
+        const feeData = await getFeeData(provider, chainFrom)
+
+        bigAmount = bigAmount - bigAmount - BigInt(txDataRawEstimate.txn.gasLimit) * (feeData.maxFeePerGas ?? DEFAULT_GAS_PRICE) // в эстимейте есть газлимит, но он какой-то лажовый
         const quote = await this.getQuote(bigAmount, chainFrom, chainTo)
         quote["senderAddress"] = wallet.getAddress()
         quote["receiverAddress"] = wallet.getAddress()

@@ -10,7 +10,7 @@ import {getTxForTransfer, waitBalanceChanged} from "../utils";
 import {destToChain} from "../../module_blockchains/blockchain_modules";
 
 const EXTRA_GAS_LIMIT = 10_000
-const DEFAULT_GAS_PRICE = ethers.parseUnits("20", "gwei")
+export const DEFAULT_GAS_PRICE = ethers.parseUnits("20", "gwei")
 const ETH_BRIDGE_ROUTER = "0x80C67432656d59144cEFf962E8fAF8926599bCF8"
 
 class OrbiterConnectionModule implements ConnectionModule {

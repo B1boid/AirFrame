@@ -21,13 +21,18 @@ class UniversalConnectionModule implements ConnectionModule {
 
         if (useNitroRes) {
             try {
-                return nitroConnectionModule.sendAsset(wallet, from, to, asset, amount, keepAmount)
+                const tryNitro = await nitroConnectionModule.sendAsset(wallet, from, to, asset, amount, keepAmount)
+                if (!tryNitro[0]) {
+                    globalLogger.connect(wallet.getAddress(), destToChain(from)).warn(`Failed to transfer with Nitro ${from} -> ${to}. Fallback to orbiter.`)
+                    return await orbiterConnectionModule.sendAsset(wallet, from, to, asset, amount, keepAmount)
+                }
+                return tryNitro
             } catch {
                 globalLogger.connect(wallet.getAddress(), destToChain(from)).warn(`Failed to transfer with Nitro ${from} -> ${to}. Fallback to orbiter.`)
-                return orbiterConnectionModule.sendAsset(wallet, from, to, asset, amount, keepAmount)
+                return await orbiterConnectionModule.sendAsset(wallet, from, to, asset, amount, keepAmount)
             }
         } else {
-            return orbiterConnectionModule.sendAsset(wallet, from, to, asset, amount, keepAmount)
+            return await orbiterConnectionModule.sendAsset(wallet, from, to, asset, amount, keepAmount)
         }
     }
 
