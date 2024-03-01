@@ -302,7 +302,8 @@ class OkxConnectionModule implements ConnectionModule {
             if (!needToStop() && (response !== null && response.msg.startsWith("Withdrawals suspended") || response === null)) {
                 globalLogger.connect(wallet.getAddress(), chain).warn("Withdrawals suspended or response is null. Waiting and trying again later.")
                 await sleep(60 * 60) // 1 hour
-                return this.withdraw(wallet, ccy, amt, fee, chain)
+                const newFee: string = await this.getMinFee(wallet, ccy, chain.title)
+                return this.withdraw(wallet, ccy, amt, newFee, chain)
             }
             return Promise.resolve([false, ""])
         }
