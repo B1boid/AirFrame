@@ -353,7 +353,7 @@ function backToOkx(accInfo: ExtendedFeatures, actions: AnyActions[], keepAmount:
 
 function generateZkSyncRandomActivities(activitiesNum: number): ZkSyncActivity[] {
     let availableActivities: ZkSyncActivity[] = [
-        ZkSyncActivity.zkSyncDummyRandomSwapCycle, ZkSyncActivity.zkSyncDummyRandomSwapCycle, //x2
+        ZkSyncActivity.zkSyncDummyRandomSwapCycle, ZkSyncActivity.zkSyncDummyRandomSwapCycle, ZkSyncActivity.zkSyncDummyRandomSwapCycle, //x3
         ZkSyncActivity.zkSyncDummyRandomLending,
         ZkSyncActivity.zkSyncDummyRandomStuff, ZkSyncActivity.zkSyncDummyRandomStuff, //x2
         ZkSyncActivity.zkSyncEmptyMulticall, ZkSyncActivity.zkSyncEmptyMulticall //x2
@@ -377,7 +377,7 @@ function generateZkSyncRandomActivities(activitiesNum: number): ZkSyncActivity[]
             let lendingActivities: ZkSyncActivity[] = [
                 ZkSyncActivity.zkSyncSwapCycleNativeToWsteth,
                 ZkSyncActivity.zkSyncSwapCycleNativeToUsdc,
-                ZkSyncActivity.zkSyncSwapCycleNativeToUsdcWithPaymaster, ZkSyncActivity.zkSyncSwapCycleNativeToUsdcWithPaymaster //2x
+                ZkSyncActivity.zkSyncSwapCycleNativeToUsdcWithPaymaster, ZkSyncActivity.zkSyncSwapCycleNativeToUsdcWithPaymaster, ZkSyncActivity.zkSyncSwapCycleNativeToUsdcWithPaymaster //3x
             ]
             res.push(getRandomElement(lendingActivities))
         } else if (curActivity === ZkSyncActivity.zkSyncDummyRandomStuff) {

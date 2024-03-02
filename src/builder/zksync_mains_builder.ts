@@ -95,7 +95,7 @@ function generateZkSync(): ModuleActions {
 
 function generateZkSyncRandomActivities(activitiesNum: number): ZkSyncActivity[] {
     let availableActivities: ZkSyncActivity[] = [
-        ZkSyncActivity.zkSyncDummyRandomSwapCycle,
+        ZkSyncActivity.zkSyncDummyRandomSwapCycle, ZkSyncActivity.zkSyncDummyRandomSwapCycle, ZkSyncActivity.zkSyncDummyRandomSwapCycle,
         ZkSyncActivity.zkSyncDummyRandomLending,
         ZkSyncActivity.zkSyncDummyRandomStuff,
         ZkSyncActivity.zkSyncEmptyMulticall,
