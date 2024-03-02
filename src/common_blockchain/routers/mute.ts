@@ -28,7 +28,7 @@ export async function muteSwapNativeTo(
         let tokenBalance: bigint = await provider.getBalance(wallet.getAddress())
         tokenBalance = getExecBalance(execBalance, tokenBalance)!
         let amountsOutMin: bigint[] = await routerContract.getAmountsOut(tokenBalance.toString(), [wrappedToken, token], [ true, false ])
-        let minOut: bigint = amountsOutMin[1] * BigInt(998) / BigInt(1000)
+        let minOut: bigint = amountsOutMin[1] * BigInt(995) / BigInt(1000)
         let data = routerContract.interface.encodeFunctionData("swapExactETHForTokensSupportingFeeOnTransferTokens",
             [minOut, [wrappedToken, token], wallet.getAddress(), getCurTimestamp() + 1200,  [ true, false ]])
         txs.push({
@@ -68,7 +68,7 @@ export async function muteSwap(
         tokenBalance = getExecBalance(execBalance, tokenBalance)!
         let txs = await checkAndGetApprovalsInteraction(wallet.getAddress(), contracts.muteRouter, tokenBalance, tokenContract)
         let amountsOutMin: bigint[] = await routerContract.getAmountsOut(tokenBalance.toString(), [tokenFrom, tokenTo], [ true, false ])
-        let minOut: bigint = amountsOutMin[1] * BigInt(998) / BigInt(1000)
+        let minOut: bigint = amountsOutMin[1] * BigInt(995) / BigInt(1000)
         let data = routerContract.interface.encodeFunctionData("swapExactTokensForETHSupportingFeeOnTransferTokens",
             [tokenBalance.toString(), minOut, [tokenFrom, tokenTo], wallet.getAddress(), getCurTimestamp() + 1200,  [ true, false ]])
         txs.push({
