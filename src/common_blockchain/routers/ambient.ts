@@ -6,6 +6,7 @@ import {ethers, formatEther} from "ethers-new";
 import {globalLogger} from "../../utils/logger";
 import {CrocEnv} from "../../ambient";
 import erc20 from "../../abi/erc20.json";
+import abiAmbient from "../../abi/ambient.json";
 import {checkAndGetApprovalsInteraction} from "../approvals";
 import {BigNumber} from "ethers";
 
@@ -26,7 +27,10 @@ export async function ambientSwapNativeTo(
         tokenBalance = getExecBalance(execBalance, tokenBalance)!
 
         const croc = new CrocEnv(chain.chainId, wallet.getSigner(chain))
-        let data = await croc.sellEth(formatEther(tokenBalance).toString()).for(token).encodeSwap({surplus: false})
+        let swapData = await croc.sellEth(formatEther(tokenBalance).toString()).for(token).encodeSwap({surplus: false})
+
+        let ambientContract = new ethers.Contract(contracts.ambientRouter, abiAmbient, provider)
+        let data = ambientContract.interface.encodeFunctionData("userCmd", [1, "0x" + swapData.slice(10)])
 
         txs.push({
             to: contracts.ambientRouter,
@@ -64,7 +68,10 @@ export async function ambientSwap(
         tokenBalance = getExecBalance(execBalance, tokenBalance)!
         let txs = await checkAndGetApprovalsInteraction(wallet.getAddress(), contracts.ambientRouter, tokenBalance, tokenContract)
         const croc = new CrocEnv(chain.chainId, wallet.getSigner(chain))
-        let data = await croc.sell(tokenFrom, BigNumber.from(tokenBalance)).forEth().encodeSwap({surplus: false})
+        let swapData = await croc.sell(tokenFrom, BigNumber.from(tokenBalance)).forEth().encodeSwap({surplus: false})
+
+        let ambientContract = new ethers.Contract(contracts.ambientRouter, abiAmbient, provider)
+        let data = ambientContract.interface.encodeFunctionData("userCmd", [1, "0x" + swapData.slice(10)])
 
         txs.push({
             to: contracts.ambientRouter,

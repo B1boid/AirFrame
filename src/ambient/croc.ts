@@ -59,7 +59,7 @@ interface SwapArgs {
 }
 
 const DFLT_SWAP_ARGS: SwapArgs = {
-    slippage: 0.01
+    slippage: 0.2
 }
 
 class BuyPrefix {
