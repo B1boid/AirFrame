@@ -1,12 +1,13 @@
 import {WalletI} from "../../classes/wallet";
 import {TxInteraction} from "../../classes/module";
 import {Contract, ethers} from "ethers-new";
-import {Chain} from "../../config/chains";
+import {Blockchains, Chain} from "../../config/chains";
 import erc20 from "./../../abi/erc20.json";
 import SyncPool from "../../abi/syncPool.json";
-import SyncSwapRouter from "../../abi/syncSwapRouter.json";
+import abiSyncSwapRouter from "../../abi/syncSwapRouter.json";
+import abiSyncSwapRouterV2 from "../../abi/syncSwapRouterV2.json";
 import {checkAndGetApprovalsInteraction} from "../approvals";
-import {getCurTimestamp, getRandomizedPercent} from "../../utils/utils";
+import {getCurTimestamp} from "../../utils/utils";
 import {defaultAbiCoder} from "ethers/lib/utils";
 import {globalLogger} from "../../utils/logger";
 import {ExecBalance, getExecBalance} from "../common_utils";
@@ -39,23 +40,39 @@ export async function syncSwapNativeTo(
             ["address", "address", "uint8"],
             [wrappedToken, wallet.getAddress(), 1]
         );
-        const steps = [{
-            pool: poolAddress,
-            data: swapData,
-            callback: ZERO_ADDRESS,
-            callbackData: '0x',
-            useVault: true
-        }];
+        let steps;
+        let routerAddress;
+        let abi;
+        if (chain.title === Blockchains.ZkSync) {
+            routerAddress = contracts.syncSwapRouterV2
+            abi = abiSyncSwapRouterV2
+            steps = [{
+                pool: poolAddress,
+                data: swapData,
+                callback: ZERO_ADDRESS,
+                callbackData: '0x',
+                useVault: true
+            }];
+        } else {
+            routerAddress = contracts.syncSwapRouter
+            abi = abiSyncSwapRouter
+            steps = [{
+                pool: poolAddress,
+                data: swapData,
+                callback: ZERO_ADDRESS,
+                callbackData: '0x'
+            }];
+        }
         const paths = [{
             steps: steps,
             tokenIn: ZERO_ADDRESS,
             amountIn: tokenBalance.toString(),
         }];
-        const routerContract: Contract = new Contract(contracts.syncSwapRouterV2, SyncSwapRouter, provider);
+        const routerContract: Contract = new Contract(routerAddress, abi, provider);
 
         let data = routerContract.interface.encodeFunctionData("swap", [paths, 0, getCurTimestamp() + 1800])
         txs.push({
-            to: contracts.syncSwapRouterV2,
+            to: routerAddress,
             data: data,
             value: tokenBalance.toString(),
             stoppable: stoppable,
@@ -81,6 +98,12 @@ export async function syncSwap(
     stoppable: boolean = false,
 ): Promise<TxInteraction[]> {
     try {
+        let routerAddress;
+        if (chain.title === Blockchains.ZkSync) {
+            routerAddress = contracts.syncSwapRouterV2
+        } else {
+            routerAddress = contracts.syncSwapRouter
+        }
         const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
         let tokenContract = new ethers.Contract(tokenFrom, erc20, provider)
         let tokenBalance: bigint = await tokenContract.balanceOf(wallet.getAddress())
@@ -90,7 +113,7 @@ export async function syncSwap(
             return []
         }
         tokenBalance = getExecBalance(execBalance, tokenBalance)!
-        let txs = await checkAndGetApprovalsInteraction(wallet.getAddress(), contracts.syncSwapRouterV2, tokenBalance, tokenContract)
+        let txs = await checkAndGetApprovalsInteraction(wallet.getAddress(), routerAddress, tokenBalance, tokenContract)
 
         const classicPoolFactory: Contract = new Contract(
             contracts.syncSwapPool, SyncPool, provider
@@ -103,23 +126,37 @@ export async function syncSwap(
             ["address", "address", "uint8"],
             [tokenFrom, wallet.getAddress(), 1]
         );
-        const steps = [{
-            pool: poolAddress,
-            data: swapData,
-            callback: ZERO_ADDRESS,
-            callbackData: '0x',
-        }];
+        let steps;
+        let abi;
+        if (chain.title === Blockchains.ZkSync) {
+            abi = abiSyncSwapRouterV2
+            steps = [{
+                pool: poolAddress,
+                data: swapData,
+                callback: ZERO_ADDRESS,
+                callbackData: '0x',
+                useVault: true
+            }];
+        } else {
+            abi = abiSyncSwapRouter
+            steps = [{
+                pool: poolAddress,
+                data: swapData,
+                callback: ZERO_ADDRESS,
+                callbackData: '0x'
+            }];
+        }
         const paths = [{
             steps: steps,
             tokenIn: tokenFrom,
             amountIn: tokenBalance.toString(),
         }];
-        const routerContract: Contract = new Contract(contracts.syncSwapRouterV2, SyncSwapRouter, provider);
+        const routerContract: Contract = new Contract(routerAddress, abi, provider);
 
         let data = routerContract.interface.encodeFunctionData("swap", [paths, 0, getCurTimestamp() + 1800])
 
         txs.push({
-            to: contracts.syncSwapRouterV2,
+            to: routerAddress,
             data: data,
             value: "0",
             stoppable: stoppable,

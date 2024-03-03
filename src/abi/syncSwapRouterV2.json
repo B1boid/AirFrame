@@ -22,6 +22,11 @@
   },
   {
     "inputs": [],
+    "name": "ETHTransferFailed",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "Expired",
     "type": "error"
   },
@@ -37,8 +42,32 @@
   },
   {
     "inputs": [],
+    "name": "TransferFailed",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "TransferFromFailed",
     "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
   },
   {
     "inputs": [
@@ -58,9 +87,14 @@
             "internalType": "uint256",
             "name": "amount",
             "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "useVault",
+            "type": "bool"
           }
         ],
-        "internalType": "struct SyncSwapRouter.TokenInput[]",
+        "internalType": "struct SyncSwapRouterV2.TokenInput[]",
         "name": "inputs",
         "type": "tuple[]"
       },
@@ -83,6 +117,11 @@
         "internalType": "bytes",
         "name": "callbackData",
         "type": "bytes"
+      },
+      {
+        "internalType": "address",
+        "name": "staking",
+        "type": "address"
       }
     ],
     "name": "addLiquidity",
@@ -114,9 +153,14 @@
             "internalType": "uint256",
             "name": "amount",
             "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "useVault",
+            "type": "bool"
           }
         ],
-        "internalType": "struct SyncSwapRouter.TokenInput[]",
+        "internalType": "struct SyncSwapRouterV2.TokenInput[]",
         "name": "inputs",
         "type": "tuple[]"
       },
@@ -139,6 +183,11 @@
         "internalType": "bytes",
         "name": "callbackData",
         "type": "bytes"
+      },
+      {
+        "internalType": "address",
+        "name": "staking",
+        "type": "address"
       }
     ],
     "name": "addLiquidity2",
@@ -170,9 +219,14 @@
             "internalType": "uint256",
             "name": "amount",
             "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "useVault",
+            "type": "bool"
           }
         ],
-        "internalType": "struct SyncSwapRouter.TokenInput[]",
+        "internalType": "struct SyncSwapRouterV2.TokenInput[]",
         "name": "inputs",
         "type": "tuple[]"
       },
@@ -232,6 +286,11 @@
         "internalType": "struct IRouter.SplitPermitParams[]",
         "name": "permits",
         "type": "tuple[]"
+      },
+      {
+        "internalType": "address",
+        "name": "staking",
+        "type": "address"
       }
     ],
     "name": "addLiquidityWithPermit",
@@ -263,9 +322,14 @@
             "internalType": "uint256",
             "name": "amount",
             "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "useVault",
+            "type": "bool"
           }
         ],
-        "internalType": "struct SyncSwapRouter.TokenInput[]",
+        "internalType": "struct SyncSwapRouterV2.TokenInput[]",
         "name": "inputs",
         "type": "tuple[]"
       },
@@ -325,6 +389,11 @@
         "internalType": "struct IRouter.SplitPermitParams[]",
         "name": "permits",
         "type": "tuple[]"
+      },
+      {
+        "internalType": "address",
+        "name": "staking",
+        "type": "address"
       }
     ],
     "name": "addLiquidityWithPermit2",
@@ -717,6 +786,67 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "rescueERC20",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address payable",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "rescueETH",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -928,7 +1058,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "stakingPool",
+        "name": "target",
         "type": "address"
       },
       {
@@ -943,11 +1073,39 @@
       },
       {
         "internalType": "address",
-        "name": "onBehalf",
+        "name": "to",
         "type": "address"
       }
     ],
     "name": "stake",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "target",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      }
+    ],
+    "name": "stakeWithToken",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -977,6 +1135,11 @@
                 "internalType": "bytes",
                 "name": "callbackData",
                 "type": "bytes"
+              },
+              {
+                "internalType": "bool",
+                "name": "useVault",
+                "type": "bool"
               }
             ],
             "internalType": "struct IRouter.SwapStep[]",
@@ -1057,6 +1220,11 @@
                 "internalType": "bytes",
                 "name": "callbackData",
                 "type": "bytes"
+              },
+              {
+                "internalType": "bool",
+                "name": "useVault",
+                "type": "bool"
               }
             ],
             "internalType": "struct IRouter.SwapStep[]",
@@ -1147,6 +1315,19 @@
       }
     ],
     "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {

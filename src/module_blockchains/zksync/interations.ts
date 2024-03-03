@@ -132,13 +132,13 @@ export async function zkSyncSwapPaymaster_do(wallet: WalletI): Promise<TxInterac
 
 export async function zkSyncSwapCycleNativeToUsdc_swapto(wallet: WalletI): Promise<TxInteraction[]> {
     return await commonSwap(tokens.ETH, tokens.USDC, {balancePercent: [10, 30]},
-        [Dexes.SyncSwap, Dexes.Mute, Dexes.Woofi, Dexes.Maverick, Dexes.Pancake],
+        [Dexes.SyncSwap, Dexes.Woofi, Dexes.Maverick, Dexes.Pancake],
         wallet, chain, contracts, tokens, "zkSyncSwapCycleNativeToUsdc_swapto")
 }
 
 export async function zkSyncSwapCycleNativeToUsdc_swapback(wallet: WalletI): Promise<TxInteraction[]> {
     return await commonSwap(tokens.USDC, tokens.ETH, {fullBalance: true},
-        [Dexes.SyncSwap, Dexes.Mute, Dexes.Woofi, Dexes.Maverick, Dexes.Pancake],
+        [Dexes.SyncSwap, Dexes.Woofi, Dexes.Maverick, Dexes.Pancake],
         wallet, chain, contracts, tokens,"zkSyncSwapCycleNativeToUsdc_swapback", true)
 }
 
