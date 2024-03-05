@@ -231,7 +231,7 @@ function generateTypeCoolOrBomzh(accInfo: ExtendedFeatures, actions: AnyActions[
     let rnd = getRandomInt(1, 100)
     if (rnd < 15){
         progonType = 1;
-        fee += getRandomFloat(0.2, 0.5, 3);
+        fee += getRandomFloat(0.15, 0.35, 3);
     } else if (rnd < 30){
         progonType = 2;
     } else {
