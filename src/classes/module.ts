@@ -1,11 +1,14 @@
-import {Chain} from "../config/chains";
-import {TxResult, WalletI} from "./wallet";
+import {Blockchains, Chain} from "../config/chains";
+import {TxResult, UnionProvider, WalletI} from "./wallet";
 import {Randomness} from "./actions";
 import {getActivitiesGenerator} from "../utils/activity_generators";
 import {ActivityTag} from "../module_blockchains/blockchain_modules";
-import {FeeData} from "ethers-new";
+import {ethers, FeeData} from "ethers-new";
 import {Limits} from "../config/run_config";
 import {sleepWithLimits} from "../utils/utils";
+import {getFeeData} from "../utils/gas";
+import * as zk from "zksync-web3";
+import * as oldethers from "ethers";
 
 
 export abstract class BlockchainModule {
@@ -40,6 +43,13 @@ export abstract class BlockchainModule {
             let failed: boolean = false;
             for (let i = 0; i <= this.extraTries; i++) { // extra try with rebuilding tx interaction
                 failed = false
+                let provider: UnionProvider
+                if (this.chain.title === Blockchains.ZkSync) {
+                    provider = new zk.Provider(this.chain.nodeUrl)
+                } else {
+                    provider = new ethers.JsonRpcProvider(this.chain.nodeUrl, this.chain.chainId)
+                }
+                await getFeeData(provider, this.chain)
                 const interactions: TxInteraction[] = await activityTx.tx(wallet)
                 if (interactions.length === 0) {
                     failed = true // empty array means failure while building tx interactions

@@ -21,11 +21,11 @@ const mavPools: {[chainId: string]: {[token: string]: PoolInfo}} = {
     "324": {
         "0x3355df6D4c9C3035724Fd0e3914dE96A5a83aaf4": {
             poolAddr: "0x41C8cf74c27554A8972d3bf3D2BD4a14D8B604AB",
-            wethLess: true
+            wethLess: false
         }, // USDC(weth) pool
         "0x703b52F2b28fEbcB60E1372858AF5b18849FE867": {
             poolAddr: "0xc929935c6D780e036aE5C3A0f78e628A10df677B",
-            wethLess: false
+            wethLess: true
         }, //WSTETH(weth) ppol
     }
 }
@@ -50,7 +50,7 @@ export async function maverickSwapNativeTo(
         tokenBalance = getExecBalance(execBalance, tokenBalance)!
         let poolAddress: string = mavPools[chain.chainId.toString()][token].poolAddr
         let amountsOutMin: bigint = await poolContract.calculateSwap(
-            poolAddress, tokenBalance.toString(), mavPools[chain.chainId.toString()][token].wethLess, true, 0
+            poolAddress, tokenBalance.toString(), mavPools[chain.chainId.toString()][token].wethLess, false, 0
         )
         let minOut: bigint = amountsOutMin * BigInt(998) / BigInt(1000)
         let deadline = getCurTimestamp() + 1000
