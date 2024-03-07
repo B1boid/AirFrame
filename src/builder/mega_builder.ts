@@ -204,7 +204,12 @@ function generateTypeVol(accInfo: ExtendedFeatures, actions: AnyActions[]): void
     actions.push(BRIDGE_ORBITER_ZKSYNC_TO_SCROLL)
 
     let scroll_activities: ScrollActivity[] = generateScrollActivities(getRandomInt(2, 3), true)
-    scroll_activities.push(ScrollActivity.scrollInteractWithContract)
+    let splitted = accInfo.label.split("_")
+    let firstPachka = splitted[0] === "em"
+    let olType = splitted[0] === "ol"
+    if (firstPachka || olType) {
+        scroll_activities.push(ScrollActivity.scrollInteractWithContract)
+    }
     const SCROLL_ACTIONS: ModuleActions = {
         chainName: Blockchains.Scroll,
         randomOrder: Randomness.Full,

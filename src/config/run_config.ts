@@ -49,7 +49,7 @@ export const ZKSYNC_ANOTHER_CONFIG: RunConfig = {
 export const MEGA_CONFIG: RunConfig = {
     strategy: Strategy.MegaStrata,
     threads: 2,
-    waitInitial: {min: 0, max: 15 * 60},
+    waitInitial: {min: 0, max: 60 * 60},
     waitBetweenTxs: {min: 30, max: 15 * 60},
-    waitBetweenModules: {min: 0, max: 5 * 60}
+    waitBetweenModules: {min: 0, max: 30 * 60}
 }
