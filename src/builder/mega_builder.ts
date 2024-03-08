@@ -224,19 +224,19 @@ function generateTypeVol(accInfo: ExtendedFeatures, actions: AnyActions[]): void
 function generateTypeCoolOrBomzh(accInfo: ExtendedFeatures, actions: AnyActions[]): void {
     let scrollAmount;
     let zksyncAmount;
-    let fee = getRandomFloat(0.001, 0.002, 4);
+    let fee = getRandomFloat(0.002, 0.003, 4);
     if (accInfo.megaType === MegaType.CoolAcc){
-        scrollAmount = getRandomKeepAmountFloat() + getRandomFloat(0.0035, 0.0055, 5)
-        zksyncAmount = getRandomKeepAmountFloat() + getRandomFloat(0.0035, 0.0055, 5)
+        scrollAmount = getRandomKeepAmountFloat() + getRandomFloat(0.0045, 0.0065, 5)
+        zksyncAmount = getRandomKeepAmountFloat() + getRandomFloat(0.0045, 0.0065, 5)
     } else { //bomzhAcc
-        scrollAmount = getRandomFloat(0.0035, 0.0055, 5);
-        zksyncAmount = getRandomFloat(0.0035, 0.0055, 5);
+        scrollAmount = getRandomFloat(0.0045, 0.0065, 5);
+        zksyncAmount = getRandomFloat(0.0045, 0.0065, 5);
     }
     let progonType; // 1(bigAm) - 15%, 2(through l2) - 15%, 3 - 60%
     let rnd = getRandomInt(1, 100)
     if (rnd < 15){
         progonType = 1;
-        fee += getRandomFloat(0.15, 0.35, 3);
+        fee += getRandomFloat(0.1, 0.3, 3);
     } else if (rnd < 30){
         progonType = 2;
     } else {
