@@ -227,10 +227,10 @@ function generateTypeCoolOrBomzh(accInfo: ExtendedFeatures, actions: AnyActions[
     let fee = getRandomFloat(0.002, 0.003, 4);
     if (accInfo.megaType === MegaType.CoolAcc){
         scrollAmount = getRandomKeepAmountFloat() + getRandomFloat(0.0045, 0.0065, 5)
-        zksyncAmount = getRandomKeepAmountFloat() + getRandomFloat(0.0045, 0.0065, 5)
+        zksyncAmount = getRandomKeepAmountFloat() + getRandomFloat(0.0035, 0.0055, 5)
     } else { //bomzhAcc
         scrollAmount = getRandomFloat(0.0045, 0.0065, 5);
-        zksyncAmount = getRandomFloat(0.0045, 0.0065, 5);
+        zksyncAmount = getRandomFloat(0.0035, 0.0055, 5);
     }
     let progonType; // 1(bigAm) - 15%, 2(through l2) - 15%, 3 - 60%
     let rnd = getRandomInt(1, 100)
