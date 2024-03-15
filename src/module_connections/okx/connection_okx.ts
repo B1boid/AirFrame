@@ -331,12 +331,8 @@ class OkxConnectionModule implements ConnectionModule {
         globalLogger.connect(wallet.getAddress(), ethereumChain).info(`From sub to master: ${amt}`)
         globalLogger.connect(wallet.getAddress(), ethereumChain).info(`Response: ${JSON.stringify(response)}`)
         if (response === null || response.code !== "0") {
-            globalLogger.connect(wallet.getAddress(), ethereumChain).warn(`Failed transfer from sub to master. Response: ${response}`)
-            if (needToStop()) {
-                return Promise.resolve([false, 0])
-            } else {
-                return this.internalTransfer(wallet, ccy, amt, subAccountName, transferType)
-            }
+            globalLogger.connect(wallet.getAddress(), ethereumChain).warn("Failed transfer from sub to master.")
+            return Promise.resolve([false, 0])
         }
 
         globalLogger.connect(wallet.getAddress(), ethereumChain).done("Successfully transferred assets from sub to master.")
