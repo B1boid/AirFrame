@@ -112,7 +112,7 @@ function generateZkSyncRandomActivities(activitiesNum: number): ZkSyncActivity[]
         }
         if (curActivity === ZkSyncActivity.zkSyncDummyRandomLending) {
             let lendingActivities: ZkSyncActivity[] = [
-                ZkSyncActivity.zkSyncReactFusionCycle, ZkSyncActivity.zkSyncEraLendCycle, ZkSyncActivity.zkSyncZerolendCycle
+                ZkSyncActivity.zkSyncReactFusionCycle, ZkSyncActivity.zkSyncEraLendCycle
             ]
             res.push(getRandomElement(lendingActivities))
         } else if (curActivity === ZkSyncActivity.zkSyncDummyRandomSwapCycle) {
