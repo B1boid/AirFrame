@@ -4,13 +4,15 @@ import {buildZkSyncMains} from "./zksync_mains_builder";
 import {buildZkSyncAnother} from "./zksync_another_builder";
 import {getActiveAddresses} from "../utils/utils";
 import {buildMegaladona} from "./mega_builder";
+import {buildExitZksync} from "./exit_zksync_builder";
 
 export enum Strategy {
     TestMode = "TestMode",
     ZkSyncBasic = "ZkSyncBasic", //@old
     ZkSyncMains = "ZkSyncMains", // without bridging for main accounts with balance
     ZkSyncAnother = "ZkSyncAnother", // classic zksync for multi-accounts
-    MegaStrata = "MegaStrata" // 200iq
+    MegaStrata = "MegaStrata", // 200iq
+    ExitZksync = "ExitZksync"
 }
 
 export class Builder {
@@ -25,6 +27,8 @@ export class Builder {
                 return await buildZkSyncAnother(getActiveAddresses())
             case Strategy.MegaStrata:
                 return await buildMegaladona()
+            case Strategy.ExitZksync:
+                return await buildExitZksync()
             default:
                 return []
         }

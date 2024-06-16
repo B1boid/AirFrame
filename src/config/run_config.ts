@@ -53,3 +53,11 @@ export const MEGA_CONFIG: RunConfig = {
     waitBetweenTxs: {min: 30, max: 15 * 60},
     waitBetweenModules: {min: 0, max: 30 * 60}
 }
+
+export const ZK_EXIT_CONFIG: RunConfig = {
+    strategy: Strategy.ExitZksync,
+    threads: 2,
+    waitInitial: {min: 0, max: 60 * 60},
+    waitBetweenTxs: {min: 30, max: 60 * 60},
+    waitBetweenModules: {min: 0, max: 120 * 60}
+}

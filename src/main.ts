@@ -16,7 +16,7 @@ import {WalletActions} from "./classes/actions";
 import {
     MAINS_ZKSYNC_CONFIG, MEGA_CONFIG,
     RunConfig,
-    TEST_CONFIG,
+    TEST_CONFIG, ZK_EXIT_CONFIG,
     ZKSYNC_ANOTHER_CONFIG,
     ZKSYNC_BASIC_CONFIG
 } from "./config/run_config";
@@ -96,7 +96,7 @@ async function doTask(password: string, passwordOkx: string, walletActions: Wall
 
 
 export async function main(accsPassword : string | undefined = undefined, okxPassword: string | undefined = undefined){
-    const runConfig: RunConfig = MEGA_CONFIG
+    const runConfig: RunConfig = ZK_EXIT_CONFIG
 
     const threads: number = runConfig.threads
     const strategy: Strategy = runConfig.strategy
