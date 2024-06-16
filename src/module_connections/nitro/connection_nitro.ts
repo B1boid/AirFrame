@@ -62,7 +62,7 @@ class NitroConnectionModule implements ConnectionModule {
 
         const feeData = await getFeeData(provider, chainFrom)
         if (amount == -1) {
-            bigAmount = bigAmount - BigInt(txDataRawEstimate.txn.gasLimit) * (feeData.maxFeePerGas ?? DEFAULT_GAS_PRICE) // в эстимейте есть газлимит, но он какой-то лажовый
+            bigAmount = bigAmount - (BigInt(txDataRawEstimate.txn.gasLimit ) + BigInt(60000)) * (feeData.maxFeePerGas ?? DEFAULT_GAS_PRICE) // в эстимейте есть газлимит, но он какой-то лажовый
         }
         const quote = await this.getQuote(bigAmount, chainFrom, chainTo)
         quote["senderAddress"] = wallet.getAddress()

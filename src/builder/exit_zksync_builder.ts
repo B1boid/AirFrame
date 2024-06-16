@@ -110,7 +110,7 @@ function generateExit(accInfo: ExtendedFeatures, actions: AnyActions[]): void {
         to: Destination.Scroll,
         asset: Asset.ETH,
         amount: -1,
-        connectionName: (getRandomInt(1, 100) < 50 ? Connections.Orbiter : Connections.Universal)
+        connectionName: (getRandomInt(1, 100) < 33 ? Connections.Orbiter : Connections.Universal)
     }
     actions.push(BRIDGE_ZKSYNC_TO_SCROLL)
 }

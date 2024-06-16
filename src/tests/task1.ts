@@ -162,8 +162,7 @@ const CONNECTION_NITRO_TEST: ConnectionAction = {
     to: Destination.Scroll,
     asset: Asset.ETH,
     amount: -1,
-    connectionName: Connections.Nitro,
-    keepAmount: 0.015
+    connectionName: Connections.Nitro
 }
 
 
@@ -185,7 +184,7 @@ export const WALLETS_ACTIONS_1: WalletActions[] = [
     // {address: "0x750D0B78E16426a42cd9a5485BA3DF70290912C0", actions: ACTIONS_1},
 
     // {address: "0x1Ce3B1D69e3b1C4DE3b0Bc460714fD81aB203d35", actions: ACTIONS_1},
-    {address: "0x087B0aF1a2e03311F159160A8aAC29F72eF17332", actions: ACTIONS_1}
+    {address: "0xC6Bc1875567ee49EeD3a6e0B651189f2cbd57e81", actions: ACTIONS_1}
 ]
 
 
