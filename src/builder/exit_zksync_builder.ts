@@ -1,26 +1,10 @@
 import {AnyActions, ConnectionAction, ModuleActions, Randomness, WalletActions} from "../classes/actions";
-import {getAccBalance, getTxCount, hasInteractionWithEthContract} from "./features";
-import {
-    arbitrumChain,
-    Blockchains,
-    Destination,
-    ethereumChain,
-    optimismChain,
-    scrollChain,
-    zkSyncChain
-} from "../config/chains";
+import {getAccBalance} from "./features";
+import {Blockchains, Destination, scrollChain, zkSyncChain} from "../config/chains";
 import {Asset} from "../config/tokens";
 import {Connections} from "../module_connections/connection_modules";
-import {
-    getActiveAddressesWithLabels,
-    getMedian,
-    getRandomElement,
-    getRandomFloat,
-    getRandomInt,
-    getRandomKeepAmountFloat,
-    shuffleArray
-} from "../utils/utils";
-import {ArbActivity, OptimismActivity, ScrollActivity, ZkSyncActivity} from "../module_blockchains/blockchain_modules";
+import {getActiveAddressesWithLabels, getRandomElement, getRandomInt, shuffleArray} from "../utils/utils";
+import {ScrollActivity} from "../module_blockchains/blockchain_modules";
 import {globalLogger} from "../utils/logger";
 import {ethers} from "ethers-new";
 
@@ -117,7 +101,8 @@ function generateExit(accInfo: ExtendedFeatures, actions: AnyActions[]): void {
 
 function generateScroll(accInfo: ExtendedFeatures, actions: AnyActions[]): void {
     let isBigBalance = (accInfo.scrollBalance > ethers.parseEther("0.1"));
-    let scroll_activities: ScrollActivity[] = generateScrollActivities(getRandomInt(2, 3), isBigBalance)
+    let scroll_activities: ScrollActivity[] = generateScrollActivities(getRandomInt(0, 2), isBigBalance)
+    scroll_activities.push(ScrollActivity.scrollAaveFull)
 
     const SCROLL_ACTIONS: ModuleActions = {
         chainName: Blockchains.Scroll,
@@ -132,13 +117,13 @@ function generateScrollActivities(activitiesNum: number, bigBalance: boolean = f
         ScrollActivity.scrollDmail,
         ScrollActivity.scrollRandomStuff,
         ScrollActivity.scrollEmptyRouter,
-        ScrollActivity.scrollDummyLendingCycle,
+        // ScrollActivity.scrollDummyLendingCycle,
         ScrollActivity.scrollDummySwapCycle,
-        ScrollActivity.scrollCreateSafe
+        // ScrollActivity.scrollCreateSafe
     ]
     if (bigBalance){
-        availableActivities.push(ScrollActivity.scrollDummyLendingCycle)
-        availableActivities.push(ScrollActivity.scrollDummyLendingCycle)
+        // availableActivities.push(ScrollActivity.scrollDummyLendingCycle)
+        // availableActivities.push(ScrollActivity.scrollDummyLendingCycle)
         availableActivities.push(ScrollActivity.scrollDummySwapCycle)
         availableActivities.push(ScrollActivity.scrollDummySwapCycle)
         availableActivities.push(ScrollActivity.scrollDummySwapCycle)

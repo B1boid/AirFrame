@@ -236,6 +236,28 @@ export async function scrollDmail_send(wallet: WalletI): Promise<TxInteraction[]
     }
 }
 
+export async function scrollAaveFull_deposit(wallet: WalletI): Promise<TxInteraction[]> {
+    try {
+        let balancePercent = [70, 85]
+        const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+        let depoContract = new ethers.Contract(contracts.aaveDepo, aave, provider)
+        let data: string = depoContract.interface.encodeFunctionData("depositETH", [contracts.aavePool, wallet.getAddress(), 0])
+        let tokenBalance: bigint = await provider.getBalance(wallet.getAddress())
+        tokenBalance = getRandomizedPercent(tokenBalance, balancePercent[0], balancePercent[1])
+        return [{
+            to: contracts.aaveDepo,
+            data: data,
+            value: tokenBalance.toString(),
+            stoppable: false,
+            confirmations: 1,
+            name: "scrollAaveFull_deposit"
+        }]
+    } catch (e) {
+        globalLogger.connect(wallet.getAddress(), chain).warn(`scrollAaveFull_deposit failed: ${e}`)
+        return []
+    }
+}
+
 export async function scrollAaveCycle_deposit(wallet: WalletI): Promise<TxInteraction[]> {
     try {
         let balancePercent = [10, 25]

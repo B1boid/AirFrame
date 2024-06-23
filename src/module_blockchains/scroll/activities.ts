@@ -2,7 +2,7 @@ import {Activity} from "../../classes/module";
 import {ScrollActivity} from "../blockchain_modules";
 import {
     scrollAaveCycle_deposit,
-    scrollAaveCycle_withdraw,
+    scrollAaveCycle_withdraw, scrollAaveFull_deposit,
     scrollCreateSafe_do,
     scrollDeployAndInteract_deploy,
     scrollDeployAndInteract_interact,
@@ -108,6 +108,13 @@ export const scrollAaveCycle: Activity = {
     txs: [
         scrollAaveCycle_deposit,
         scrollAaveCycle_withdraw
+    ]
+}
+
+export const scrollAaveFull: Activity = {
+    name: ScrollActivity.scrollAaveFull,
+    txs: [
+        scrollAaveFull_deposit
     ]
 }
 
