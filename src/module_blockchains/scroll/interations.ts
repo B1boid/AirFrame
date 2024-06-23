@@ -77,7 +77,13 @@ export async function scrollWrapUnwrap_unwrap(wallet: WalletI): Promise<TxIntera
 export async function scrollEmptyRouter_do(wallet: WalletI): Promise<TxInteraction[]> {
     try {
         const provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
-        let tokenContract = new ethers.Contract(contracts.iziRouter, allAbi, provider)
+        let chance = getRandomInt(1, 10)
+        let tokenContract
+        if (chance > 5){
+            tokenContract = new ethers.Contract(contracts.iziRouter, allAbi, provider)
+        } else {
+            tokenContract = new ethers.Contract(contracts.nuriRouter, allAbi, provider)
+        }
         let data: string = tokenContract.interface.encodeFunctionData("multicall", [[]])
         return [{
             to: contracts.iziRouter,

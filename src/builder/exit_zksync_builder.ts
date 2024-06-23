@@ -101,7 +101,7 @@ function generateExit(accInfo: ExtendedFeatures, actions: AnyActions[]): void {
 
 function generateScroll(accInfo: ExtendedFeatures, actions: AnyActions[]): void {
     let isBigBalance = (accInfo.scrollBalance > ethers.parseEther("0.1"));
-    let scroll_activities: ScrollActivity[] = generateScrollActivities(getRandomInt(0, 2), isBigBalance)
+    let scroll_activities: ScrollActivity[] = generateScrollActivities(getRandomInt(0, 1), isBigBalance)
     scroll_activities.push(ScrollActivity.scrollAaveFull)
 
     const SCROLL_ACTIONS: ModuleActions = {
@@ -114,7 +114,7 @@ function generateScroll(accInfo: ExtendedFeatures, actions: AnyActions[]): void 
 
 function generateScrollActivities(activitiesNum: number, bigBalance: boolean = false): ScrollActivity[] {
     let availableActivities: ScrollActivity[] = [
-        ScrollActivity.scrollDmail,
+        // ScrollActivity.scrollDmail,
         ScrollActivity.scrollRandomStuff,
         ScrollActivity.scrollEmptyRouter,
         // ScrollActivity.scrollDummyLendingCycle,
