@@ -104,7 +104,8 @@ export const enum ScrollActivity {
     scrollDummyLendingCycle = "scrollDummyLendingCycle",
     scrollDummySwapCycle = "scrollDummySwapCycle",
     scrollSimpleSwap = "scrollSimpleSwap",
-    scrollAaveFull = "scrollAaveFull"
+    scrollAaveFull = "scrollAaveFull",
+    scrollLayerbankFull = "scrollLayerbankFull"
 }
 
 export const enum LineaActivity {

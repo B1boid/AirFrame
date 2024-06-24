@@ -9,7 +9,7 @@ import {
     scrollDmail_send,
     scrollEmptyRouter_do,
     scrollLayerbankCycle_supply,
-    scrollLayerbankCycle_withdraw,
+    scrollLayerbankCycle_withdraw, scrollLayerbankFull_deposit,
     scrollOffMint_mint,
     scrollRandomApprove_approve,
     scrollRandomStuff_do, scrollSimpleSwap_do,
@@ -115,6 +115,13 @@ export const scrollAaveFull: Activity = {
     name: ScrollActivity.scrollAaveFull,
     txs: [
         scrollAaveFull_deposit
+    ]
+}
+
+export const scrollLayerbankFull: Activity = {
+    name: ScrollActivity.scrollLayerbankFull,
+    txs: [
+        scrollLayerbankFull_deposit
     ]
 }
 

@@ -100,9 +100,10 @@ function generateExit(accInfo: ExtendedFeatures, actions: AnyActions[]): void {
 }
 
 function generateScroll(accInfo: ExtendedFeatures, actions: AnyActions[]): void {
-    let isBigBalance = (accInfo.scrollBalance > ethers.parseEther("0.1"));
+    let isBigBalance = (accInfo.scrollBalance > ethers.parseEther("0.2"));
     let scroll_activities: ScrollActivity[] = generateScrollActivities(getRandomInt(0, 1), isBigBalance)
-    scroll_activities.push(ScrollActivity.scrollAaveFull)
+    // scroll_activities.push(ScrollActivity.scrollAaveFull)
+    scroll_activities.push(ScrollActivity.scrollLayerbankFull)
 
     const SCROLL_ACTIONS: ModuleActions = {
         chainName: Blockchains.Scroll,

@@ -4,7 +4,7 @@ import {
     scrollAaveCycle, scrollAaveFull, scrollCreateSafe,
     scrollDeployAndInteract,
     scrollDmail,
-    scrollEmptyRouter, scrollInteractWithContract, scrollLayerbankCycle, scrollOffMint,
+    scrollEmptyRouter, scrollInteractWithContract, scrollLayerbankCycle, scrollLayerbankFull, scrollOffMint,
     scrollRandomApprove,
     scrollRandomStuff, scrollSimpleSwap,
     scrollSwapCycleNativeToUsdc, scrollSwapCycleNativeToWsteth,
@@ -25,6 +25,7 @@ export const moduleScroll: ScrollModule = new ScrollModule(
     [
         scrollRandomApprove, scrollRandomStuff, scrollEmptyRouter, scrollSwapCycleNativeToUsdc, scrollWrapUnwrap,
         scrollDmail, scrollDeployAndInteract, scrollOffMint, scrollSwapCycleNativeToWsteth, scrollAaveCycle,
-        scrollLayerbankCycle, scrollCreateSafe, scrollInteractWithContract, scrollSimpleSwap, scrollAaveFull
+        scrollLayerbankCycle, scrollCreateSafe, scrollInteractWithContract, scrollSimpleSwap, scrollAaveFull,
+        scrollLayerbankFull
     ]
 )
