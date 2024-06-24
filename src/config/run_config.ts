@@ -57,7 +57,7 @@ export const MEGA_CONFIG: RunConfig = {
 export const ZK_EXIT_CONFIG: RunConfig = {
     strategy: Strategy.ExitZksync,
     threads: 2,
-    waitInitial: {min: 0, max: 30 * 60},
-    waitBetweenTxs: {min: 30, max: 45 * 60},
+    waitInitial: {min: 0, max: 60 * 60},
+    waitBetweenTxs: {min: 30, max: 60 * 60},
     waitBetweenModules: {min: 0, max: 60 * 60}
 }
