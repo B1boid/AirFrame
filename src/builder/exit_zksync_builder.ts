@@ -18,7 +18,7 @@ interface ExtendedFeatures {
 const MIN_BALANCE_FOR_EXIT = ethers.parseEther("0.0025")
 
 
-export async function buildExitZksync(): Promise<WalletActions[]> {
+export async function buildExitZksync(need_scroll_actions: boolean): Promise<WalletActions[]> {
     let activeAddresses: string[][] = getActiveAddressesWithLabels()
     let accountInfos: ExtendedFeatures[] = []
     for (let [address, label] of activeAddresses){
@@ -31,7 +31,7 @@ export async function buildExitZksync(): Promise<WalletActions[]> {
     shuffleArray(accountInfos)
     let res: WalletActions[] = []
     for (let accInfo of accountInfos) {
-        res.push(generateActions(accInfo))
+        res.push(generateActions(accInfo, need_scroll_actions))
         console.log(res[res.length - 1])
     }
     printStats(accountInfos)
@@ -69,12 +69,12 @@ function printStats(accs: ExtendedFeatures[]){
     globalLogger.done(`\nTotal accounts: ${accs.length}\nAccounts with zk-balance: ${accsWithBalance}`)
 }
 
-function generateActions(accInfo: ExtendedFeatures): WalletActions {
+function generateActions(accInfo: ExtendedFeatures, need_scroll_actions: boolean): WalletActions {
     let actions: AnyActions[] = []
     if (accInfo.zkBalance >= MIN_BALANCE_FOR_EXIT){
         generateExit(accInfo, actions)
         generateScroll(accInfo, actions)
-    } else {
+    } else if (need_scroll_actions) {
         let min_balance_for_scroll = ethers.parseEther("0.001")
         if (accInfo.scrollBalance >= min_balance_for_scroll){
             generateScroll(accInfo, actions)

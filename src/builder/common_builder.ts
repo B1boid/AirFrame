@@ -12,7 +12,8 @@ export enum Strategy {
     ZkSyncMains = "ZkSyncMains", // without bridging for main accounts with balance
     ZkSyncAnother = "ZkSyncAnother", // classic zksync for multi-accounts
     MegaStrata = "MegaStrata", // 200iq
-    ExitZksync = "ExitZksync"
+    ExitZksync = "ExitZksync",
+    ExitZksyncNoScrollWithoutBridge = "ExitZksyncNoScrollWithoutBridge"
 }
 
 export class Builder {
@@ -28,7 +29,9 @@ export class Builder {
             case Strategy.MegaStrata:
                 return await buildMegaladona()
             case Strategy.ExitZksync:
-                return await buildExitZksync()
+                return await buildExitZksync(true)
+            case Strategy.ExitZksyncNoScrollWithoutBridge:
+                return await buildExitZksync(false)
             default:
                 return []
         }
