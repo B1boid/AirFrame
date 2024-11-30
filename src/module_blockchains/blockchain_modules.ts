@@ -8,9 +8,8 @@ import {moduleOptimism} from "./optimism/optimism";
 import {moduleArbitrum} from "./arbitrum/arbitrum";
 import {moduleBsc} from "./bsc/bsc";
 import {moduleScroll} from "./scroll/scroll";
-import {scrollAaveFull, scrollCreateSafe, scrollSwapCycleNativeToWsteth, scrollWrapUnwrap} from "./scroll/activities";
 import {moduleLinea} from "./linea/linea";
-import {zkSyncSwapCycleNativeToUsdcWithPaymaster, zkSyncZerolendCycle} from "./zksync/activities";
+import {moduleBase} from "./base/base";
 
 
 export const enum PolygonActivity {
@@ -105,14 +104,20 @@ export const enum ScrollActivity {
     scrollDummySwapCycle = "scrollDummySwapCycle",
     scrollSimpleSwap = "scrollSimpleSwap",
     scrollAaveFull = "scrollAaveFull",
-    scrollLayerbankFull = "scrollLayerbankFull"
+    scrollLayerbankFull = "scrollLayerbankFull",
+    scrollAaveWithdraw = "scrollAaveWithdraw",
+    scrollLayerbankWithdraw = "scrollLayerbankWithdraw",
 }
 
 export const enum LineaActivity {
     lineaSwapEthToWst = "lineaSwapEthToWst"
 }
 
-export type ActivityTag = PolygonActivity | ZkSyncActivity | EthereumActivity | OptimismActivity | BscActivity | ArbActivity | ScrollActivity | LineaActivity
+export const enum BaseActivity {
+    wrapUnwrap = "wrapUnwrap"
+}
+
+export type ActivityTag = PolygonActivity | ZkSyncActivity | EthereumActivity | OptimismActivity | BscActivity | ArbActivity | ScrollActivity | LineaActivity | BaseActivity
 
 export const blockchainModules: EnumDictionary<Blockchains, BlockchainModule> = {
     [Blockchains.ZkSync]: moduleZkSync,
@@ -122,7 +127,8 @@ export const blockchainModules: EnumDictionary<Blockchains, BlockchainModule> = 
     [Blockchains.Arbitrum]: moduleArbitrum,
     [Blockchains.Bsc]: moduleBsc,
     [Blockchains.Scroll]: moduleScroll,
-    [Blockchains.Linea]: moduleLinea
+    [Blockchains.Linea]: moduleLinea,
+    [Blockchains.Base]: moduleBase
 }
 
 export const destToChain = (destination: Destination): Chain => {

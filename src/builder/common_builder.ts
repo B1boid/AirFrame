@@ -5,6 +5,7 @@ import {buildZkSyncAnother} from "./zksync_another_builder";
 import {getActiveAddresses} from "../utils/utils";
 import {buildMegaladona} from "./mega_builder";
 import {buildExitZksync} from "./exit_zksync_builder";
+import {buildExitScrollToBase} from "./exit_scroll_builder";
 
 export enum Strategy {
     TestMode = "TestMode",
@@ -13,7 +14,8 @@ export enum Strategy {
     ZkSyncAnother = "ZkSyncAnother", // classic zksync for multi-accounts
     MegaStrata = "MegaStrata", // 200iq
     ExitZksync = "ExitZksync",
-    ExitZksyncNoScrollWithoutBridge = "ExitZksyncNoScrollWithoutBridge"
+    ExitZksyncNoScrollWithoutBridge = "ExitZksyncNoScrollWithoutBridge",
+    ExitScrollToBase = "ExitScrollToBase"
 }
 
 export class Builder {
@@ -32,6 +34,8 @@ export class Builder {
                 return await buildExitZksync(true)
             case Strategy.ExitZksyncNoScrollWithoutBridge:
                 return await buildExitZksync(false)
+            case Strategy.ExitScrollToBase:
+                return await buildExitScrollToBase()
             default:
                 return []
         }

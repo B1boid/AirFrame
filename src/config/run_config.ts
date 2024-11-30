@@ -62,6 +62,14 @@ export const ZK_EXIT_CONFIG: RunConfig = {
     waitBetweenModules: {min: 0, max: 60 * 60}
 }
 
+export const EXIT_SCROLL_TO_BASE: RunConfig = {
+    strategy: Strategy.ExitScrollToBase,
+    threads: 2,
+    waitInitial: {min: 0, max: 60 * 60},
+    waitBetweenTxs: {min: 30, max: 60 * 60},
+    waitBetweenModules: {min: 0, max: 60 * 60}
+}
+
 export const ZK_EXIT_CONFIG_NO_SCROLL: RunConfig = {
     strategy: Strategy.ExitZksyncNoScrollWithoutBridge,
     threads: 2,

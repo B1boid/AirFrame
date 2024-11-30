@@ -3,6 +3,7 @@ import {ethers} from "ethers-new";
 import axios from "axios";
 import {sleep} from "../utils/utils";
 import {globalLogger} from "../utils/logger";
+import erc20 from "../abi/erc20.json";
 
 
 export async function getTxCount(address: string, chain: Chain, retries: number = 1): Promise<number | null> {
@@ -28,7 +29,19 @@ export async function getAccBalance(address: string, chain: Chain, retries: numb
         await sleep(1)
         return await getAccBalance(address, chain, retries - 1)
     }
+}
 
+export async function getTokenBalance(address: string, chain: Chain, token: string, retries: number = 1): Promise<bigint | null> {
+    if (retries < 0) return null
+    try {
+        let provider = new ethers.JsonRpcProvider(chain.nodeUrl, chain.chainId)
+        let tokenContract = new ethers.Contract(token, erc20, provider)
+        return await tokenContract.balanceOf(address)
+    } catch (e) {
+        globalLogger.warn(`Failed to get tx count for ${address} on ${chain.title}, try: ${retries}, error: ${e}`)
+        await sleep(1)
+        return await getAccBalance(address, chain, retries - 1)
+    }
 }
 
 export async function hasInteractionWithEthContract(user: string, contract: string, retries: number = 1): Promise<boolean | null>{

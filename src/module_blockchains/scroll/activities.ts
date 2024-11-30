@@ -140,4 +140,17 @@ export const scrollCreateSafe: Activity = {
     ]
 }
 
+export const scrollAaveWithdraw: Activity = {
+    name: ScrollActivity.scrollAaveWithdraw,
+    txs: [
+        scrollAaveCycle_withdraw
+    ]
+}
+
+export const scrollLayerbankWithdraw: Activity = {
+    name: ScrollActivity.scrollLayerbankWithdraw,
+    txs: [
+        scrollLayerbankCycle_withdraw
+    ]
+}
 

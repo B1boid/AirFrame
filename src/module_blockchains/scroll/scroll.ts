@@ -1,13 +1,23 @@
 import {Chain, scrollChain} from "../../config/chains";
 import {Activity, BlockchainModule} from "../../classes/module";
 import {
-    scrollAaveCycle, scrollAaveFull, scrollCreateSafe,
+    scrollAaveCycle,
+    scrollAaveFull,
+    scrollAaveWithdraw,
+    scrollCreateSafe,
     scrollDeployAndInteract,
     scrollDmail,
-    scrollEmptyRouter, scrollInteractWithContract, scrollLayerbankCycle, scrollLayerbankFull, scrollOffMint,
+    scrollEmptyRouter,
+    scrollInteractWithContract,
+    scrollLayerbankCycle,
+    scrollLayerbankFull,
+    scrollLayerbankWithdraw,
+    scrollOffMint,
     scrollRandomApprove,
-    scrollRandomStuff, scrollSimpleSwap,
-    scrollSwapCycleNativeToUsdc, scrollSwapCycleNativeToWsteth,
+    scrollRandomStuff,
+    scrollSimpleSwap,
+    scrollSwapCycleNativeToUsdc,
+    scrollSwapCycleNativeToWsteth,
     scrollWrapUnwrap
 } from "./activities";
 
@@ -26,6 +36,6 @@ export const moduleScroll: ScrollModule = new ScrollModule(
         scrollRandomApprove, scrollRandomStuff, scrollEmptyRouter, scrollSwapCycleNativeToUsdc, scrollWrapUnwrap,
         scrollDmail, scrollDeployAndInteract, scrollOffMint, scrollSwapCycleNativeToWsteth, scrollAaveCycle,
         scrollLayerbankCycle, scrollCreateSafe, scrollInteractWithContract, scrollSimpleSwap, scrollAaveFull,
-        scrollLayerbankFull
+        scrollLayerbankFull, scrollAaveWithdraw, scrollLayerbankWithdraw
     ]
 )

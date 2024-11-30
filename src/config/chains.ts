@@ -19,7 +19,8 @@ export enum Blockchains {
     Arbitrum = "Arbitrum",
     Bsc = "Bsc",
     Scroll = "Scroll",
-    Linea = "Linea"
+    Linea = "Linea",
+    Base = "Base"
 }
 
 enum Exchanges {
@@ -88,7 +89,7 @@ export const arbitrumChain: Chain = {
 export const scrollChain: Chain = {
     title: Blockchains.Scroll,
     chainId: 534352,
-    nodeUrl: `${process.env.RPC_SCROLL}`,
+    nodeUrl: "https://scroll.blockpi.network/v1/rpc/395f9c1e31a38063cdc8bdc919f2f9387865f758",
     symbol: "ETH",
     extraGasLimit: 50000,
     explorerUrl: "https://scrollscan.com",
@@ -116,4 +117,15 @@ export const lineaChain: Chain = {
     explorerUrl: "https://lineascan.build",
     orbiterCode: -1,
     nitroConnectionId: "59144"
+}
+
+export const baseChain: Chain = {
+    title: Blockchains.Base,
+    chainId: 8453,
+    nodeUrl: "https://base.blockpi.network/v1/rpc/69f0e1f00f5ef09d76b352676e931cbbe6c28e10",
+    symbol: "ETH",
+    extraGasLimit: 0,
+    explorerUrl: "https://basescan.org",
+    orbiterCode: 9021,
+    nitroConnectionId: "8453"
 }

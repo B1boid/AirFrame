@@ -14,6 +14,7 @@ import {WALLETS_ACTIONS_1} from "./tests/task1";
 import {Builder, Strategy} from "./builder/common_builder";
 import {WalletActions} from "./classes/actions";
 import {
+    EXIT_SCROLL_TO_BASE,
     MAINS_ZKSYNC_CONFIG, MEGA_CONFIG,
     RunConfig,
     TEST_CONFIG, ZK_EXIT_CONFIG,
@@ -96,17 +97,17 @@ async function doTask(password: string, passwordOkx: string, walletActions: Wall
 
 
 export async function main(accsPassword : string | undefined = undefined, okxPassword: string | undefined = undefined){
-    const runConfig: RunConfig = ZK_EXIT_CONFIG
+    const runConfig: RunConfig = EXIT_SCROLL_TO_BASE
 
     const threads: number = runConfig.threads
     const strategy: Strategy = runConfig.strategy
 
     const password: string = accsPassword ? accsPassword : await prompt('Accs password: ')
     const passwordOkx: string = okxPassword ? okxPassword : await prompt('Okx password: ')
-    pingSubs(passwordOkx).catch(e => {
-        globalLogger.warn("Failed to ping subaccs")
-        console.log(e)
-    })
+    // pingSubs(passwordOkx).catch(e => {
+    //     globalLogger.warn("Failed to ping subaccs")
+    //     console.log(e)
+    // })
 
     let actions: WalletActions[]
     if (runConfig.strategy === Strategy.TestMode){
@@ -114,8 +115,7 @@ export async function main(accsPassword : string | undefined = undefined, okxPas
     } else {
         actions = await Builder.build(strategy)
     }
-
-
+    
     const errors: Error[] = []
     const { results} = await PromisePool
         .for(actions)
