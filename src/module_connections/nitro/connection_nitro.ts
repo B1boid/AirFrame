@@ -108,7 +108,7 @@ class NitroConnectionModule implements ConnectionModule {
             "amount": amount,
             "fromTokenChainId": fromChain.nitroConnectionId,
             "toTokenChainId": toChain.nitroConnectionId,
-            "partnerId": 0
+            "partnerId": 1
         }
 
         const tx_data = await axios.get(QUOTE_ENDPOINT, { params: params })

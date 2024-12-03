@@ -11,8 +11,8 @@ export const allGases : EnumDictionary<Blockchains, number> = {
     [Blockchains.Arbitrum]: 1000,
     [Blockchains.Optimism]: 1000,
     [Blockchains.Bsc]: 1000,
-    [Blockchains.Scroll]: 27, // mainnet fee
-    [Blockchains.Linea]: 30, // mainnet fee
+    [Blockchains.Scroll]: 50, // mainnet fee
+    [Blockchains.Linea]: 50, // mainnet fee
     [Blockchains.Base]: 1000,
 }
 

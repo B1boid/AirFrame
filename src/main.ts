@@ -38,8 +38,8 @@ async function doTask(password: string, passwordOkx: string, walletActions: Wall
     const address = walletActions.address
     const addressInfo: AddressInfo = getAddressInfo(password, address)
     const wallet: WalletI = new MyWallet(addressInfo,
-        getOkxCredentials(addressInfo, passwordOkx),
-        getOkxCredentialsForSub(addressInfo, passwordOkx)
+        null, //getOkxCredentials(addressInfo, passwordOkx),
+        null, //getOkxCredentialsForSub(addressInfo, passwordOkx)
     )
     let actionsRes: boolean = true
     let firstSentAmount : number = -1
