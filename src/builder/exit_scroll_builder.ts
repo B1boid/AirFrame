@@ -85,7 +85,7 @@ function generateActions(accInfo: ExtendedFeatures): WalletActions {
             to: Destination.Base,
             asset: Asset.ETH,
             amount: -1,
-            connectionName: (getRandomInt(1, 100) < 33 ? Connections.Orbiter : Connections.Universal)
+            connectionName: (getRandomInt(1, 100) < 0 ? Connections.Orbiter : Connections.Universal)
         }
         actions.push(BRIDGE_SCROLL_TO_BASE)
     }
