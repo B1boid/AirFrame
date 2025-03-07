@@ -97,7 +97,7 @@ async function doTask(password: string, passwordOkx: string, walletActions: Wall
 
 
 export async function main(accsPassword : string | undefined = undefined, okxPassword: string | undefined = undefined){
-    const runConfig: RunConfig = EXIT_SCROLL_TO_BASE
+    const runConfig: RunConfig = TEST_CONFIG
 
     const threads: number = runConfig.threads
     const strategy: Strategy = runConfig.strategy

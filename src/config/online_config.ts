@@ -7,7 +7,7 @@ import {globalLogger} from "../utils/logger";
 export const allGases : EnumDictionary<Blockchains, number> = {
     [Blockchains.Ethereum]: 24,
     [Blockchains.Polygon]: 900,
-    [Blockchains.ZkSync]: 80, // mainnet fee
+    [Blockchains.ZkSync]: 50, // mainnet fee
     [Blockchains.Arbitrum]: 1000,
     [Blockchains.Optimism]: 1000,
     [Blockchains.Bsc]: 1000,

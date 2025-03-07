@@ -34,7 +34,7 @@ export const Destination = {...Blockchains, ...Exchanges};
 export const zkSyncChain: Chain = {
   title: Blockchains.ZkSync,
   chainId: 324,
-  nodeUrl: `${process.env.RPC_ZK}`,
+  nodeUrl: `${process.env.RPC_324}`,
   symbol: "ETH",
   extraGasLimit: 100000,
   explorerUrl: "https://explorer.zksync.io",
@@ -45,7 +45,7 @@ export const zkSyncChain: Chain = {
 export const polygonChain: Chain = {
   title: Blockchains.Polygon,
   chainId: 137,
-  nodeUrl: `https://polygon-mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
+  nodeUrl: `${process.env.RPC_137}`,
   symbol: "MATIC",
   extraGasLimit: 100000,
   explorerUrl: "https://polygonscan.com",
@@ -56,7 +56,7 @@ export const polygonChain: Chain = {
 export const ethereumChain: Chain = {
     title: Blockchains.Ethereum,
     chainId: 1,
-    nodeUrl: `https://mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
+    nodeUrl: `${process.env.RPC_1}`,
     symbol: "ETH",
     extraGasLimit: 100000,
     explorerUrl: "https://etherscan.io",
@@ -67,7 +67,7 @@ export const ethereumChain: Chain = {
 export const optimismChain: Chain = {
     title: Blockchains.Optimism,
     chainId: 10,
-    nodeUrl: `${process.env.RPC_OPT}`,
+    nodeUrl: `${process.env.RPC_10}`,
     symbol: "ETH",
     extraGasLimit: 0,
     explorerUrl: "https://optimistic.etherscan.io",
@@ -78,7 +78,7 @@ export const optimismChain: Chain = {
 export const arbitrumChain: Chain = {
     title: Blockchains.Arbitrum,
     chainId: 42161,
-    nodeUrl: `${process.env.RPC_ARB}`,
+    nodeUrl: `${process.env.RPC_42161}`,
     symbol: "ETH",
     extraGasLimit: 0,
     explorerUrl: "https://arbiscan.io",
@@ -89,7 +89,7 @@ export const arbitrumChain: Chain = {
 export const scrollChain: Chain = {
     title: Blockchains.Scroll,
     chainId: 534352,
-    nodeUrl: "https://scroll.blockpi.network/v1/rpc/395f9c1e31a38063cdc8bdc919f2f9387865f758",
+    nodeUrl: `${process.env.RPC_534352}`,
     symbol: "ETH",
     extraGasLimit: 50000,
     explorerUrl: "https://scrollscan.com",
@@ -100,7 +100,7 @@ export const scrollChain: Chain = {
 export const bscChain: Chain = {
     title: Blockchains.Bsc,
     chainId: 56,
-    nodeUrl: "https://rpc.ankr.com/bsc",
+    nodeUrl: `${process.env.RPC_56}`,
     symbol: "BNB",
     extraGasLimit: 0,
     explorerUrl: "https://bscscan.com",
@@ -111,7 +111,7 @@ export const bscChain: Chain = {
 export const lineaChain: Chain = {
     title: Blockchains.Linea,
     chainId: 59144,
-    nodeUrl: "https://1rpc.io/linea",
+    nodeUrl: `${process.env.RPC_59144}`,
     symbol: "ETH",
     extraGasLimit: 0,
     explorerUrl: "https://lineascan.build",
@@ -122,7 +122,7 @@ export const lineaChain: Chain = {
 export const baseChain: Chain = {
     title: Blockchains.Base,
     chainId: 8453,
-    nodeUrl: "https://base.blockpi.network/v1/rpc/69f0e1f00f5ef09d76b352676e931cbbe6c28e10",
+    nodeUrl: "https://base-rpc.publicnode.com",
     symbol: "ETH",
     extraGasLimit: 0,
     explorerUrl: "https://basescan.org",

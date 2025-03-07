@@ -4,6 +4,7 @@ import {Destination} from "../../config/chains";
 
 class LzConnectionModule implements ConnectionModule {
     async sendAsset(wallet: WalletI, from: Destination, to: Destination, asset: string, amount: number, keepAmount: number): Promise<[boolean, number]> {
+        // todo: implement
         return Promise.resolve([false, 0]);
     }
 
